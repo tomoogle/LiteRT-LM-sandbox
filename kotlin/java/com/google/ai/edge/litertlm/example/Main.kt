@@ -15,7 +15,7 @@
  */
 package com.google.ai.edge.litertlm.example
 
-import com.google.ai.edge.litertlm.Content
+import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
     args.getOrNull(0)
       ?: throw IllegalArgumentException("Model path must be provided as the first argument.")
 
-  val engine = Engine(EngineConfig(modelPath = modelPath))
+  val engine = Engine(EngineConfig(modelPath = modelPath, backend = Backend.CPU))
   engine.initialize()
 
   engine.use { engine ->
@@ -50,13 +50,9 @@ fun main(args: Array<String>) {
           userMessage,
           object : MessageCallback {
             override fun onMessage(message: Message) {
-              for (content in message.contents) {
-                if (content is Content.Text) {
-                  print(ANSI_YELLOW)
-                  print(content.text)
-                  print(ANSI_RESET)
-                }
-              }
+              print(ANSI_YELLOW)
+              print(message)
+              print(ANSI_RESET)
             }
 
             override fun onDone() {
