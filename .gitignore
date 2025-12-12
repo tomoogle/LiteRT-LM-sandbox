@@ -1,2 +1,6 @@
 /MODULE.bazel.lock
 /bazel-*
+.bak
+/cmake/build
+/cmake/src
+.bak*
