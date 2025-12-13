@@ -31,8 +31,8 @@ set(LITERT_INSTALL_DIR ${INSTALL_DIR})
 set(LITERT_BUILD_DIR ${BINARY_DIR})      
 
 set(LITERT_INCLUDE_DIR 
-    "$<BUILD_INTERFACE:${LITERT_INSTALL_DIR}/include>"
     "$<BUILD_INTERFACE:${BINARY_DIR}/include>"
+    "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/litert/src/litert_external>"
 )
 
 macro(define_litert_target target_name lib_name lib_subdir)
@@ -49,7 +49,7 @@ define_litert_target(litert_core_model       "liblitert_core_model.a"        "co
 define_litert_target(litert_core_cache       "liblitert_core_cache.a"        "core/cache") 
 define_litert_target(litert_c_api            "liblitert_c_api.a"             "c")
 define_litert_target(litert_c_options        "liblitert_c_options.a"         "c/options")
-define_litert_target(litert_cc_internal      "liblitert_cc_internal.a"       "cc")
+# define_litert_target(litert_cc_internal      "liblitert_cc_internal.a"       "cc")
 define_litert_target(litert_cc_options       "liblitert_cc_options.a"        "cc/options")
 define_litert_target(litert_runtime          "liblitert_runtime.a"           "runtime")
 define_litert_target(litert_logging          "liblitert_logging.a"           "c")
@@ -78,48 +78,38 @@ set(LITERT_BYPASS_TARGETS
   litert_core
   litert_runtime
   litert_core_model
-
-# Abseil Base & Core Utilities
-  absl_base        
-  absl_base_internal
-  absl_check       
-  absl_strerror
-  absl_throw_delegate
-  absl_hash
-  absl_span
+  tensorflow-lite
   
-  # Status, Error, and Synchronization (Fixes Mutex::unlock, Status builders)
-  absl_status      
-  absl_statusor    
-  absl_status_builders
-  absl_status_core
-  absl_synchronization
-  absl_synchronization_core
-
-  # Logging (Fixes Flush, MinLogLevel)
-  absl_log         
-  absl_log_internal_message
-  absl_log_internal_globals
-  absl_log_initialize 
-  absl_log_sink
-
-  # Strings, Numeric, and Containers
-  absl_strings_lib 
-  absl_str_format
-  absl_flat_hash_map
-  absl_random_random
-  
-  # Flags and Parsing (Fixes FlagImpl::ReadOneWord, RegisterCommandLineFlag)
-  absl_flags       
-  absl_flags_internal
-  absl_flags_commandlineflag
-  absl_flags_marshalling 
-  absl_flags_program_name # Critical low-level flag logic
-  absl_flags_registry
+  ${absl_base_targets}
+  ${absl_container_targets}
+  ${absl_debugging_targets}
+  ${absl_flags_targets}
+  ${absl_crc_targets}
+  ${absl_hash_targets}
+  ${absl_log_targets}
+  ${absl_numeric_targets}
+  ${absl_profiling_targets}
+  ${absl_random_targets}
+  ${absl_status_targets}
+  ${absl_strings_targets}
+  ${absl_synchronization_targets}
+  ${absl_time_targets}
 )
 set(LITERT_EXTRACTION_TARGETS "")
 
 
+# Macro to handle the extraction: Now correctly adds dependency to the CUSTOM target
+# macro(extract_target_objects target_name)
+#     get_target_property(ARCHIVE_PATH ${target_name} IMPORTED_LOCATION)
+#     set(EXTRACTION_TARGET_NAME "${target_name}_extract_objects")
+
+#     add_custom_command(
+#         OUTPUT ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
+#         COMMAND ${CMAKE_COMMAND} -E chdir ${LITERT_EXTRACTED_DIR} ar x ${ARCHIVE_PATH}
+#         COMMAND ${CMAKE_COMMAND} -E touch ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
+#         DEPENDS ${target_name}
+#         VERBATIM
+#     )
 # Macro to handle the extraction: Now correctly adds dependency to the CUSTOM target
 macro(extract_target_objects target_name)
     get_target_property(ARCHIVE_PATH ${target_name} IMPORTED_LOCATION)
@@ -129,7 +119,7 @@ macro(extract_target_objects target_name)
         OUTPUT ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
         COMMAND ${CMAKE_COMMAND} -E chdir ${LITERT_EXTRACTED_DIR} ar x ${ARCHIVE_PATH}
         COMMAND ${CMAKE_COMMAND} -E touch ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
-        DEPENDS ${target_name}
+        DEPENDS ${target_name} litert_external
         VERBATIM
     )
     add_custom_target(${EXTRACTION_TARGET_NAME} DEPENDS ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete)
@@ -143,11 +133,9 @@ foreach(target IN LISTS LITERT_BYPASS_TARGETS)
     extract_target_objects(${target})
 endforeach()
 
-# CRITICAL FIX: Ensure the final litert_libs target depends on the extraction custom targets.
 add_dependencies(litert_libs ${LITERT_EXTRACTION_TARGETS})
 
 
-# --- 6. Define the Remaining Archives for Linkage ---
 
 set(LITERT_REMAINING_ARCHIVES)
 file(GLOB_RECURSE ALL_ARCHIVES_PATHS "${LITERT_BUILD_DIR}/**/*.a")
@@ -156,7 +144,9 @@ foreach(archive_path IN LISTS ALL_ARCHIVES_PATHS)
     if(archive_path MATCHES "/liblitert_c_api.a" OR 
        archive_path MATCHES "/liblitert_logging.a" OR 
        archive_path MATCHES "/input.a$" OR
-       archive_path MATCHES "/liblitert_npu_numerics_check.a"
+       archive_path MATCHES "/liblitert_npu_numerics_check.a" OR
+       archive_path MATCHES "/_deps/abseil-cpp-build/" OR
+       archive_path MATCHES "internal"
     )
         # Skip the problematic/redundant archives
     else()
@@ -164,8 +154,6 @@ foreach(archive_path IN LISTS ALL_ARCHIVES_PATHS)
     endif()
 endforeach()
 
-
-# --- 7. The Final Linkage Block (Using the Extracted Objects/Directory) ---
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(litert_libs INTERFACE
@@ -194,3 +182,4 @@ endif()
 
 target_include_directories(litert_libs INTERFACE ${LITERT_INCLUDE_DIR})
 add_dependencies(litert_libs litert_external)
+add_dependencies(litert_libs litert_external-build)

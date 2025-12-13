@@ -32,9 +32,13 @@ absl::StatusOr<std::unique_ptr<SentencePieceTokenizer>>
 SentencePieceTokenizer::CreateFromFile(absl::string_view model_path) {
   auto processor = std::make_unique<sentencepiece::SentencePieceProcessor>();
   auto status = processor->Load(model_path);
-  if (!status.ok()) {
-    return status;
-  }
+if (!status.ok()) {
+    // Manually convert SentencePiece status to Abseil status
+    return absl::Status(
+        static_cast<absl::StatusCode>(status.code()), 
+        status.message()
+    );
+}
   return absl::WrapUnique(new SentencePieceTokenizer(std::move(processor)));
 }
 
@@ -42,9 +46,13 @@ absl::StatusOr<std::unique_ptr<SentencePieceTokenizer>>
 SentencePieceTokenizer::CreateFromBuffer(absl::string_view model_buffer) {
   auto processor = std::make_unique<sentencepiece::SentencePieceProcessor>();
   auto status = processor->LoadFromSerializedProto(model_buffer);
-  if (!status.ok()) {
-    return status;
-  }
+if (!status.ok()) {
+    // Manually convert SentencePiece status to Abseil status
+    return absl::Status(
+        static_cast<absl::StatusCode>(status.code()), 
+        status.message()
+    );
+}
   return absl::WrapUnique(new SentencePieceTokenizer(std::move(processor)));
 }
 
@@ -54,8 +62,12 @@ absl::StatusOr<std::vector<int>> SentencePieceTokenizer::TextToTokenIds(
   std::vector<int> ids;
   auto status = processor_->Encode(text, &ids);
   if (!status.ok()) {
-    return status;
-  }
+    // Manually convert SentencePiece status to Abseil status
+    return absl::Status(
+        static_cast<absl::StatusCode>(status.code()), 
+        status.message()
+    );
+}
   return ids;
 }
 

@@ -286,7 +286,17 @@ absl::Status ReadSectionIntoSPTokenizer(
         absl::StrFormat("Could not read %d bytes from stream.", size));
   }
   absl::string_view buffer_view(buffer.get(), size);
-  return sp_proc->LoadFromSerializedProto(buffer_view);
+// Capture the SentencePiece status first
+  auto sp_status = sp_proc->LoadFromSerializedProto(buffer_view);
+
+  // Check if it failed
+  if (!sp_status.ok()) {
+    // Convert the SP error message into an Abseil InternalError
+    return absl::InternalError(sp_status.ToString());
+  }
+
+  // If we got here, it succeeded. Return a fresh Abseil OK.
+  return absl::OkStatus();
 }
 
 absl::Status ReadSectionIntoBinaryData(const std::string& litertlm_path,

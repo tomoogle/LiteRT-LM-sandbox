@@ -1,0 +1,149 @@
+include(ExternalProject)
+
+set(PATCH_FILE "${CMAKE_SOURCE_DIR}/cmake/patches/litert_fixes.patch")
+
+
+ExternalProject_Add(
+    litert_external 
+    GIT_REPOSITORY      https://github.com/google-ai-edge/LiteRT.git
+    GIT_TAG             08735bb886df5e3e1294604c61175efbc72c59dd
+    PREFIX              ${CMAKE_CURRENT_BINARY_DIR}/litert
+    SOURCE_SUBDIR       litert
+    
+    PATCH_COMMAND       git apply --ignore-space-change --ignore-whitespace "${PATCH_FILE}" || ${CMAKE_COMMAND} -E echo "Git apply failed (or not needed)..."
+    
+    CMAKE_ARGS          
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> 
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_POLICY_DEFAULT_CMP0169=OLD
+        
+        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DLITERT_DISABLE_KLEIDIAI=ON
+        -DLITERT_BUILD_C_API=ON
+        -DFLATBUFFERS_INSTALL=OFF
+        -DFLATBUFFERS_BUILD_TESTS=OFF
+        -DLITERT_ENABLE_GPU=OFF
+        -DLITERT_ENABLE_NPU=OFF
+)
+
+ExternalProject_Get_Property(litert_external INSTALL_DIR BINARY_DIR)
+set(LITERT_INSTALL_DIR ${INSTALL_DIR})
+set(LITERT_BUILD_DIR ${BINARY_DIR})      # Use this path for finding the static libs
+
+set(LITERT_INCLUDE_DIR 
+    "$<BUILD_INTERFACE:${LITERT_INSTALL_DIR}/include>"
+    "$<BUILD_INTERFACE:${BINARY_DIR}/include>"
+)
+
+# Macro updated to take lib_subdir argument to fix the IMPORTED_LOCATION path
+macro(define_litert_target target_name lib_name lib_subdir)
+    add_library(${target_name} STATIC IMPORTED)
+    set_target_properties(${target_name} PROPERTIES
+        IMPORTED_LOCATION "${LITERT_BUILD_DIR}/${lib_subdir}/${lib_name}" 
+        INTERFACE_INCLUDE_DIRECTORIES "${LITERT_INCLUDE_DIR}"
+    )
+    add_dependencies(${target_name} litert_external)
+endmacro()
+
+## --- LiteRT Target Definitions (Using Correct Subdirs) ---
+
+# LiteRT Core Libraries (from your rg output)
+define_litert_target(litert_core        "liblitert_core.a"        "core")
+define_litert_target(litert_c_api       "liblitert_c_api.a"       "c")
+define_litert_target(litert_c_options   "liblitert_c_options.a"   "c/options")
+define_litert_target(litert_cc_api      "liblitert_cc_api.a"      "cc")
+define_litert_target(litert_cc_internal "liblitert_cc_internal.a" "cc")
+define_litert_target(litert_cc_options  "liblitert_cc_options.a"  "cc/options")
+define_litert_target(litert_runtime     "liblitert_runtime.a"     "runtime")
+define_litert_target(litert_logging     "liblitert_logging.a"     "c")
+
+
+# TFLite/External Dependencies (from your rg output)
+define_litert_target(tensorflow-lite    "libtensorflow-lite.a"    "tflite_build")
+define_litert_target(flatbuffers        "libflatbuffers.a"        "_deps/flatbuffers-build")
+define_litert_target(xnnpack-delegate   "libxnnpack-delegate.a"   "tflite_build")
+define_litert_target(xnnpack-core       "libXNNPACK.a"            "tflite_build/_deps/xnnpack-build")
+
+
+
+
+
+# Get the path to the ExternalProject build output directory (where all the .a files live)
+ExternalProject_Get_Property(litert_external BINARY_DIR)
+set(LITERT_BUILD_DIR ${BINARY_DIR})
+
+# --- 1. GLOB for all Abseil Static Archives ---
+# Finds all libabsl_*.a files created by the external build system
+# file(GLOB_RECURSE LITERT_ABSL_PATHS
+    # "${LITERT_BUILD_DIR}/_deps/abseil-cpp-build/absl/*.a"
+    # "${LITERT_BUILD_DIR}/_deps/abseil-cpp-build/absl/*/*.a"
+# )
+
+# --- 2. GLOB for all Ruy, XNNPACK, and related Math Libraries ---
+# Finds all Ruy and related math libraries (XNNPACK, CPUINFO, pthreadpool, etc.)
+file(GLOB_RECURSE LITERT_RUY_MATH_PATHS
+    # Ruy libs
+    "${LITERT_BUILD_DIR}/tflite_build/_deps/ruy-build/ruy/*.a"
+    "${LITERT_BUILD_DIR}/tflite_build/_deps/ruy-build/ruy/*/*.a"
+    # CPUInfo lib
+    "${LITERT_BUILD_DIR}/tflite_build/_deps/cpuinfo-build/libcpuinfo.a"
+    # Pthreadpool lib
+    "${LITERT_BUILD_DIR}/tflite_build/pthreadpool/libpthreadpool.a"
+    # XNNPACK (other parts not already in your defined targets)
+    "${LITERT_BUILD_DIR}/tflite_build/_deps/xnnpack-build/*.a"
+)
+
+# Combine all low-level dependencies into one variable of absolute paths
+set(LITERT_LOW_LEVEL_DEPS 
+    # ${LITERT_ABSL_PATHS} 
+    ${LITERT_RUY_MATH_PATHS}
+)
+
+
+
+add_library(litert_libs INTERFACE)
+
+if(UNIX AND NOT APPLE)
+    # LINUX: Use start/end group to handle circular dependencies
+    target_link_libraries(litert_libs INTERFACE
+        -Wl,--start-group
+        
+        # High-level LiteRT/TFLite targets
+        litert_core
+        litert_c_api
+        litert_c_options 
+        litert_cc_api
+        litert_cc_options 
+        litert_runtime
+        litert_logging
+        tensorflow-lite
+        flatbuffers
+        xnnpack-delegate
+        xnnpack-core
+        
+        # Inject the absolute paths to all the Abseil, Ruy, etc., archives
+        ${LITERT_LOW_LEVEL_DEPS} 
+        
+        -Wl,--end-group
+    )
+else()
+    target_link_libraries(litert_libs INTERFACE
+        litert_core
+        litert_c_api
+        litert_cc_api
+        litert_runtime
+        litert_logging
+        tensorflow-lite
+        flatbuffers
+        xnnpack-delegate
+        xnnpack-core
+        ${LITERT_LOW_LEVEL_DEPS} # Still needed, but without the group flags
+    )
+endif()
+
+target_include_directories(litert_libs INTERFACE ${LITERT_INCLUDE_DIR})
+add_dependencies(litert_libs litert_external)

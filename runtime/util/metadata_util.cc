@@ -27,12 +27,16 @@ namespace litert::lm {
 absl::StatusOr<proto::LlmMetadata> ExtractOrConvertLlmMetadata(
     absl::string_view string_view) {
   proto::LlmMetadata llm_metadata;
-  if (!llm_metadata.ParseFromString(string_view) ||
+
+  const std::string metadata_str(string_view);
+
+  if (!llm_metadata.ParseFromString(metadata_str) || 
       !llm_metadata.has_start_token()) {
-      return absl::InvalidArgumentError("Failed to parse LlmMetadata.");
+    return absl::InvalidArgumentError("Failed to parse LlmMetadata.");
   }
   ABSL_LOG(INFO) << "The llm metadata: " << llm_metadata.DebugString();
   return llm_metadata;
 }
+
 
 }  // namespace litert::lm

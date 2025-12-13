@@ -25,6 +25,7 @@ target_link_libraries(runtime_engine_engine_settings
     runtime_components_tokenizer
   PRIVATE
     litert_libs
+    tflite_extra_libs
     LITERTLM_DEPS
     proto_lib
 )
@@ -62,11 +63,9 @@ target_link_libraries(runtime_engine_io_types
     runtime_util_litert_status_util
   PUBLIC
     proto_lib
+    tflite_extra_libs
     litert_libs
     LITERTLM_DEPS
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_tensor_buffer
 )
 
 # add_litert_executable(runtime_engine_io_types_test
@@ -107,14 +106,8 @@ target_link_libraries(runtime_engine_litert_lm_advanced_main
     runtime_util_litert_status_util
   PRIVATE
     litert_libs
-    # absl::status
-    # absl::statusor
-    # absl::strings
-    # absl::log
-        
-    # # Link the specific LiteRT libraries that define the status/logging wrappers
-    # # litert_logging
     LITERTLM_DEPS
+    tflite_extra_libs
 )
 
 
@@ -150,13 +143,8 @@ target_link_libraries(runtime_engine_litert_lm_lib
     # runtime_core_engine_impl
   PRIVATE
     litert_libs
-    # absl::status
-    # absl::statusor
-    # absl::strings
-    # absl::log
-    # # litert_logging
     LITERTLM_DEPS
-
+    tflite_extra_libs
 )
 
 

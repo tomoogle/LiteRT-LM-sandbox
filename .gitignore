@@ -4,3 +4,6 @@
 /cmake/build
 /cmake/src
 .bak*
+cmake/src/
+*.bak
+__pycache__/

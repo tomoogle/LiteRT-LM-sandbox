@@ -2,15 +2,15 @@ include(FetchContent)
 
 
 set(BUILD_TESTING OFF)
-set(ABSL_SRC_DIR ${THIRD_PARTY_DIR}/absl)
-FetchContent_Declare(
-  absl_lib
-  GIT_REPOSITORY https://github.com/abseil/abseil-cpp
-  GIT_TAG master
-  GIT_SHALLOW true
-  SOURCE_DIR ${ABSL_SRC_DIR}
-)
-FetchContent_Populate(absl_lib)
+# set(ABSL_SRC_DIR ${THIRD_PARTY_DIR}/absl)
+# FetchContent_Declare(
+#   absl_lib
+#   GIT_REPOSITORY https://github.com/abseil/abseil-cpp
+#   GIT_TAG master
+#   GIT_SHALLOW true
+#   SOURCE_DIR ${ABSL_SRC_DIR}
+# )
+# FetchContent_Populate(absl_lib)
 # block()
 #   set(ABSL_ENABLE_INSTALL OFF)
 #   set(ABSL_BUILD_TESTING OFF)
@@ -214,8 +214,9 @@ endblock()
 # )
 
 
-set(_LITERT_SRC "${CMAKE_BINARY_DIR}/litert/src/litert_external")
+set(_LITERT_SRC_DIR "${CMAKE_BINARY_DIR}/litert/src/litert_external")
 set(_LITERT_BUILD_CONFIG "${CMAKE_BINARY_DIR}/litert/src/litert_external-build/include")
+set(_LITERT_ABSL_SRC_DIR "${CMAKE_BINARY_DIR}/litert/src/litert_external-build/abseil-cpp")
 
 
 set(THIRD_PARTY_SOURCE_DIR
@@ -248,8 +249,9 @@ set(THIRD_PARTY_INCLUDE_DIR
 set(LITERTLM_INCLUDE_PATHS
   ${GENERATED_SRC_DIR}
   ${THIRD_PARTY_DIR}
-  ${_LITERT_SRC}
+  ${_LITERT_SRC_DIR}
   ${_LITERT_BUILD_CONFIG}
+  ${_LITERT_ABSL_SRC_DIR}
   ${THIRD_PARTY_SOURCE_DIR}
   ${THIRD_PARTY_INCLUDE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}/antlr_generated

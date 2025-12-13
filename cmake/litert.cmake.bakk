@@ -1,0 +1,148 @@
+include(ExternalProject)
+
+set(PATCH_FILE "${CMAKE_SOURCE_DIR}/cmake/patches/litert_fixes.patch")
+
+
+ExternalProject_Add(
+    litert_external 
+    GIT_REPOSITORY      https://github.com/google-ai-edge/LiteRT.git
+    GIT_TAG             08735bb886df5e3e1294604c61175efbc72c59dd
+    PREFIX              ${CMAKE_CURRENT_BINARY_DIR}/litert
+    SOURCE_SUBDIR       litert
+    
+    PATCH_COMMAND       git apply --ignore-space-change --ignore-whitespace "${PATCH_FILE}" || ${CMAKE_COMMAND} -E echo "Git apply failed (or not needed)..."
+    
+    CMAKE_ARGS          
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> 
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_POLICY_DEFAULT_CMP0169=OLD
+        
+        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DLITERT_DISABLE_KLEIDIAI=ON
+        -DLITERT_BUILD_C_API=ON
+        -DFLATBUFFERS_INSTALL=OFF
+        -DFLATBUFFERS_BUILD_TESTS=OFF
+        -DLITERT_ENABLE_GPU=OFF
+        -DLITERT_ENABLE_NPU=OFF
+)
+
+ExternalProject_Get_Property(litert_external INSTALL_DIR BINARY_DIR)
+set(LITERT_INSTALL_DIR ${INSTALL_DIR}) # No longer used for library location
+
+set(LITERT_BUILD_DIR ${BINARY_DIR})    # Explicitly define this for clarit
+
+set(LITERT_INCLUDE_DIR 
+    "$<BUILD_INTERFACE:${LITERT_INSTALL_DIR}/include>"
+    "$<BUILD_INTERFACE:${BINARY_DIR}/include>"
+)
+
+
+macro(define_litert_target target_name lib_name lib_subdir) # ADDED lib_subdir
+    add_library(${target_name} STATIC IMPORTED)
+    set_target_properties(${target_name} PROPERTIES
+        # Use the explicit subdirectory defined below
+        IMPORTED_LOCATION "${LITERT_BUILD_DIR}/${lib_subdir}/${lib_name}" 
+        INTERFACE_INCLUDE_DIRECTORIES "${LITERT_INCLUDE_DIR}"
+    )
+    add_dependencies(${target_name} litert_external)
+endmacro()
+
+# macro(define_litert_target target_name lib_name)
+#     add_library(${target_name} STATIC IMPORTED)
+#     set_target_properties(${target_name} PROPERTIES
+#         IMPORTED_LOCATION "${LITERT_INSTALL_DIR}/lib/${lib_name}"
+#         INTERFACE_INCLUDE_DIRECTORIES "${LITERT_INCLUDE_DIR}"
+#     )
+#     add_dependencies(${target_name} litert_external)
+# endmacro()
+
+# # Define the libraries we know exist
+# define_litert_target(litert_core       "liblitert_core.a")
+# define_litert_target(litert_c_api      "liblitert_c_api.a")
+# define_litert_target(litert_cc_api     "liblitert_cc_api.a")
+# define_litert_target(litert_cc_internal "liblitert_cc_internal.a")
+# define_litert_target(litert_runtime    "liblitert_runtime.a")
+# define_litert_target(flatbuffers       "libflatbuffers.a")
+# define_litert_target(tensorflow-lite    "libtensorflow-lite.a")
+
+
+
+
+# LiteRT Core Libraries
+define_litert_target(litert_core        "liblitert_core.a"        "core")
+define_litert_target(litert_c_api       "liblitert_c_api.a"       "c")
+define_litert_target(litert_cc_api      "liblitert_cc_api.a"      "cc")
+define_litert_target(litert_runtime     "liblitert_runtime.a"     "runtime")
+# Note: litert_cc_internal is missing from your file list, remove if not needed.
+
+# TFLite/TensorFlow Libraries
+define_litert_target(tensorflow-lite    "libtensorflow-lite.a"    "tflite_build")
+define_litert_target(xnnpack-delegate   "libxnnpack-delegate.a"   "tflite_build")
+define_litert_target(xnnpack-core       "libXNNPACK.a"            "tflite_build/_deps/xnnpack-build")
+define_litert_target(flatbuffers        "libflatbuffers.a"        "_deps/flatbuffers-build") # NOTE: This is the external dependency FB, not the TFLite FB.
+add_library(litert_libs INTERFACE)
+
+if(UNIX AND NOT APPLE)
+    # LINUX: Use start/end group to handle circular dependencies between LiteRT libs
+    target_link_libraries(litert_libs INTERFACE
+        -Wl,--start-group
+        litert_core
+        litert_c_api
+        litert_cc_api
+        litert_cc_internal
+        litert_runtime
+        tensorflow-lite
+        flatbuffer
+        -Wl,--end-group
+    )
+else()
+    # NON-LINUX: Standard linking (hope for the best regarding circular deps)
+    target_link_libraries(litert_libs INTERFACE
+        litert_core
+        litert_c_api
+        litert_cc_api
+        litert_cc_internal
+        litert_runtime
+        tensorflow-lite
+        flatbuffers
+    )
+endif()
+
+target_include_directories(litert_libs INTERFACE ${LITERT_INCLUDE_DIR})
+add_dependencies(litert_libs litert_external)
+
+
+# add_library(litert_libs INTERFACE)
+# if(UNIX AND NOT APPLE)
+#     target_link_options(litert_libs INTERFACE 
+#         "LINKER:--start-group"
+#         $<TARGET_PROPERTY:litert_core,IMPORTED_LOCATION>
+#         $<TARGET_PROPERTY:litert_c_api,IMPORTED_LOCATION>
+#         $<TARGET_PROPERTY:litert_cc_api,IMPORTED_LOCATION>
+#         $<TARGET_PROPERTY:litert_cc_internal,IMPORTED_LOCATION>
+#         $<TARGET_PROPERTY:litert_runtime,IMPORTED_LOCATION>
+#         $<TARGET_PROPERTY:tensorflow-lite,IMPORTED_LOCATION>
+#         $<TARGET_PROPERTY:flatbuffers::flatbuffers,IMPORTED_LOCATION>
+
+#         "LINKER:--end-group"
+#     )
+# else()
+#     # Fallback for Mac/Windows (Standard linking)
+#     target_link_libraries(litert_libs INTERFACE
+#         litert_core
+#         litert_c_api
+#         litert_cc_api
+#         litert_cc_internal
+#         litert_runtime
+#         tensorflow-lite
+#         flatbuffers
+#     )
+# endif()
+
+# target_include_directories(litert_libs INTERFACE ${LITERT_INCLUDE_DIR})
+
+# add_dependencies(litert_libs litert_external)
