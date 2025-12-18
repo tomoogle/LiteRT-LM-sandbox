@@ -1,39 +1,65 @@
 include(ExternalProject)
 
 
-ExternalProject_Add(
+
+set(ABSL_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/abseil-cpp)
+set(ABSL_INSTALL_PREFIX ${ABSL_EXT_PREFIX}/install)
+set(ABSL_CONFIG_CMAKE_FILE "${ABSL_INSTALL_PREFIX}/lib/cmake/absl/abslConfig.cmake")
+
+if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
+  message(STATUS "Abseil not found. Configuring external build...")
+
+  ExternalProject_Add(
     absl_external
-    GIT_REPOSITORY      https://github.com/abseil/abseil-cpp
-    GIT_TAG             20250814.1
-    PREFIX              ${EXTERNAL_PROJECTS_DIR}/abseil
+    GIT_REPOSITORY
+      https://github.com/abseil/abseil-cpp
+    GIT_TAG
+      d9e4955c65cd4367dd6bf46f4ccb8cd3d100540b
+    PREFIX
+      ${ABSL_EXT_PREFIX}
     CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_POLICY_DEFAULT_CMP0169=OLD
-        -DCMAKE_CXX_STANDARD=17
-        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-        -DABSL_BUILD_TESTING=OFF
-        -DABSL_USE_GOOGLETEST_HEAD=OFF
-)
+      -DCMAKE_INSTALL_PREFIX=${ABSL_INSTALL_PREFIX}
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+      -DCMAKE_POLICY_DEFAULT_CMP0169=OLD
+      -DCMAKE_CXX_STANDARD=17
+      -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      -DABSL_BUILD_TESTING=OFF
+      -DABSL_USE_GOOGLETEST_HEAD=OFF
+      -DABSL_ENABLE_INSTALL=ON
+      -DABSL_PROPAGATE_CXX_STD=ON
+    STEP_TARGETS
+      step_verify_install
+  )
+  verify_install(absl_external ${ABSL_CONFIG_CMAKE_FILE})
 
-add_custom_command(
-    OUTPUT ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
-    COMMAND ${CMAKE_COMMAND} -E chdir ${LITERT_EXTRACTED_DIR} ar x ${ARCHIVE_PATH}
-    COMMAND ${CMAKE_COMMAND} -E touch ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
-    DEPENDS ${target_name}
-    VERBATIM
-)
+else()
+    message(STATUS "Abseil already installed at: ${ABSL_INSTALL_PREFIX}")
+    if(NOT TARGET absl_external)
+        add_custom_target(absl_external)
+    endif()
+endif()
 
-ExternalProject_Get_Property(absl_external INSTALL_DIR BINARY_DIR)
-set(ABSL_INSTALL_DIR ${INSTALL_DIR})
+
+
+
+
+# add_custom_command(
+#     OUTPUT ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
+#     COMMAND ${CMAKE_COMMAND} -E chdir ${LITERT_EXTRACTED_DIR} ar x ${ARCHIVE_PATH}
+#     COMMAND ${CMAKE_COMMAND} -E touch ${LITERT_EXTRACTED_DIR}/${target_name}_extraction_complete
+#     DEPENDS ${target_name}
+#     VERBATIM
+# )
+
+# ExternalProject_Get_Property(absl_external INSTALL_DIR BINARY_DIR)
+# set(ABSL_INSTALL_DIR ${INSTALL_DIR})
 # set(ABSL_BUILD_DIR ${BINARY_DIR})
 
 # set(ABSL_INCLUDE_DIR
 #     "$<BUILD_INTERFACE:${BINARY_DIR}/include>"
-#     # "$<BUILD_INTERFACE:${EXTERNAL_PROJECTS_DIRabsl_external>"
+#     # "$<BUILD_INTERFACE:${EXTERNAL_PROJECT_BINARY_DIR_absl_external>"
 # )
 
 

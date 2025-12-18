@@ -13,7 +13,7 @@ target_link_libraries(runtime_util_convert_tensor_buffer INTERFACE
 # add_litert_executable(runtime_util_convert_tensor_buffer_test
 #   convert_tensor_buffer_test.cc
 # )
-# target_include_directories(runtime_util_convert_tensor_buffer_test INTERFACE ${_project_root}
+# target_include_directories(runtime_util_convert_tensor_buffer_test INTERFACE ${PROJECT_ROOT}
 #     ${LITERT_INCLUDE_DIR})
 # target_link_libraries(runtime_util_convert_tensor_buffer_test PRIVATE 
 #   runtime_util_convert_tensor_buffer
@@ -471,7 +471,7 @@ target_link_libraries(runtime_util_tensor_buffer_util
 # add_litert_executable(runtime_util_tensor_buffer_util_test
 #   tensor_buffer_util_test.cc
 # )
-# target_include_directories(runtime_util_tensor_buffer_util_test INTERFACE ${_project_root}
+# target_include_directories(runtime_util_tensor_buffer_util_test INTERFACE ${PROJECT_ROOT}
 #     ${LITERTLM_INCLUDE_PATHS})
 # target_link_libraries(runtime_util_tensor_buffer_util_test PRIVATE
 #   runtime_util_convert_tensor_buffer

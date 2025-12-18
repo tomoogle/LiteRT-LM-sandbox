@@ -1,7 +1,6 @@
 include(FetchContent)
 
 
-set(BUILD_TESTING OFF)
 # set(ABSL_SRC_DIR ${THIRD_PARTY_DIR}/absl)
 # FetchContent_Declare(
 #   absl_lib
@@ -122,15 +121,15 @@ FetchContent_Declare(
 FetchContent_Populate(json_lib)
 
 
-set(RE2_SRC_DIR ${THIRD_PARTY_DIR}/re2)
-FetchContent_Declare(
-  _re2_lib
-  GIT_REPOSITORY https://github.com/google/re2
-  GIT_TAG main
-  GIT_SHALLOW true
-  SOURCE_DIR ${RE2_SRC_DIR}
-)
-FetchContent_Populate(_re2_lib)
+# set(RE2_SRC_DIR ${THIRD_PARTY_DIR}/re2)
+# FetchContent_Declare(
+#   _re2_lib
+#   GIT_REPOSITORY https://github.com/google/re2
+#   GIT_TAG main
+#   GIT_SHALLOW true
+#   SOURCE_DIR ${RE2_SRC_DIR}
+# )
+# FetchContent_Populate(_re2_lib)
 
 
 # set(SENTENCEPIECE_SRC_DIR ${THIRD_PARTY_DIR}/sentencepiece)
@@ -160,18 +159,18 @@ FetchContent_Declare(
 FetchContent_Populate(stb_lib)
 
 
-set(TOKENIZERS_SRC_DIR ${THIRD_PARTY_DIR}/tokenizers-cpp)
-FetchContent_Declare(
-  tokenizers_cpp_lib
-  GIT_REPOSITORY https://github.com/mlc-ai/tokenizers-cpp
-  GIT_TAG main
-  GIT_SHALLOW true
-  SOURCE_DIR ${TOKENIZERS_SRC_DIR}
-)
-block()
-  set(CMAKE_POLICY_VERSION_MINIMUM "3.5")
-  FetchContent_MakeAvailable(tokenizers_cpp_lib)
-endblock()
+# set(TOKENIZERS_SRC_DIR ${THIRD_PARTY_DIR}/tokenizers-cpp)
+# FetchContent_Declare(
+#   tokenizers_cpp_lib
+#   GIT_REPOSITORY https://github.com/mlc-ai/tokenizers-cpp
+#   GIT_TAG main
+#   GIT_SHALLOW true
+#   SOURCE_DIR ${TOKENIZERS_SRC_DIR}
+# )
+# block()
+#   set(CMAKE_POLICY_VERSION_MINIMUM "3.5")
+#   FetchContent_MakeAvailable(tokenizers_cpp_lib)
+# endblock()
 
 set(ZLIB_SRC_DIR ${THIRD_PARTY_DIR}/zlib)
 FetchContent_Declare(
@@ -220,17 +219,17 @@ set(_LITERT_ABSL_SRC_DIR "${CMAKE_BINARY_DIR}/litert/src/litert_external-build/a
 
 
 set(THIRD_PARTY_SOURCE_DIR
-  ${ABSL_SRC_DIR}
+  # ${ABSL_SRC_DIR}
   ${ANTRL_SRC_DIR}
   ${KISSFFT_SRC_DIR}
   ${MINIAUDIO_SRC_DIR}
   ${MINIZIP_SRC_DIR}
   ${MINJA_SRC_DIR}
   ${JSON_SRC_DIR}
-  ${RE2_SRC_DIR}
+  # ${RE2_SRC_DIR}
   # ${SENTENCEPIECE_SRC_DIR}
   ${STB_SRC_DIR}
-  ${TOKENIZERS_SRC_DIR}/sentencepiece
+  # ${TOKENIZERS_SRC_DIR}/sentencepiece
   ${ZLIB_SRC_DIR}
 )
 
@@ -239,10 +238,10 @@ set(THIRD_PARTY_INCLUDE_DIR
   ${MINIZIP_SRC_DIR}/minizip
   ${MINJA_SRC_DIR}/include
   ${JSON_SRC_DIR}/include
-  ${RE2_SRC_DIR}/re2
-  ${TOKENIZERS_SRC_DIR}/sentencepiece/src
+  # ${RE2_SRC_DIR}/re2
+  # ${TOKENIZERS_SRC_DIR}/sentencepiece/src
   ${STB_SRC_DIR}/stb_lib
-  ${TOKENIZERS_SRC_DIR}/include
+  # ${TOKENIZERS_SRC_DIR}/include
   ${ZLIB_SRC_DIR}
 )
 
@@ -259,21 +258,21 @@ set(LITERTLM_INCLUDE_PATHS
 
 
 
-set(re2_exclude
-  "${RE2_SRC_DIR}/re2/testing/"
-  "${RE2_SRC_DIR}/re2/fuzzing/"
-)
+# set(re2_exclude
+#   "${RE2_SRC_DIR}/re2/testing/"
+#   "${RE2_SRC_DIR}/re2/fuzzing/"
+# )
 
 
-file(GLOB RE2_SRC 
-  ${RE2_SRC_DIR}/re2/*.cc
-  ${RE2_SRC_DIR}/util/*.cc
-)
-add_library(re2_lib ${RE2_SRC})
-target_include_directories(re2_lib
-  PRIVATE
-  ${LITERTLM_INCLUDE_PATHS}
-)
+# file(GLOB RE2_SRC 
+#   ${RE2_SRC_DIR}/re2/*.cc
+#   ${RE2_SRC_DIR}/util/*.cc
+# )
+# add_library(re2_lib ${RE2_SRC})
+# target_include_directories(re2_lib
+#   PRIVATE
+#   ${LITERTLM_INCLUDE_PATHS}
+# )
 
 
 
@@ -315,9 +314,9 @@ target_link_libraries(LITERTLM_DEPS INTERFACE
   # gtest
   zlibstatic
   # sentencepiece-static
-  tokenizers_cpp
-  proto_lib
-  re2_lib
+  # tokenizers_cpp
+  # proto_lib
+  # re2_lib
 )
 
 
