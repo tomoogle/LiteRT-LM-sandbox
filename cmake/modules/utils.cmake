@@ -1,6 +1,17 @@
-function(generate_clean_files OUTPUT_CLEAN_PATHS)
+function(verify_install target_name config_path)
+    ExternalProject_Add_Step(${target_name} step_verify_install
+        COMMAND ${CMAKE_COMMAND} -E echo "Verifying installation..."
+        COMMAND ${CMAKE_COMMAND} -DFILE_TO_CHECK=${config_path} -P "${LITERTLM_SCRIPTS_DIR}/verify_install.cmake"
+        DEPENDEES install
+        COMMENT "Ensuring ${config_path} was actually generated."
+    )
+endfunction()
+
+
+
+
+function(generate_src_files OUTPUT_CLEAN_PATHS)
     set(RAW_FILES ${ARGN})
-    
     set(CLEANED_PATHS_OUT "")
 
     foreach(RAW_FILE IN ITEMS ${RAW_FILES})
@@ -46,11 +57,44 @@ function(generate_clean_files OUTPUT_CLEAN_PATHS)
 endfunction()
 
 
-function(verify_install target_name config_path)
-    ExternalProject_Add_Step(${target_name} step_verify_install
-        COMMAND ${CMAKE_COMMAND} -E echo "Verifying installation..."
-        COMMAND ${CMAKE_COMMAND} -DFILE_TO_CHECK=${config_path} -P "${LITERTLM_SCRIPTS_DIR}/verify_install.cmake"
-        DEPENDEES install
-        COMMENT "Ensuring ${config_path} was actually generated."
-    )
+function(generate_protobuf)
+  if(NOT TARGET protobuf_external)
+    message(FATAL_ERROR "ExternalProject_Add failed to create protobuf_external or generate_protobuf was called too soon!")
+  endif()
+
+  include(vendor/protobuf-generate)
+  message(STATUS "Protobuf_INCLUDE_DIR: ${Protobuf_INCLUDE_DIR}")
+  protobuf_generate(
+    TARGET proto_lib
+    LANGUAGE cpp
+    IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_ROOT} ${Protobuf_INCLUDE_DIR}
+    APPEND_PATH ${Protobuf_INCLUDE_DIR}
+    PROTOS ${PROTO_FILES}
+  )
+endfunction()
+
+
+function(compile_flatbuffer_files flatb_files)
+    set(output_dir "${GENERATED_SRC_DIR}/schema/core")
+
+    file(MAKE_DIRECTORY "${output_dir}")
+
+    foreach(fbf ${flatb_files})
+        get_filename_component(fbf_name ${fbf} NAME)
+        
+        message(STATUS " [FlatBuffers] Generating header for ${fbf_name}...")
+
+        execute_process(
+            COMMAND flatc --gen-mutable --gen-object-api --cpp -o "${output_dir}/" "${fbf}"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            RESULT_VARIABLE ret_code
+            OUTPUT_VARIABLE flatc_output
+            ERROR_VARIABLE flatc_error
+        )
+
+        if(NOT "${ret_code}" STREQUAL "0")
+            message(FATAL_ERROR "flatc failed for ${fbf}: ${flatc_error}")
+        endif()
+
+    endforeach()
 endfunction()

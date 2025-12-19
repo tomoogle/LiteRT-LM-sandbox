@@ -69,6 +69,35 @@ else()
     endif()
 endif()
 
+
+
+# --- TFLite Manual Imports ---
+
+import_static_lib(imp_tflite_core "${TFLITE_LIB_DIR}/libtensorflow-lite.a")
+
+import_static_lib(imp_xnnpack "${TFLITE_LIB_DIR}/libXNNPACK.a")
+import_static_lib(imp_cpuinfo  "${TFLITE_LIB_DIR}/libcpuinfo.a")
+import_static_lib(imp_pthreadpool "${TFLITE_LIB_DIR}/libpthreadpool.a")
+
+
+if(NOT TARGET litertlm-tflite::runtime)
+    add_library(litertlm-tflite::runtime INTERFACE)
+    
+    target_link_libraries(litertlm-tflite::runtime INTERFACE 
+        imp_tflite_core
+        imp_xnnpack
+        imp_cpuinfo
+        imp_pthreadpool
+    )
+
+    target_include_directories(litertlm-tflite::runtime INTERFACE 
+        "${TFLITE_INCLUDE_DIR}"
+        "${FLATBUFFERS_INSTALL_PREFIX}/include" 
+    )
+    add_dependencies(litertlm-tflite::runtime tflite_external)
+endif()
+
+
 # set(TFLITE_EXT_PREFIX ${EXTERNAL_PROJECTS_DIR}/tensorflow)
 # set(TFLITE_INSTALL_PREFIX ${TFLITE_EXT_PREFIX}/install)
 # set(TFLITE_MARKER_FILE "${TFLITE_INSTALL_PREFIX}/lib/libtensorflow-lite.a")

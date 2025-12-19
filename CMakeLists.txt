@@ -2,16 +2,19 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 project(LiteRT-LM LANGUAGES C CXX)
 
 
-# --- Paths
+# --- Global Paths
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(GENERATED_SRC_DIR    "${PROJECT_ROOT}/cmake/src")
-set(LITERTLM_SCRIPTS_DIR "${PROJECT_ROOT}/cmake/scripts")
-set(LITERTLM_MODULES_DIR "${PROJECT_ROOT}/cmake/modules")
-list(APPEND CMAKE_MODULE_PATH "${LITERTLM_MODULES_DIR}")
+set(LITERTLM_SCRIPTS_DIR        "${PROJECT_ROOT}/cmake/scripts")
+set(LITERTLM_MODULES_DIR        "${PROJECT_ROOT}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH   "${LITERTLM_MODULES_DIR}")
 
 set(EXTERNAL_PROJECT_BINARY_DIR "${CMAKE_BINARY_DIR}/external")
 set(THIRD_PARTY_DIR             "${CMAKE_BINARY_DIR}/third_party")
+
+set(GENERATED_SRC_DIR           "${PROJECT_ROOT}/cmake/generated/src")
+
+set(LITERTLM_INCLUDE_PATHS      "${GENERATED_SRC_DIR}")
 
 
 # --- Environment
@@ -47,16 +50,30 @@ include(utils)
 include(external_project)
 include(fetch_content)
 
+# LITERTLM_INCLUDE_PATHS must be updated before collect_dependencies is called
+list(APPEND LITERTLM_INCLUDE_PATHS
+  ${ABSL_INCLUDE_DIR}
+  ${FLATBUFFERS_INCLUDE_DIR}
+  ${GTEST_INCLUDE_DIR}
+  ${LITERT_INCLUDE_DIR}
+  ${Protobuf_INCLUDE_DIR}
+  ${RE2_INCLUDE_DIR}
+  ${SENTENCE_INCLUDE_DIR}
+  ${TOKENIZER_INCLUDE_DIR}
 
-# --- Targets
-include(generated_files_setup)
-generate_clean_files(ALL_CLEANED_FILES ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES})
+  ${FETCHCONTENT_MODULE_SRC_DIRS}
+  ${FETCHCONTENT_MODULE_INCLUDE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/antlr_generated
+)
 
-# set(schema_fbs
-#   "${PROJECT_ROOT}/schema/core/litertlm_header_schema.fbs"
-# )
-# compile_flatbuffer_files(${schema_fbs})
+include(collect_dependencies)
 
-# add_subdirectory(runtime)
-# add_subdirectory(c)
+
+# --- LiteRT-LM Targets
+include(setup_generated_src_files)
+generate_src_files(ALL_GENERATED_FILES ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES})
+generate_protobuf()
+
+add_subdirectory(c)
 # add_subdirectory(schema)
+# add_subdirectory(runtime)

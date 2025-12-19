@@ -5,16 +5,13 @@ set(C_ENGINE_SRCS
   "${GEN_C_DIR}/engine.cc"
   "${GEN_C_DIR}/litert_lm_logging.cc"
 )
-add_litert_static_library(c_engine ${C_ENGINE_SRCS})
+add_library(c_engine ${C_ENGINE_SRCS})
 # add_library(c_engine STATIC
 #   ${C_ENGINE_SRCS}
 # )
 
 target_include_directories(c_engine 
   PRIVATE
-    ${CMAKE_BINARY_DIR}
-    ${GENERATED_SRC_DIR}
-    ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
     ${THIRD_PARTY_DIR}/json/include
     ${THIRD_PARTY_DIR}/minja/include
@@ -28,12 +25,11 @@ target_link_libraries(c_engine
 )
 
 
-# _clean_path( c_engine_test_src
-#   engine_test.cc
+# set(C_ENGINE_TEST_SRCS
+#   "${GEN_C_DIR}/engine_test.cc"
 # )
-
 # add_executable(c_engine_test
-#   ${c_engine_test_src}
+#   ${C_ENGINE_TEST_SRCS}
 # )
 
 # target_link_libraries(c_engine_test PRIVATE 

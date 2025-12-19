@@ -1,50 +1,60 @@
+# ==============================================================================
+# LITERTLM MACROS
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Macro: import_static_lib
+# Purpose: Imports a built static library (.a) from an absolute path.
+# Usage: import_static_lib(my_target_name "/path/to/lib.a")
+# ------------------------------------------------------------------------------
+macro(import_static_lib target_name lib_full_path)
+    if("${lib_full_path}" STREQUAL "")
+        message(FATAL_ERROR "Critical Error: Attempted to import '${target_name}' with an empty path.")
+    endif()
+
+    add_library(${target_name} STATIC IMPORTED GLOBAL)
+    set_target_properties(${target_name} PROPERTIES
+        IMPORTED_LOCATION "${lib_full_path}"
+    )
+endmacro()
+
+# ------------------------------------------------------------------------------
+# Macro: add_litert_library
+# Purpose: Wrapper for add_library that automatically ensures build order.
+# Usage: add_litert_library(my_lib STATIC src/file.cc)
+#        add_litert_library(my_interface INTERFACE)
+# ------------------------------------------------------------------------------
 macro(add_litert_library target_name lib_type)
     add_library(${target_name} ${lib_type} ${ARGN})
-    # Inject the critical build order dependency
-    add_dependencies(${target_name} litert_external) 
+    
+    if(TARGET litert_external)
+        add_dependencies(${target_name} litert_external)
+    endif()
 endmacro()
 
-
-### [DEPRECATED] [TODO] Refactor to add_litert_library ###
-macro(add_litert_static_library target_name)
-    add_library(${target_name} STATIC ${ARGN})
-    # Inject the critical build order dependency
-    add_dependencies(${target_name} litert_external) 
-endmacro()
-
-### [DEPRECATED] [TODO] Refactor to add_litert_library ###
-macro(add_litert_interface_library target_name)
-    add_library(${target_name} INTERFACE ${ARGN})
-    # Inject the critical build order dependency
-    add_dependencies(${target_name} litert_external) 
-endmacro()
-
-
+# ------------------------------------------------------------------------------
+# Macro: add_litert_executable
+# Purpose: Wrapper for add_executable that automatically ensures build order.
+# Usage: add_litert_executable(my_app src/main.cc)
+# ------------------------------------------------------------------------------
 macro(add_litert_executable target_name)
     add_executable(${target_name} ${ARGN})
-    # Inject the critical build order dependency
-    add_dependencies(${target_name} litert_external) 
+
+    # Inject Build Order Dependency
+    if(TARGET litert_external)
+        add_dependencies(${target_name} litert_external)
+    endif()
 endmacro()
 
 
 
-
-
-
-macro(define_litert_target target_name lib_name lib_subdir)
-    add_library(${target_name} STATIC IMPORTED)
-    set_target_properties(${target_name} PROPERTIES
-        IMPORTED_LOCATION "${LITERT_BUILD_DIR}/${lib_subdir}/${lib_name}"
-        INTERFACE_INCLUDE_DIRECTORIES "${LITERT_INCLUDE_DIR}"
-    )
-    add_dependencies(${target_name} litert_external)
-endmacro()
-
-
-macro(define_imported_target target_name lib_name lib_subdir)
-    add_library(${target_name} STATIC IMPORTED)
-    set_target_properties(${target_name} PROPERTIES
-        IMPORTED_LOCATION "${LITERT_BUILD_DIR}/${lib_subdir}/${lib_name}"
-        INTERFACE_INCLUDE_DIRECTORIES "${LITERT_INCLUDE_DIR}"
-    )
+macro(import_proto_lib target_name lib_path)
+    if(NOT TARGET ${target_name})
+        add_library(${target_name} STATIC IMPORTED GLOBAL)
+        set_target_properties(${target_name} PROPERTIES
+            IMPORTED_LOCATION "${lib_path}"
+            INTERFACE_INCLUDE_DIRECTORIES "${PROTO_INCLUDE_DIR}"
+        )
+        add_dependencies(${target_name} protobuf_external)
+    endif()
 endmacro()

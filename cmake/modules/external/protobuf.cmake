@@ -1,16 +1,28 @@
 include(ExternalProject)
 
-set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-
-
 set(PROTO_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/protobuf)
 set(PROTO_INSTALL_PREFIX ${PROTO_EXT_PREFIX}/install)
 set(PROTO_CONFIG_CMAKE_FILE "${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf/protobuf-config.cmake")
 
+
+set(Protobuf_SRC_DIR ${PROTO_INSTALL_PREFIX}/src/protobuf_external/src)
 set(Protobuf_INCLUDE_DIR ${PROTO_INSTALL_PREFIX}/include)
-set(Protobuf_LIBRARIES ${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf)
-set(Protobuf_PROTOC_EXECUTABLE ${PROTO_INSTALL_PREFIX}/bin/protoc)
+set(Protobuf_LIB_DIR ${PROTO_INSTALL_PREFIX}/lib)
 set(Protobuf_LITE_LIBRARY ${PROTO_INSTALL_PREFIX}/lib/libprotobuf-lite.a)
+
+set(Protobuf_PROTOC_EXECUTABLE ${PROTO_INSTALL_PREFIX}/bin/protoc)
+set(protobuf_generate_PROTOC_EXE ${PROTO_INSTALL_PREFIX}/bin/protoc)
+
+
+set(PROTO_FILES
+  ${PROJECT_ROOT}/runtime/proto/engine.proto
+  ${PROJECT_ROOT}/runtime/proto/llm_metadata.proto
+  ${PROJECT_ROOT}/runtime/proto/llm_model_type.proto
+  ${PROJECT_ROOT}/runtime/proto/sampler_params.proto
+  ${PROJECT_ROOT}/runtime/proto/token.proto
+  ${PROJECT_ROOT}/runtime/executor/proto/constrained_decoding_options.proto
+  ${PROJECT_ROOT}/runtime/util/external_file.proto
+)
 
 
 
@@ -38,9 +50,11 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
       -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       -Dprotobuf_BUILD_TESTS=OFF
       -Dprotobuf_BUILD_LIBPROTOC=ON
+      -Dprotobuf_BUILD_PROTOBUF_BINARIES=ON
       -Dprotobuf_LOCAL_DEPENDENCIES_ONLY=ON
       -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
       -DGTest_DIR=${GTEST_INSTALL_PREFIX}/lib/cmake/GTest
+      -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/Protobuf
 
     STEP_TARGETS
       verify_install_step
@@ -48,31 +62,45 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
   verify_install(protobuf_external ${PROTO_CONFIG_CMAKE_FILE})
 
 else()
-    message(STATUS "Protobuf already installed at: ${PROTO_INSTALL_PREFIX}")
-    if(NOT TARGET protobuf_external)
-        add_custom_target(protobuf_external)
-    endif()
+  message(STATUS "Protobuf already installed at: ${PROTO_INSTALL_PREFIX}")
+  if(NOT TARGET protobuf_external)
+    add_custom_target(protobuf_external)
+  endif()
 endif()
 
 
+import_static_lib(imp_protobuf      "${PROTO_LIB_DIR}/libprotobuf.a")
+import_static_lib(imp_utf8_validity "${PROTO_LIB_DIR}/libutf8_validity.a")
+import_static_lib(imp_utf8_range    "${PROTO_LIB_DIR}/libutf8_range.a")
 
-# find_package(Protobuf REQUIRED PATHS ${PROTO_INSTALL_PREFIX})
-# set(PROTO_FILES
-#   ${PKG_ROOT}/runtime/proto/engine.proto
-#   ${PKG_ROOT}/runtime/proto/llm_metadata.proto
-#   ${PKG_ROOT}/runtime/proto/llm_model_type.proto
-#   ${PKG_ROOT}/runtime/proto/sampler_params.proto
-#   ${PKG_ROOT}/runtime/proto/token.proto
-#   ${PKG_ROOT}/runtime/executor/proto/constrained_decoding_options.proto
-#   ${PKG_ROOT}/runtime/util/external_file.proto
-# )
 
-# add_library(proto_lib STATIC ${PROTO_FILES})
-# target_include_directories(proto_lib PUBLIC "${CMAKE_BINARY_DIR}")
-# target_link_libraries(proto_lib PUBLIC protobuf::libprotobuf)
-# protobuf_generate(
-#     TARGET proto_lib
-#     LANGUAGE cpp
-#     IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-#     PROTOS ${PROTO_FILES}
-# )
+if(NOT TARGET protobuf::libprotobuf)
+    add_library(protobuf::libprotobuf ALIAS imp_protobuf)
+endif()
+
+if(NOT TARGET protobuf::protoc)
+    add_executable(protobuf::protoc IMPORTED GLOBAL)
+    set_target_properties(protobuf::protoc PROPERTIES
+        IMPORTED_LOCATION "${Protobuf_PROTOC_EXECUTABLE}"
+    )
+endif()
+
+add_library(proto_lib STATIC)
+add_dependencies(proto_lib protobuf_external)
+
+target_include_directories(proto_lib
+  PUBLIC
+    ${CMAKE_BINARY_DIR}
+    ${PROJECT_ROOT}
+    ${Protobuf_SRC_DIR}
+    ${Protobuf_INCLUDE_DIR}
+    ${ABSL_INCLUDE_DIR}
+)
+target_link_libraries(proto_lib
+  PUBLIC
+    protobuf::libprotobuf
+  PRIVATE
+    imp_absl_base
+)
+
+

@@ -2,6 +2,18 @@ include(ExternalProject)
 
 set(FLATBUFFERS_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/flatbuffers)
 set(FLATBUFFERS_INSTALL_PREFIX ${FLATBUFFERS_EXT_PREFIX}/install)
+set(FLATBUFFERS_INCLUDE_DIR ${FLATBUFFERS_INSTALL_PREFIX}/include)
+set(FLATBUFFERS_LIB_DIR ${FLATBUFFERS_INSTALL_PREFIX}/lib)
+set(FLATBUFFERS_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers" CACHE INTERNAL "")
+set(FLATBUFFERS_CMAKE_CONFIG_FILE "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers/flatbuffersConfig.cmake")
+
+
+
+set(FLATC_EXECUTABLE "${FLATBUFFERS_INSTALL_PREFIX}/bin/flatc" CACHE INTERNAL "")
+
+if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
+  message(STATUS "Abseil not found. Configuring external build...")
+
 
 ExternalProject_Add(
     flatbuffers_external
@@ -9,7 +21,7 @@ ExternalProject_Add(
       absl_external
       googletest_external
     GIT_REPOSITORY https://github.com/google/flatbuffers.git
-    GIT_TAG v23.5.26
+    GIT_TAG v25.9.23
     PREFIX ${FLATBUFFERS_EXT_PREFIX}
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${FLATBUFFERS_INSTALL_PREFIX}
@@ -20,38 +32,20 @@ ExternalProject_Add(
         -DFLATBUFFERS_INSTALL=ON
         -DFLATBUFFERS_BUILD_FLATC=ON
         -DFLATBUFFERS_BUILD_FLATHASH=OFF
+    STEP_TARGETS
+      step_verify_install
+  )
+  verify_install(flatbuffers_external ${FLATBUFFERS_CMAKE_CONFIG_FILE})
+
+else()
+    message(STATUS "Flatbuffers already installed at: ${FLATBUFFERS_INSTALL_PREFIX}")
+    if(NOT TARGET flatbuffers_external)
+        add_custom_target(flatbuffers_external)
+    endif()
+endif()
+
+
+set(schema_fbs
+  "${PROJECT_ROOT}/schema/core/litertlm_header_schema.fbs"
 )
-
-# Export the location for LiteRT to see
-set(FLATBUFFERS_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers" CACHE INTERNAL "")
-set(FLATC_EXECUTABLE "${FLATBUFFERS_INSTALL_PREFIX}/bin/flatc" CACHE INTERNAL "")
-
-
-
-
-function(compile_flatbuffer_files flatb_files)
-
-    set(output_dir "${GENERATED_SRC_DIR}/schema/core")
-
-    file(MAKE_DIRECTORY "${output_dir}")
-
-    foreach(fbf ${flatb_files})
-        get_filename_component(fbf_name ${fbf} NAME)
-        
-        message(STATUS " [FlatBuffers] Generating header for ${fbf_name}...")
-
-        execute_process(
-            COMMAND flatc --gen-mutable --gen-object-api --cpp -o "${output_dir}/" "${fbf}"
-            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-            RESULT_VARIABLE ret_code
-            OUTPUT_VARIABLE flatc_output
-            ERROR_VARIABLE flatc_error
-        )
-
-        if(NOT "${ret_code}" STREQUAL "0")
-            message(FATAL_ERROR "flatc failed for ${fbf}: ${flatc_error}")
-        endif()
-
-    endforeach()
-
-endfunction()
+compile_flatbuffer_files(${schema_fbs})
