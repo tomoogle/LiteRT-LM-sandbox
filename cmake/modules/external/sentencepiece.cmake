@@ -55,3 +55,13 @@ else()
     add_custom_target(sentencepiece_external)
   endif()
 endif()
+
+
+import_static_lib(imp_sentencepiece              "${SENTENCEPIECE_LIB_DIR}/libsentencepiece.a")
+import_static_lib(imp_sentencepiece_train        "${SENTENCEPIECE_LIB_DIR}/libsentencepiece_train.a")
+
+add_library(sentencepiece_libs INTERFACE)
+target_link_libraries(sentencepiece_libs INTERFACE
+    imp_sentencepiece
+    imp_sentencepiece_train
+)

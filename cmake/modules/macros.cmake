@@ -19,12 +19,12 @@ macro(import_static_lib target_name lib_full_path)
 endmacro()
 
 # ------------------------------------------------------------------------------
-# Macro: add_litert_library
+# Macro: add_litertlm_library
 # Purpose: Wrapper for add_library that automatically ensures build order.
-# Usage: add_litert_library(my_lib STATIC src/file.cc)
-#        add_litert_library(my_interface INTERFACE)
+# Usage: add_litertlm_library(my_lib STATIC src/file.cc)
+#        add_litertlm_library(my_interface INTERFACE)
 # ------------------------------------------------------------------------------
-macro(add_litert_library target_name lib_type)
+macro(add_litertlm_library target_name lib_type)
     add_library(${target_name} ${lib_type} ${ARGN})
     
     if(TARGET litert_external)
@@ -33,11 +33,11 @@ macro(add_litert_library target_name lib_type)
 endmacro()
 
 # ------------------------------------------------------------------------------
-# Macro: add_litert_executable
+# Macro: add_litertlm_executable
 # Purpose: Wrapper for add_executable that automatically ensures build order.
-# Usage: add_litert_executable(my_app src/main.cc)
+# Usage: add_litertlm_executable(my_app src/main.cc)
 # ------------------------------------------------------------------------------
-macro(add_litert_executable target_name)
+macro(add_litertlm_executable target_name)
     add_executable(${target_name} ${ARGN})
 
     # Inject Build Order Dependency

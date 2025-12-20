@@ -38,3 +38,11 @@ else()
     add_custom_target(re2_external)
   endif()
 endif()
+
+
+import_static_lib(imp_re2                        "${RE2_LIB_DIR}/libre2.a")
+
+add_library(re2_libs INTERFACE)
+target_link_libraries(re2_libs INTERFACE
+    imp_re2
+)

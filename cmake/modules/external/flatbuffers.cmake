@@ -5,14 +5,14 @@ set(FLATBUFFERS_INSTALL_PREFIX ${FLATBUFFERS_EXT_PREFIX}/install)
 set(FLATBUFFERS_INCLUDE_DIR ${FLATBUFFERS_INSTALL_PREFIX}/include)
 set(FLATBUFFERS_LIB_DIR ${FLATBUFFERS_INSTALL_PREFIX}/lib)
 set(FLATBUFFERS_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers" CACHE INTERNAL "")
-set(FLATBUFFERS_CMAKE_CONFIG_FILE "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers/flatbuffersConfig.cmake")
+set(FLATBUFFERS_CMAKE_CONFIG_FILE "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers/flatbuffers-config.cmake")
 
 
 
 set(FLATC_EXECUTABLE "${FLATBUFFERS_INSTALL_PREFIX}/bin/flatc" CACHE INTERNAL "")
 
-if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
-  message(STATUS "Abseil not found. Configuring external build...")
+if(NOT EXISTS "${FLATBUFFERS_CMAKE_CONFIG_FILE}")
+  message(STATUS "Flatbuffers not found. Configuring external build...")
 
 
 ExternalProject_Add(

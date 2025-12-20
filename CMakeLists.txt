@@ -72,7 +72,7 @@ include(collect_dependencies)
 # --- LiteRT-LM Targets
 include(setup_generated_src_files)
 generate_src_files(ALL_GENERATED_FILES ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES})
-generate_protobuf()
+
 
 add_subdirectory(c)
 # add_subdirectory(schema)

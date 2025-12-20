@@ -1,128 +1,89 @@
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_litert_interface_library(runtime_executor_audio_executor)
-target_include_directories(runtime_executor_audio_executor INTERFACE
+# --- Audio Executor Interface ---
+add_litertlm_library(runtime_executor_audio_executor INTERFACE)
+add_library(LiteRTLM::Executor::Audio::Interface ALIAS runtime_executor_audio_executor)
+
+target_include_directories(runtime_executor_audio_executor
+  INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
+# --- Audio Executor Base ---
+add_litertlm_library(runtime_executor_audio_executor_base INTERFACE)
+add_library(LiteRTLM::Executor::Audio::Base ALIAS runtime_executor_audio_executor_base)
 
-add_litert_interface_library(runtime_executor_audio_executor_base)
-target_include_directories(runtime_executor_audio_executor_base INTERFACE
+target_include_directories(runtime_executor_audio_executor_base
+  INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-
-add_litert_static_library(runtime_executor_audio_executor_settings
+# --- Audio Executor Settings ---
+add_litertlm_library(runtime_executor_audio_executor_settings STATIC
   audio_executor_settings.cc
 )
+add_library(LiteRTLM::Executor::Audio::Settings ALIAS runtime_executor_audio_executor_settings)
+
 target_include_directories(runtime_executor_audio_executor_settings
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_audio_executor_settings
   PUBLIC
-    runtime_executor_executor_settings_base
+    LiteRTLM::Executor::SettingsBase # (Defined below)
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
     litert_libs
 )
 
-# add_litert_executable(runtime_executor_audio_executor_settings_test
-#   audio_executor_settings_test.cc
-# )
-# target_link_libraries(runtime_executor_audio_executor_settings_test PRIVATE
-#   runtime_executor_audio_executor_settings
-#   runtime_executor_executor_settings_base
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-# )
-# add_test(NAME runtime_executor_audio_executor_settings_test COMMAND audio_executor_settings_test)
-
-add_litert_library(runtime_executor_audio_litert_compiled_model_executor STATIC
+# --- Audio LiteRT Compiled Model Executor ---
+add_litertlm_library(runtime_executor_audio_litert_compiled_model_executor STATIC
   audio_litert_compiled_model_executor.cc
 )
+add_library(LiteRTLM::Executor::Audio::CompiledModel ALIAS runtime_executor_audio_litert_compiled_model_executor)
+
 target_include_directories(runtime_executor_audio_litert_compiled_model_executor
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_audio_litert_compiled_model_executor
   PUBLIC
-    runtime_executor_audio_executor_settings
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_io_types
-    runtime_components_model_resources
-    runtime_executor_audio_executor
+    LiteRTLM::Executor::Audio::Interface
+    LiteRTLM::Executor::Audio::Settings
+    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Executor::LLM::IoTypes # (Defined below)
+    LiteRTLM::Components::ModelResources::Interface
     runtime_util_litert_status_util
-    runtime_executor_litert_compiled_model_executor_utils    
+    LiteRTLM::Executor::CompiledModelUtils # (Defined below)
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-
-  # litert
-  # litert_litert_cc_litert_tensor_buffer_types
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_c_litert_tensor_buffer_types
-  # litert_litert_cc_litert_common
-  # litert_litert_cc_litert_compiled_model
-  # litert_litert_cc_litert_element_type
-  # litert_litert_cc_litert_environment
-  # litert_litert_cc_litert_layout
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_model
-  # litert_litert_cc_litert_options
-  # litert_litert_cc_litert_ranked_tensor_type
-  # litert_litert_cc_litert_tensor_buffer
-  # litert_litert_cc_options_litert_cpu_options
-  # litert_litert_cc_options_litert_gpu_options
-  # litert_litert_cc_options_litert_runtime_options
 )
 
-# add_litert_executable(runtime_executor_audio_litert_compiled_model_executor_test
-#   audio_litert_compiled_model_executor_test.cc
-# )
-# target_link_libraries(runtime_executor_audio_litert_compiled_model_executor_test PRIVATE 
-#   runtime_executor_audio_executor_settings
-#   runtime_executor_audio_litert_compiled_model_executor
-#   runtime_executor_executor_settings_base
-#   runtime_util_litert_status_util
-#   runtime_util_scoped_file
-#   runtime_util_test_utils
-
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_cc_litert_element_type
-#   # litert_litert_cc_litert_layout
-#   # litert_litert_cc_litert_macros
-#   # litert_litert_cc_litert_model
-#   # litert_litert_cc_litert_tensor_buffer
-#   # litert_litert_cc_litert_tensor_buffer_types
-#   # litert_litert_test_matchers
-#   # litert_litert_cc_litert_api_with_dynamic_runtime
-#   # litert_litert_cc_litert_environment
-# )
-# add_test(NAME runtime_executor_audio_litert_compiled_model_executor_test COMMAND audio_litert_compiled_model_executor_test)
-
-# Skipping library default_static_gpu_accelerator: no sources or headers
-
-add_litert_library(runtime_executor_executor_settings_base STATIC
+# --- Executor Settings Base ---
+add_litertlm_library(runtime_executor_executor_settings_base STATIC
   executor_settings_base.cc
 )
+add_library(LiteRTLM::Executor::SettingsBase ALIAS runtime_executor_executor_settings_base)
+
 target_include_directories(runtime_executor_executor_settings_base
-    PUBLIC
+  PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_executor_settings_base
   PUBLIC
     runtime_util_scoped_file
@@ -131,72 +92,52 @@ target_link_libraries(runtime_executor_executor_settings_base
     litert_libs
 )
 
-# add_litert_executable(runtime_executor_executor_settings_base_test
-#   executor_settings_base_test.cc
-# )
-# target_link_libraries(runtime_executor_executor_settings_base_test PRIVATE
-#   runtime_executor_executor_settings_base
-#   runtime_util_test_utils
-#   gtest_lib
-# )
-# add_test(NAME runtime_executor_executor_settings_base_test COMMAND executor_settings_base_test)
-
-add_litert_library(runtime_executor_fake_llm_executor STATIC
+# --- Fake LLM Executor ---
+add_litertlm_library(runtime_executor_fake_llm_executor STATIC
   fake_llm_executor.cc
 )
+add_library(LiteRTLM::Executor::LLM::Fake ALIAS runtime_executor_fake_llm_executor)
+
 target_include_directories(runtime_executor_fake_llm_executor
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
-  )
+)
+
 target_link_libraries(runtime_executor_fake_llm_executor
   PUBLIC
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_io_types
-    runtime_executor_llm_executor_settings
+    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Executor::LLM::Interface # (Defined below)
+    LiteRTLM::Executor::LLM::IoTypes
+    LiteRTLM::Executor::LLM::Settings # (Defined below)
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
-    runtime_executor_llm_executor
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-  # litert
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_tensor_buffer)
 )
-# add_litert_executable(runtime_executor_fake_llm_executor_test
-#   fake_llm_executor_test.cc
-# )
-# target_link_libraries(runtime_executor_fake_llm_executor_test PRIVATE
-#   runtime_executor_fake_llm_executor
-#   runtime_executor_llm_executor_io_types
-#   runtime_util_convert_tensor_buffer
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   absl_lib
-#   # litert_litert_test_matchers
-# )
-# add_test(NAME runtime_executor_fake_llm_executor_test COMMAND fake_llm_executor_test)
 
-add_litert_library(runtime_executor_litert_compiled_model_executor_utils STATIC
+# --- LiteRT Compiled Model Executor Utils ---
+add_litertlm_library(runtime_executor_litert_compiled_model_executor_utils STATIC
   litert_compiled_model_executor_utils.cc
 )
+add_library(LiteRTLM::Executor::CompiledModelUtils ALIAS runtime_executor_litert_compiled_model_executor_utils)
+
 target_include_directories(runtime_executor_litert_compiled_model_executor_utils
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_litert_compiled_model_executor_utils
   PUBLIC
-    runtime_executor_executor_settings_base
-    runtime_components_model_resources
-    runtime_components_model_resources_litert_lm
-    runtime_components_model_resources_task
-    runtime_components_sentencepiece_tokenizer
-    
+    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Components::ModelResources::LiteRTLM
+    LiteRTLM::Components::ModelResources::Task
+    LiteRTLM::Components::Tokenizer::SentencePiece
     runtime_util_file_format_util
     runtime_util_litert_lm_loader
     runtime_util_litert_status_util
@@ -207,125 +148,87 @@ target_link_libraries(runtime_executor_litert_compiled_model_executor_utils
     proto_lib
     LITERTLM_DEPS
     litert_libs
-  # litert
-  #litert_litert_cc_litert_api_with_dynamic_runtime
-  #litert_litert_cc_litert_element_type
-  #litert_litert_cc_litert_expected
-  #litert_litert_cc_litert_macros
-  #litert_litert_cc_litert_model
-  #litert_litert_cc_litert_tensor_buffer
-  )
+)
 
-# add_litert_executable(runtime_executor_litert_compiled_model_executor_utils_test
-#   litert_compiled_model_executor_utils_test.cc
-# )
-# target_link_libraries(runtime_executor_litert_compiled_model_executor_utils_test PRIVATE
-#   runtime_executor_executor_settings_base
-#   runtime_executor_litert_compiled_model_executor_utils
-#   runtime_components_model_resources
-#   runtime_util_scoped_file
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   absl_lib
-#   # litert_litert_c_litert_tensor_buffer_types
-#   # litert_litert_cc_litert_element_type
-#   # litert_litert_cc_litert_environment
-#   # litert_litert_cc_litert_layout
-#   # litert_litert_cc_litert_ranked_tensor_type
-#   # litert_litert_cc_litert_tensor_buffer
-#   # litert_litert_cc_litert_tensor_buffer_types
-#   # litert_litert_test_matchers
-# )
-# add_test(NAME runtime_executor_litert_compiled_model_executor_utils_test COMMAND litert_compiled_model_executor_utils_test)
+# --- LLM Executor Interface ---
+add_litertlm_library(runtime_executor_llm_executor INTERFACE)
+add_library(LiteRTLM::Executor::LLM::Interface ALIAS runtime_executor_llm_executor)
 
-add_litert_library(runtime_executor_llm_executor INTERFACE)
-target_include_directories(runtime_executor_llm_executor INTERFACE
+target_include_directories(runtime_executor_llm_executor 
+  INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
+# --- LLM Executor Base ---
+add_litertlm_library(runtime_executor_llm_executor_base INTERFACE)
+add_library(LiteRTLM::Executor::LLM::Base ALIAS runtime_executor_llm_executor_base)
 
-add_litert_library(runtime_executor_llm_executor_base INTERFACE)
-target_include_directories(runtime_executor_llm_executor_base INTERFACE
+target_include_directories(runtime_executor_llm_executor_base
+  INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-
-add_litert_library(runtime_executor_llm_executor_io_types STATIC
+# --- LLM Executor IO Types ---
+add_litertlm_library(runtime_executor_llm_executor_io_types STATIC
   llm_executor_io_types.cc
 )
+add_library(LiteRTLM::Executor::LLM::IoTypes ALIAS runtime_executor_llm_executor_io_types)
+
 target_include_directories(runtime_executor_llm_executor_io_types
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
-    ${LITERTLM_INCLUDE_PATHS})
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
 target_link_libraries(runtime_executor_llm_executor_io_types
   PUBLIC
-    runtime_components_constrained_decoding_constrained_decoder
+    LiteRTLM::ConstrainedDecoding::Decoder
     runtime_util_logging_tensor_buffer
   PRIVATE 
     LITERTLM_DEPS
     litert_libs
 )
-# add_litert_executable(runtime_executor_llm_executor_io_types_test
-#   llm_executor_io_types_test.cc
-# )
-# target_link_libraries(runtime_executor_llm_executor_io_types_test PRIVATE
-#   runtime_executor_llm_executor_io_types
-#   runtime_components_constrained_decoding_constrained_decoder
-#   runtime_components_constrained_decoding_fake_constraint
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_cc_litert_element_type
-#   # litert_litert_cc_litert_environment
-#   # litert_litert_cc_litert_layout
-#   # litert_litert_cc_litert_model
-#   # litert_litert_cc_litert_tensor_buffer
-# )
-# add_test(NAME runtime_executor_llm_executor_io_types_test COMMAND llm_executor_io_types_test)
 
-
-add_litert_library(runtime_executor_llm_executor_processed_tokens STATIC
+# --- LLM Executor Processed Tokens ---
+add_litertlm_library(runtime_executor_llm_executor_processed_tokens STATIC
   llm_executor_processed_tokens.cc
 )
+add_library(LiteRTLM::Executor::LLM::ProcessedTokens ALIAS runtime_executor_llm_executor_processed_tokens)
+
 target_include_directories(runtime_executor_llm_executor_processed_tokens
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
-    ${LITERTLM_INCLUDE_PATHS})
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
 target_link_libraries(runtime_executor_llm_executor_processed_tokens
   PRIVATE
     LITERTLM_DEPS
     litert_libs
 )
 
-# add_litert_executable(runtime_executor_llm_executor_processed_tokens_test
-#   llm_executor_processed_tokens_test.cc
-# )
-# target_link_libraries(runtime_executor_llm_executor_processed_tokens_test PRIVATE
-#   runtime_executor_llm_executor_processed_tokens
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-# )
-# add_test(NAME runtime_executor_llm_executor_processed_tokens_test COMMAND llm_executor_processed_tokens_test)
-
-
-add_litert_library(runtime_executor_llm_executor_settings STATIC
+# --- LLM Executor Settings ---
+add_litertlm_library(runtime_executor_llm_executor_settings STATIC
   llm_executor_settings.cc
 )
+add_library(LiteRTLM::Executor::LLM::Settings ALIAS runtime_executor_llm_executor_settings)
+
 target_include_directories(runtime_executor_llm_executor_settings
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_llm_executor_settings
   PUBLIC
-    runtime_executor_executor_settings_base
+    LiteRTLM::Executor::SettingsBase
     runtime_util_litert_status_util
     runtime_util_logging
   PRIVATE
@@ -334,51 +237,19 @@ target_link_libraries(runtime_executor_llm_executor_settings
     proto_lib
 )
 
-
-# add_litert_library(runtime_executor_llm_executor_settings_utils STATIC
-#   llm_executor_settings_utils.cc
-# )
-# target_include_directories(runtime_executor_llm_executor_settings_utils
-#   PUBLIC
-#     ${GENERATED_SRC_DIR}
-#     ${LITERT_INCLUDE_DIR}
-#     ${LITERTLM_INCLUDE_PATHS}
-# )
-# target_link_libraries(runtime_executor_llm_executor_settings_utils
-#   PUBLIC
-#     runtime_executor_executor_settings_base
-#     runtime_util_litert_status_util
-#     runtime_util_logging
-#   PRIVATE
-#     LITERTLM_DEPS
-#     litert_libs
-#     proto_lib
-# )
-
-
-# add_litert_executable(runtime_executor_llm_executor_settings_test
-#   llm_executor_settings_test.cc
-# )
-# target_link_libraries(runtime_executor_llm_executor_settings_test PRIVATE
-#   runtime_executor_executor_settings_base
-#   runtime_executor_llm_executor_settings
-#   runtime_util_scoped_file
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-# )
-# add_test(NAME runtime_executor_llm_executor_settings_test COMMAND llm_executor_settings_test)
-
-
-add_litert_library(runtime_executor_llm_litert_compiled_model_cache_utils STATIC
+# --- LLM LiteRT Compiled Model Cache Utils ---
+add_litertlm_library(runtime_executor_llm_litert_compiled_model_cache_utils STATIC
   llm_litert_compiled_model_cache_utils.cc
 )
+add_library(LiteRTLM::Executor::LLM::CacheUtils ALIAS runtime_executor_llm_litert_compiled_model_cache_utils)
+
 target_include_directories(runtime_executor_llm_litert_compiled_model_cache_utils
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
-  )
+)
+
 target_link_libraries(runtime_executor_llm_litert_compiled_model_cache_utils
   PUBLIC
     runtime_util_convert_tensor_buffer
@@ -388,51 +259,37 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_cache_utils
     litert_libs
 )
 
-# add_litert_executable(runtime_executor_llm_litert_compiled_model_cache_utils_test
-#   llm_litert_compiled_model_cache_utils_test.cc
-# )
-# target_link_libraries(runtime_executor_llm_litert_compiled_model_cache_utils_test PRIVATE
-#   runtime_executor_llm_litert_compiled_model_cache_utils
-#   runtime_components_convert_tensor_buffer
-#   runtime_components_litert_status_util
-#   runtime_components_test_utils
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_cc_litert_model
-#   # litert_litert_cc_litert_tensor_buffer
-#   # litert_litert_test_matchers
-  
-# )
-# add_test(NAME runtime_executor_llm_litert_compiled_model_cache_utils_test COMMAND llm_litert_compiled_model_cache_utils_test)
-
-add_litert_library(runtime_executor_llm_litert_compiled_model_executor_factory STATIC
+# --- LLM LiteRT Compiled Model Executor Factory ---
+add_litertlm_library(runtime_executor_llm_litert_compiled_model_executor_factory STATIC
   llm_litert_compiled_model_executor_factory.cc
-
 )
+add_library(LiteRTLM::Executor::LLM::Factory ALIAS runtime_executor_llm_litert_compiled_model_executor_factory)
+
 target_include_directories(runtime_executor_llm_litert_compiled_model_executor_factory
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_llm_litert_compiled_model_executor_factory
   PUBLIC
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_io_types
-    runtime_executor_llm_executor_settings
-    runtime_executor_llm_litert_compiled_model_executor
-    runtime_executor_llm_litert_npu_compiled_model_executor
-    runtime_executor_litert_compiled_model_executor_utils
-    runtime_executor_llm_executor
-    runtime_executor_llm_executor_processed_tokens
-    runtime_executor_llm_litert_compiled_model_cache_utils
-    runtime_executor_magic_number_configs_helper
-    runtime_components_model_resources
-    runtime_components_model_resources_litert_lm
-    runtime_components_model_resources_task
-    runtime_components_sampler
-    runtime_components_sampler_factory
-    runtime_components_embedding_lookup_embedding_lookup_manager
+    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Executor::LLM::IoTypes
+    LiteRTLM::Executor::LLM::Settings
+    LiteRTLM::Executor::LLM::CompiledModel # (Defined below)
+    LiteRTLM::Executor::LLM::NpuCompiledModel # (Defined below)
+    LiteRTLM::Executor::CompiledModelUtils
+    LiteRTLM::Executor::LLM::Interface
+    LiteRTLM::Executor::LLM::ProcessedTokens
+    LiteRTLM::Executor::LLM::CacheUtils
+    LiteRTLM::Executor::MagicNumberConfigsHelper # (Defined below)
+    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Components::ModelResources::LiteRTLM
+    LiteRTLM::Components::ModelResources::Task
+    LiteRTLM::Components::Sampler::Interface
+    LiteRTLM::Components::Sampler::Factory
+    LiteRTLM::EmbeddingLookup::Manager
     runtime_util_convert_tensor_buffer
     runtime_util_file_util
     runtime_util_litert_status_util
@@ -442,53 +299,37 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_executor_factor
     proto_lib
     LITERTLM_DEPS
     litert_libs
-  # litert_litert_cc_litert_tensor_buffer_types
-  # litert_tflite_delegates_xnnpack_xnnpack_delegate
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_c_internal_litert_external_litert_buffer_context litert_litert_cc_litert_common
-  # litert_litert_cc_litert_compiled_model
-  # litert_litert_cc_litert_element_type
-  # litert_litert_cc_litert_environment
-  # litert_litert_cc_litert_expected
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_model
-  # litert_litert_cc_litert_options
-  # litert_litert_cc_litert_ranked_tensor_type
-  # litert_litert_cc_litert_tensor_buffer
-  # litert_litert_cc_options_litert_cpu_options
-  # litert_litert_cc_options_litert_gpu_options
-  # litert_litert_cc_options_litert_runtime_options
 )
 
-
-
-
-add_litert_library(runtime_executor_llm_litert_compiled_model_executor STATIC
+# --- LLM LiteRT Compiled Model Executor ---
+add_litertlm_library(runtime_executor_llm_litert_compiled_model_executor STATIC
   llm_litert_compiled_model_executor.cc
-
 )
+add_library(LiteRTLM::Executor::LLM::CompiledModel ALIAS runtime_executor_llm_litert_compiled_model_executor)
+
 target_include_directories(runtime_executor_llm_litert_compiled_model_executor
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_llm_litert_compiled_model_executor
   PUBLIC
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_io_types
-    runtime_executor_llm_executor_settings
-    runtime_executor_litert_compiled_model_executor_utils
-    runtime_executor_llm_executor
-    runtime_executor_llm_executor_processed_tokens
-    runtime_executor_llm_litert_compiled_model_cache_utils
-    runtime_executor_magic_number_configs_helper
-    runtime_components_model_resources
-    runtime_components_model_resources_litert_lm
-    runtime_components_model_resources_task
-    runtime_components_sampler
-    runtime_components_sampler_factory
-    runtime_components_embedding_lookup_embedding_lookup_manager
+    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Executor::LLM::IoTypes
+    LiteRTLM::Executor::LLM::Settings
+    LiteRTLM::Executor::CompiledModelUtils
+    LiteRTLM::Executor::LLM::Interface
+    LiteRTLM::Executor::LLM::ProcessedTokens
+    LiteRTLM::Executor::LLM::CacheUtils
+    LiteRTLM::Executor::MagicNumberConfigsHelper
+    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Components::ModelResources::LiteRTLM
+    LiteRTLM::Components::ModelResources::Task
+    LiteRTLM::Components::Sampler::Interface
+    LiteRTLM::Components::Sampler::Factory
+    LiteRTLM::EmbeddingLookup::Manager
     runtime_util_convert_tensor_buffer
     runtime_util_file_util
     runtime_util_litert_status_util
@@ -497,241 +338,153 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_executor
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-  # litert_litert_cc_litert_tensor_buffer_types
-  # litert_tflite_delegates_xnnpack_xnnpack_delegate
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_c_internal_litert_external_litert_buffer_context litert_litert_cc_litert_common
-  # litert_litert_cc_litert_compiled_model
-  # litert_litert_cc_litert_element_type
-  # litert_litert_cc_litert_environment
-  # litert_litert_cc_litert_expected
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_model
-  # litert_litert_cc_litert_options
-  # litert_litert_cc_litert_ranked_tensor_type
-  # litert_litert_cc_litert_tensor_buffer
-  # litert_litert_cc_options_litert_cpu_options
-  # litert_litert_cc_options_litert_gpu_options
-  # litert_litert_cc_options_litert_runtime_options
 )
 
-# add_litert_executable(runtime_executor_llm_litert_compiled_model_executor_test
-#   llm_litert_compiled_model_executor_test.cc
-# )
-# target_link_libraries(runtime_executor_llm_litert_compiled_model_executor_test PRIVATE
-#   # default_static_gpu_accelerator
-#   runtime_executor_executor_settings_base
-#   runtime_executor_llm_executor_io_types
-#   runtime_executor_llm_executor_settings
-#   runtime_executor_llm_litert_compiled_model_executor
-#   runtime_components_model_resources
-#   runtime_components_model_resources_task
-#   runtime_components_tokenizer
-#   runtime_components_constrained_decoding_constrained_decoder
-#   runtime_components_constrained_decoding_fake_constraint
-#   runtime_util_convert_tensor_buffer
-#   model_asset_bundle_resources
-#   runtime_util_scoped_file
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_test_matchers
-#   # litert_litert_cc_litert_api_with_dynamic_runtime
-#   # litert_litert_cc_litert_element_type
-#   # litert_litert_cc_litert_environment
-#   # litert_litert_cc_litert_layout
-#   # litert_litert_cc_litert_macros
-#   # litert_litert_cc_litert_model
-# )
-# add_test(NAME runtime_executor_llm_litert_compiled_model_executor_test COMMAND llm_litert_compiled_model_executor_test)
-
-add_litert_library(runtime_executor_llm_litert_npu_compiled_model_executor STATIC
+# --- LLM LiteRT NPU Compiled Model Executor ---
+add_litertlm_library(runtime_executor_llm_litert_npu_compiled_model_executor STATIC
   llm_litert_npu_compiled_model_executor.cc
 )
+add_library(LiteRTLM::Executor::LLM::NpuCompiledModel ALIAS runtime_executor_llm_litert_npu_compiled_model_executor)
+
 target_include_directories(runtime_executor_llm_litert_npu_compiled_model_executor
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
-    ${LITERTLM_INCLUDE_PATHS})
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
 target_link_libraries(runtime_executor_llm_litert_npu_compiled_model_executor
   PUBLIC
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_io_types
-    runtime_executor_llm_executor_settings
-    runtime_executor_litert_compiled_model_executor_utils 
-    runtime_executor_llm_executor
-    runtime_components_model_resources
-    runtime_components_model_resources_task
-    runtime_components_embedding_lookup_embedding_lookup_manager
-    runtime_executor_llm_executor_processed_tokens
+    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Executor::LLM::IoTypes
+    LiteRTLM::Executor::LLM::Settings
+    LiteRTLM::Executor::CompiledModelUtils
+    LiteRTLM::Executor::LLM::Interface
+    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Components::ModelResources::Task
+    LiteRTLM::EmbeddingLookup::Manager
+    LiteRTLM::Executor::LLM::ProcessedTokens
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-  # litert_litert_cc_litert_api_with_dynamic_runtime litert_litert_c_options_litert_qualcomm_options litert_litert_cc_litert_common litert_litert_cc_litert_compiled_model litert_litert_cc_litert_element_type litert_litert_cc_litert_environment litert_litert_cc_litert_expected litert_litert_cc_litert_layout litert_litert_cc_litert_macros litert_litert_cc_litert_model litert_litert_cc_litert_options litert_litert_cc_litert_tensor_buffer litert_litert_cc_options_litert_google_tensor_options litert_litert_cc_options_litert_mediatek_options litert_litert_cc_options_litert_qualcomm_options)
 )
 
-add_litert_library(runtime_executor_magic_number_configs_helper STATIC
+# --- Magic Number Configs Helper ---
+add_litertlm_library(runtime_executor_magic_number_configs_helper STATIC
   magic_number_configs_helper.cc
 )
-target_include_directories(runtime_executor_magic_number_configs_helper PRIVATE
+add_library(LiteRTLM::Executor::MagicNumberConfigsHelper ALIAS runtime_executor_magic_number_configs_helper)
+
+target_include_directories(runtime_executor_magic_number_configs_helper
+  PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_magic_number_configs_helper
   PUBLIC 
-    runtime_executor_llm_executor_settings
-    runtime_components_model_resources
+    LiteRTLM::Executor::LLM::Settings
+    LiteRTLM::Components::ModelResources::Interface
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-  # litert_litert_cc_options_litert_magic_number_options
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_cc_litert_environment
-  # litert_litert_cc_litert_expected
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_model
 )
 
-# add_litert_executable(runtime_executor_magic_number_configs_helper_test
-#   magic_number_configs_helper_test.cc
-# )
-# target_link_libraries(runtime_executor_magic_number_configs_helper_test PRIVATE
-#   runtime_executor_executor_settings_base
-#   runtime_util_litert_status_util
-#   runtime_executor_llm_executor_settings
-#   runtime_executor_magic_number_configs_helper
-#   runtime_components_model_resources
-#   runtime_util_test_utils  
-#   runtime_comonents_tokenizer
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_cc_litert_macros
-#   # litert_litert_cc_litert_model
-# )
-# add_test(NAME runtime_executor_magic_number_configs_helper_test COMMAND magic_number_configs_helper_test)
+# --- Vision Executor Interface ---
+add_litertlm_library(runtime_executor_vision_executor INTERFACE)
+add_library(LiteRTLM::Executor::Vision::Interface ALIAS runtime_executor_vision_executor)
 
-
-add_litert_library(runtime_executor_vision_executor INTERFACE)
-target_include_directories(runtime_executor_vision_executor INTERFACE
+target_include_directories(runtime_executor_vision_executor 
+  INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
+# --- Vision Executor Base ---
+add_litertlm_library(runtime_executor_vision_executor_base INTERFACE)
+add_library(LiteRTLM::Executor::Vision::Base ALIAS runtime_executor_vision_executor_base)
 
-add_litert_library(runtime_executor_vision_executor_base INTERFACE)
-target_include_directories(runtime_executor_vision_executor_base INTERFACE
+target_include_directories(runtime_executor_vision_executor_base 
+  INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-
-add_litert_library(runtime_executor_vision_executor_settings STATIC
+# --- Vision Executor Settings ---
+add_litertlm_library(runtime_executor_vision_executor_settings STATIC
   vision_executor_settings.cc
 )
+add_library(LiteRTLM::Executor::Vision::Settings ALIAS runtime_executor_vision_executor_settings)
+
 target_include_directories(runtime_executor_vision_executor_settings
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_vision_executor_settings
   PUBLIC
-    runtime_executor_executor_settings_base
+    LiteRTLM::Executor::SettingsBase
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
     litert_libs
 )
 
-# add_litert_executable(runtime_executor_vision_executor_settings_test
-#   vision_executor_settings_test.cc
-# )
-# target_link_libraries(runtime_executor_vision_executor_settings_test PRIVATE
-#   runtime_executor_executor_settings_base
-#   runtime_executor_vision_executor_settings
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   )
-# add_test(NAME runtime_executor_vision_executor_settings_test COMMAND vision_executor_settings_test)
-
-add_litert_library(runtime_executor_vision_litert_compiled_model_executor STATIC
+# --- Vision LiteRT Compiled Model Executor ---
+add_litertlm_library(runtime_executor_vision_litert_compiled_model_executor STATIC
   vision_litert_compiled_model_executor.cc
 )
+add_library(LiteRTLM::Executor::Vision::CompiledModel ALIAS runtime_executor_vision_litert_compiled_model_executor)
+
 target_include_directories(runtime_executor_vision_litert_compiled_model_executor
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_executor_vision_litert_compiled_model_executor
   PUBLIC
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_io_types
-    runtime_executor_vision_executor_settings
+    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Executor::LLM::IoTypes
+    LiteRTLM::Executor::Vision::Settings
     runtime_util_convert_tensor_buffer
-    runtime_executor_litert_compiled_model_executor_utils
+    LiteRTLM::Executor::CompiledModelUtils
     runtime_util_litert_status_util
-    runtime_components_model_resources
-    runtime_executor_vision_executor
+    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Executor::Vision::Interface
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_c_options_litert_qualcomm_options
-  # litert_litert_cc_litert_common
-  # litert_litert_cc_litert_compiled_model
-  # litert_litert_cc_litert_environment
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_model
-  # litert_litert_cc_litert_options
-  # litert_litert_cc_litert_tensor_buffer
-  # litert_litert_cc_options_litert_cpu_options
-  # litert_litert_cc_options_litert_gpu_options
-  # litert_litert_cc_options_litert_qualcomm_options
-  # litert_litert_cc_options_litert_runtime_options
 )
 
-# add_litert_executable(runtime_executor_vision_litert_compiled_model_executor_test
-#   vision_litert_compiled_model_executor_test.cc
-# )
-# target_link_libraries(runtime_executor_vision_litert_compiled_model_executor_test PRIVATE
-#   runtime_executor_executor_settings_base
-#   runtime_executor_litert_lm_loader
-#   runtime_components_model_resources_litert_lm
-#   runtime_util_scoped_file
-#   runtime_util_test_utils
-#   runtime_executor_vision_executor_settings
-#   runtime_executor_vision_litert_compiled_model_executor
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_test_matchers
-#   # litert_litert_cc_litert_api_with_dynamic_runtime
-#   # litert_litert_cc_litert_environment
-# )
-# add_test(NAME runtime_executor_vision_litert_compiled_model_executor_test COMMAND vision_litert_compiled_model_executor_test)
-
-
+# --- Folder Facade ---
 add_library(runtime_executor_libs INTERFACE)
+add_library(LiteRTLM::Executor ALIAS runtime_executor_libs)
+
 target_link_libraries(runtime_executor_libs INTERFACE
-  runtime_executor_audio_executor_settings
-  runtime_executor_audio_litert_compiled_model_executor
-  runtime_executor_executor_settings_base
-  runtime_executor_fake_llm_executor
-  runtime_executor_litert_compiled_model_executor_utils
-  runtime_executor_llm_executor_io_types
-  runtime_executor_llm_executor_processed_tokens
-  runtime_executor_llm_executor_settings
-  runtime_executor_llm_litert_compiled_model_executor_factory
-  runtime_executor_llm_litert_compiled_model_cache_utils
-  runtime_executor_llm_litert_compiled_model_executor
-  runtime_executor_llm_litert_npu_compiled_model_executor
-  runtime_executor_magic_number_configs_helper
-  runtime_executor_vision_executor_settings
-  runtime_executor_vision_litert_compiled_model_executor
+  LiteRTLM::Executor::Audio::Interface
+  LiteRTLM::Executor::Audio::Settings
+  LiteRTLM::Executor::Audio::CompiledModel
+  LiteRTLM::Executor::SettingsBase
+  LiteRTLM::Executor::LLM::Fake
+  LiteRTLM::Executor::CompiledModelUtils
+  LiteRTLM::Executor::LLM::IoTypes
+  LiteRTLM::Executor::LLM::ProcessedTokens
+  LiteRTLM::Executor::LLM::Settings
+  LiteRTLM::Executor::LLM::Factory
+  LiteRTLM::Executor::LLM::CacheUtils
+  LiteRTLM::Executor::LLM::CompiledModel
+  LiteRTLM::Executor::LLM::NpuCompiledModel
+  LiteRTLM::Executor::MagicNumberConfigsHelper
+  LiteRTLM::Executor::Vision::Settings
+  LiteRTLM::Executor::Vision::CompiledModel
 )

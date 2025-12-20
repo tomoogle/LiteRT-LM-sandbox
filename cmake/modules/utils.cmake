@@ -57,7 +57,7 @@ function(generate_src_files OUTPUT_CLEAN_PATHS)
 endfunction()
 
 
-function(generate_protobuf)
+function(generate_protobuf target_name)
   if(NOT TARGET protobuf_external)
     message(FATAL_ERROR "ExternalProject_Add failed to create protobuf_external or generate_protobuf was called too soon!")
   endif()
@@ -65,10 +65,11 @@ function(generate_protobuf)
   include(vendor/protobuf-generate)
   message(STATUS "Protobuf_INCLUDE_DIR: ${Protobuf_INCLUDE_DIR}")
   protobuf_generate(
-    TARGET proto_lib
+    TARGET ${target_name}
     LANGUAGE cpp
-    IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_ROOT} ${Protobuf_INCLUDE_DIR}
+    IMPORT_DIRS ${PROJECT_ROOT} ${Protobuf_INCLUDE_DIR}
     APPEND_PATH ${Protobuf_INCLUDE_DIR}
+    PROTOC_OUT_DIR ${CMAKE_BINARY_DIR}
     PROTOS ${PROTO_FILES}
   )
 endfunction()

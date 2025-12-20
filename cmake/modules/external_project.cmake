@@ -9,5 +9,4 @@ include(${EXTERNAL_PROJECT_MODULES_DIR}/tokenizers.cmake)
 include(${EXTERNAL_PROJECT_MODULES_DIR}/re2.cmake)
 include(${EXTERNAL_PROJECT_MODULES_DIR}/flatbuffers.cmake)
 include(${EXTERNAL_PROJECT_MODULES_DIR}/tflite.cmake)
-
-#include(${EXTERNAL_PROJECT_MODULES_DIR}/litert.cmake)
+include(${EXTERNAL_PROJECT_MODULES_DIR}/litert.cmake)

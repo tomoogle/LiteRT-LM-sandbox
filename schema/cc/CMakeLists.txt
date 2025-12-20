@@ -1,32 +1,36 @@
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_litert_executable(schema_cc_litertlm_export_main
+# --- Export Main Executable ---
+add_litertlm_executable(schema_cc_litertlm_export_main
   litertlm_export_main.cc
 )
-target_link_directories(schema_cc_litertlm_export_main 
+
+target_include_directories(schema_cc_litertlm_export_main 
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
     ${THIRD_PARTY_DIR}
 )
+
 target_link_libraries(schema_cc_litertlm_export_main
   PUBLIC
-    schema_core_litertlm_export
-    schema_core_litertlm_header
-    schema_core_litertlm_header_schema
-    schema_core_litertlm_section
+    LiteRTLM::Schema::Core::Export
+    LiteRTLM::Schema::Core::Header
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Schema::Core::Section
   PRIVATE
     LITERTLM_DEPS
     litert_libs
     proto_lib
-  # flatbuffers
 )
 
-add_litert_executable(schema_cc_litertlm_peek
+# --- Peek Executable ---
+add_litertlm_executable(schema_cc_litertlm_peek
   litertlm_peek.cc
 )
-target_link_directories(schema_cc_litertlm_peek 
+
+target_include_directories(schema_cc_litertlm_peek 
   PRIVATE
     ${THIRD_PARTY_DIR}
     ${GENERATED_SRC_DIR}
@@ -34,22 +38,25 @@ target_link_directories(schema_cc_litertlm_peek
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(schema_cc_litertlm_peek
   PUBLIC
-    schema_core_litertlm_header
-    schema_core_litertlm_header_schema
-    schema_core_litertlm_print
-    schema_core_litertlm_read
-    schema_core_litertlm_section
+    LiteRTLM::Schema::Core::Header
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Schema::Core::Print
+    LiteRTLM::Schema::Core::Read
+    LiteRTLM::Schema::Core::Section
   PRIVATE
     LITERTLM_DEPS
     litert_libs
 )
 
-add_litert_executable(schema_cc_litertlm_writer
+# --- Writer Executable ---
+add_litertlm_executable(schema_cc_litertlm_writer
   litertlm_writer.cc
 )
-target_link_directories(schema_cc_litertlm_writer 
+
+target_include_directories(schema_cc_litertlm_writer 
   PRIVATE
     ${THIRD_PARTY_DIR}
     ${GENERATED_SRC_DIR}
@@ -57,66 +64,50 @@ target_link_directories(schema_cc_litertlm_writer
     ${LITERT_INCLUDE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(schema_cc_litertlm_writer
   PUBLIC
-    schema_cc_litertlm_writer_utils 
-    schema_core_litertlm_export
-    schema_core_litertlm_header
-    schema_core_litertlm_header_schema
-    schema_core_litertlm_section
+    LiteRTLM::Schema::CC::WriterUtils # (Defined below)
+    LiteRTLM::Schema::Core::Export
+    LiteRTLM::Schema::Core::Header
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Schema::Core::Section
   PRIVATE
     LITERTLM_DEPS
     litert_libs
     proto_lib
-  
-  
-  
-  )
+)
 
-# add_litert_executable(schema_cc_litertlm_writer_test
-#   litertlm_writer_test.cc
-# )
-# target_link_libraries(schema_cc_litertlm_writer_test PRIVATE
-#   ${LITERTLM_DEPS}
-#   schema_cc_litertlm_writer_utils
-#   schema_core_litertlm_print
-#   runtime_proto_llm_metadata_cc_proto
-#   runtime_proto_token_cc_proto
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_tflite_framework
-#   # litert_tflite_framework_stable
-#   # litert_tflite_c_common
-#   # litert_tflite_kernels_builtin_ops
-#   # litert_tflite_schema_schema_fbs
-# )
-# add_test(NAME schema_cc_litertlm_writer_test COMMAND litertlm_writer_test)
-
-add_litert_library(schema_cc_litertlm_writer_utils STATIC
+# --- Writer Utils ---
+add_litertlm_library(schema_cc_litertlm_writer_utils STATIC
   litertlm_writer_utils.cc
 )
+add_library(LiteRTLM::Schema::CC::WriterUtils ALIAS schema_cc_litertlm_writer_utils)
+
 target_include_directories(schema_cc_litertlm_writer_utils
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(schema_cc_litertlm_writer_utils
   PUBLIC
-    schema_core_litertlm_export 
-    schema_core_litertlm_header 
-    schema_core_litertlm_header_schema
-    schema_core_litertlm_print
-    schema_core_litertlm_section
-    schema_core_litertlm_utils
+    LiteRTLM::Schema::Core::Export
+    LiteRTLM::Schema::Core::Header
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Schema::Core::Print
+    LiteRTLM::Schema::Core::Section
+    LiteRTLM::Schema::Core::Utils
   PRIVATE
     LITERTLM_DEPS
     proto_lib
     litert_libs
-    # flatbuffers
-  
 )
 
+# --- Folder Facade ---
 add_library(schema_cc_libs INTERFACE)
+add_library(LiteRTLM::Schema::CC ALIAS schema_cc_libs)
+
 target_link_libraries(schema_cc_libs INTERFACE
- schema_cc_litertlm_writer_utils
+  LiteRTLM::Schema::CC::WriterUtils
 )

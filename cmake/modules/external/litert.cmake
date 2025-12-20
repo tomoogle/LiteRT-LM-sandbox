@@ -7,14 +7,25 @@ set(LITERT_INCLUDE_DIR ${LITERT_INSTALL_PREFIX}/include)
 
 set(LITERT_CONFIG_CMAKE_FILE "${LITERT_INSTALL_PREFIX}/lib/cmake/litert/litert-config.cmake")
 
+set(TENSORFLOW_SOURCE_DIR
+  ${TFLITE_SRC_DIR}
+  ${TFLITE_SRC_DIR}/tflite_external
+  ${TFLITE_SRC_DIR}/tflite_external/tensorflow
+)
+
 ExternalProject_Add(
   litert_external
   DEPENDS
     absl_external
+    protobuf_external
+    sentencepiece_external
+    tokenizers-cpp_external
+    flatbuffers_external
+    tflite_external
   GIT_REPOSITORY
     https://github.com/google-ai-edge/LiteRT.git
   GIT_TAG
-    08735bb886df5e3e1294604c61175efbc72c59dd
+    main
   PREFIX
     ${LITERT_EXT_PREFIX}
   SOURCE_SUBDIR
@@ -41,7 +52,9 @@ ExternalProject_Add(
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}" 
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-
+    -DCL_TARGET_OPENCL_VERSION=220
+    -DCL_HPP_TARGET_OPENCL_VERSION=220
+    -DCL_HPP_MIN_TARGET_OPENCL_VERSION=220
 
 
     # --- Dependency Injection ---
@@ -65,20 +78,27 @@ ExternalProject_Add(
     -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
     
     # --- TFLite Configuration ---
+    -DTFLite_DIR=${TFLITE_INSTALL_PREFIX}/lib/cmake/tensorflow-lite
+    -Dtensorflow-lite_DIR=${TFLITE_INSTALL_PREFIX}/lib/cmake/tensorflow-lite
+    -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
+    -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR}
+
     -DLITERT_AUTO_BUILD_TFLITE=OFF
     -DTFLITE_ENABLE_INSTALL=OFF
     -DTFLITE_ENABLE_XNNPACK=ON
     -DTFLITE_ENABLE_RESOURCE_VARIABLE=OFF
     -DXNNPACK_SET_VERBOSITY=OFF
+    -DTFLITE_ENABLE_GPU=OFF  # <--- Add this
+    -DLITERT_ENABLE_GPU=OFF   # <--- And this to be safe
     
-    # Manual Version Injection
-    "-DEXTRA_CXX_FLAGS=-DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
-
+# THE FIX: Add the new mocks for PFN_ types to the flag string
+    "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -fpermissive -DCL_TARGET_OPENCL_VERSION=220 -Dcl_command_buffer_khr=void* -DPFN_clFinalizeCommandBufferKHR=void* -DPFN_clCommandNDRangeKernelKHR=void* -DPFN_clGetCommandBufferInfoKHR=void*"
     # --- LiteRT Configuration ---
     -DLITERT_DISABLE_KLEIDIAI=OFF
     -DLITERT_BUILD_C_API=ON
-    -DLITERT_ENABLE_GPU=OFF
-    -DLITERT_ENABLE_NPU=OFF
+    
+    # -DLITERT_ENABLE_GPU=OFF
+    # -DLITERT_ENABLE_NPU=OFF
   
 
 

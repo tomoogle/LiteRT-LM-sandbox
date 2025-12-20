@@ -85,6 +85,8 @@ if(NOT TARGET protobuf::protoc)
     )
 endif()
 
+
+
 add_library(proto_lib STATIC)
 add_dependencies(proto_lib protobuf_external)
 
@@ -103,4 +105,4 @@ target_link_libraries(proto_lib
     imp_absl_base
 )
 
-
+generate_protobuf(proto_lib)

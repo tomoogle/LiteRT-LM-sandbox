@@ -42,3 +42,17 @@ else()
         add_custom_target(googletest_external)
     endif()
 endif()
+
+
+import_static_lib(imp_gmock                      "${GTEST_LIB_DIR}/libgmock.a")
+import_static_lib(imp_gmock_main                 "${GTEST_LIB_DIR}/libgmock_main.a")
+import_static_lib(imp_gtest                      "${GTEST_LIB_DIR}/libgtest.a")
+import_static_lib(imp_gtest_main                 "${GTEST_LIB_DIR}/libgtest_main.a")
+
+add_library(gtest_libs INTERFACE)
+target_link_libraries(gtest_libs INTERFACE
+    imp_gmock
+    imp_gmock_main
+    imp_gtest
+    imp_gtest_main
+)

@@ -1,40 +1,43 @@
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_litert_library(runtime_framework_thread_options INTERFACE)
-target_include_directories(runtime_framework_thread_options INTERFACE ${PKG_ROOT}
-    ${LITERTLM_INCLUDE_PATHS})
+# --- Thread Options ---
+add_litertlm_library(runtime_framework_thread_options INTERFACE)
+add_library(LiteRTLM::Framework::ThreadOptions ALIAS runtime_framework_thread_options)
 
-add_litert_library(runtime_framework_threadpool STATIC
+target_include_directories(runtime_framework_thread_options 
+  INTERFACE 
+    ${PKG_ROOT}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+# --- Thread Pool ---
+add_litertlm_library(runtime_framework_threadpool STATIC
   threadpool.cc
   worker_thread.cc
   worker_thread_std_thread.cc
   worker_thread_pthread.cc
 )
-target_include_directories(runtime_framework_threadpool PUBLIC ${PKG_ROOT}
-    ${LITERTLM_INCLUDE_PATHS})
+add_library(LiteRTLM::Framework::ThreadPool ALIAS runtime_framework_threadpool)
+
+target_include_directories(runtime_framework_threadpool 
+  PUBLIC 
+    ${PKG_ROOT}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
 target_link_libraries(runtime_framework_threadpool
   PUBLIC 
-  runtime_framework_thread_options
+    LiteRTLM::Framework::ThreadOptions
   PRIVATE 
-  LITERTLM_DEPS
-  litert_libs
-  )
+    LITERTLM_DEPS
+    litert_libs
+)
 
-# add_litert_executable(runtime_framework_threadpool_test
-#   threadpool_test.cc
-# )
-# target_link_libraries(runtime_framework_threadpool_test PRIVATE
-#   runtime_framework_thread_options
-#   runtime_framework_threadpool
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-# )
-# add_test(NAME runtime_framework_threadpool_test COMMAND threadpool_test)
-
-# Unsupported rule config_setting for //runtime/framework:litert_lm_std_thread
-
+# --- Folder Facade ---
 add_library(runtime_framework_libs INTERFACE)
+add_library(LiteRTLM::Framework ALIAS runtime_framework_libs)
+
 target_link_libraries(runtime_framework_libs INTERFACE
-  runtime_framework_threadpool
+  LiteRTLM::Framework::ThreadOptions
+  LiteRTLM::Framework::ThreadPool
 )

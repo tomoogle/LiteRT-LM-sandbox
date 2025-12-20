@@ -1,55 +1,48 @@
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_litert_library(runtime_engine_engine_interface INTERFACE)
+# --- Engine Interface ---
+add_litertlm_library(runtime_engine_engine_interface INTERFACE)
+add_library(LiteRTLM::Engine::Interface ALIAS runtime_engine_engine_interface)
+
 target_include_directories(runtime_engine_engine_interface
   INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-add_litert_library(runtime_engine_engine_settings STATIC
+# --- Engine Settings ---
+add_litertlm_library(runtime_engine_engine_settings STATIC
   engine_settings.cc
 )
+add_library(LiteRTLM::Engine::Settings ALIAS runtime_engine_engine_settings)
+
 target_include_directories(runtime_engine_engine_settings 
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
   )
+
 target_link_libraries(runtime_engine_engine_settings
   PUBLIC
+    LiteRTLM::Components::Tokenizer::Interface
     runtime_executor_audio_executor_settings
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor_settings
     runtime_util_litert_status_util
     runtime_util_model_type_utils
-    runtime_components_tokenizer
   PRIVATE
-    litert_libs
     tflite_extra_libs
+    litert_libs
     LITERTLM_DEPS
     proto_lib
 )
 
-# add_litert_executable(runtime_engine_engine_settings_test
-#   engine_settings_test.cc
-# )
-# target_link_libraries(runtime_engine_engine_settings_test PRIVATE
-#   runtime_engine_engine_settings
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   runtime_components_tokenizer
-#   runtime_executor_executor_settings_base
-#   runtime_proto_engine_cc_proto
-#   runtime_proto_llm_metadata_cc_proto
-#   runtime_proto_llm_model_type_cc_proto
-#   runtime_proto_token_cc_proto
-#   runtime_util_test_utils
-# )
-# add_test(NAME runtime_engine_engine_settings_test COMMAND runtime_engine_engine_settings_test)
-
-add_litert_library(runtime_engine_io_types STATIC
+# --- IO Types ---
+add_litertlm_library(runtime_engine_io_types STATIC
   io_types.cc
 )
+add_library(LiteRTLM::Engine::IoTypes ALIAS runtime_engine_io_types)
+
 target_include_directories(runtime_engine_io_types
   PRIVATE 
     ${CMAKE_BINARY_DIR}
@@ -57,146 +50,133 @@ target_include_directories(runtime_engine_io_types
     ${LITERTLM_INCLUDE_PATHS}
     ${THIRD_PARTY_DIR}
 )
+
 target_link_libraries(runtime_engine_io_types
   PUBLIC
-    runtime_components_constrained_decoding_constraint
+    LiteRTLM::ConstrainedDecoding::Constraint
     runtime_util_litert_status_util
-  PUBLIC
+    tflite_extra_libs
+    litert_libs
+    LITERTLM_DEPS
     proto_lib
-    tflite_extra_libs
-    litert_libs
-    LITERTLM_DEPS
 )
 
-# add_litert_executable(runtime_engine_io_types_test
-#   io_types_test.cc
-# )
-# target_link_libraries(runtime_engine_io_types_test PRIVATE
-#   runtime_engine_io_types
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_cc_litert_environment
-#   # litert_litert_cc_litert_layout
-#   # litert_litert_cc_litert_model
-#   # litert_litert_cc_litert_tensor_buffer
-#   # litert_litert_cc_litert_tensor_buffer_types
-#   # litert_litert_test_matchers
-#   runtime_components_constrained_decoding_fake_constraint
-#   runtime_util_convert_tensor_buffer
-#   runtime_util_test_utils
-# )
-# add_test(NAME runtime_engine_io_types_test COMMAND runtime_engine_io_types_test)
-
-
-add_litert_executable(runtime_engine_litert_lm_advanced_main
-  litert_lm_advanced_main.cc
-)
-target_link_libraries(runtime_engine_litert_lm_advanced_main
-  PUBLIC
-    c_engine
-    runtime_engine_libs
-    runtime_components_libs
-    runtime_conversation_libs
-    runtime_executor_libs
-    runtime_util_libs
-    runtime_core_libs
-    runtime_core_tasks
-    runtime_engine_litert_lm_lib
-    runtime_engine_shared_flags
-    runtime_util_litert_status_util
-  PRIVATE
-    litert_libs
-    LITERTLM_DEPS
-    tflite_extra_libs
-)
-
-
-add_litert_library(runtime_engine_litert_lm_lib STATIC
+# --- Engine Lib (The Aggregator) ---
+add_litertlm_library(runtime_engine_litert_lm_lib STATIC
   litert_lm_lib.cc
 )
+add_library(LiteRTLM::Engine::Lib ALIAS runtime_engine_litert_lm_lib)
+
 target_include_directories(runtime_engine_litert_lm_lib
   PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_engine_litert_lm_lib
   PUBLIC
-    runtime_engine_libs
-    runtime_components_libs
-    runtime_conversation_libs
-    runtime_executor_libs
-    runtime_util_libs
-    runtime_core_libs
-    # runtime_engine_libs
-    # runtime_engine_engine_interface
-    # runtime_engine_engine_settings
-    # runtime_engine_io_types
-    # runtime_conversation_conversation
-    # runtime_conversation_io_types
-    # runtime_executor_executor_settings_base
-    # runtime_executor_llm_executor_settings
-    # runtime_util_litert_status_util
+    # Refactored Modules
+    LiteRTLM::Components
+    LiteRTLM::Conversation
+    LiteRTLM::Core
+    LiteRTLM::Engine::Interface # (Self)
+    LiteRTLM::Engine::Settings  # (Self)
+    LiteRTLM::Engine::IoTypes   # (Self)
     
-    # stb_stb_image
-    # litert_tflite_profiling_memory_info
-    # litert_tflite_profiling_memory_usage_monitor
-    # runtime_core_engine_impl
-  PRIVATE
-    litert_libs
-    LITERTLM_DEPS
-    tflite_extra_libs
-)
-
-
-add_litert_executable(runtime_engine_litert_lm_main
-  litert_lm_main.cc
-)
-target_link_libraries(runtime_engine_litert_lm_main
-  PUBLIC
-    runtime_engine_libs
-    runtime_components_libs
-    runtime_conversation_libs
-    runtime_executor_libs
+    # Not yet refactored
+    runtime_executor_libs 
     runtime_util_libs
-    runtime_core_libs
-    runtime_core_tasks
-    runtime_engine_engine_interface
-    runtime_engine_engine_settings
-    runtime_engine_io_types
-    runtime_conversation_conversation
-    runtime_conversation_io_types
-    runtime_core_engine_impl
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_settings
-    runtime_util_litert_status_util
-    c_engine
+    
   PRIVATE
+    tflite_extra_libs
     litert_libs
     LITERTLM_DEPS
 )
 
-
-add_litert_library(runtime_engine_shared_flags STATIC
+# --- Shared Flags ---
+add_litertlm_library(runtime_engine_shared_flags STATIC
   shared_flags.cc
 )
+add_library(LiteRTLM::Engine::SharedFlags ALIAS runtime_engine_shared_flags)
+
 target_include_directories(runtime_engine_shared_flags
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_engine_shared_flags
   PRIVATE
     litert_libs
     LITERTLM_DEPS
 )
 
+# --- Advanced Main Executable ---
+add_litertlm_executable(runtime_engine_litert_lm_advanced_main
+  litert_lm_advanced_main.cc
+)
 
+target_link_libraries(runtime_engine_litert_lm_advanced_main
+  PUBLIC
+    c_engine
+    LiteRTLM::Engine::Lib
+    LiteRTLM::Engine::SharedFlags
+    
+    # Group dependencies
+    LiteRTLM::Components
+    LiteRTLM::Conversation
+    LiteRTLM::Core
+    LiteRTLM::Core::Tasks
+    runtime_executor_libs
+    runtime_util_libs
+    runtime_util_litert_status_util
+  PRIVATE
+    tflite_extra_libs
+    litert_libs
+    LITERTLM_DEPS
+)
 
+# --- Main Executable ---
+add_litertlm_executable(runtime_engine_litert_lm_main
+  litert_lm_main.cc
+)
+
+target_link_libraries(runtime_engine_litert_lm_main
+  PUBLIC
+    c_engine
+    
+    # Engine Internal
+    LiteRTLM::Engine::Interface
+    LiteRTLM::Engine::Settings
+    LiteRTLM::Engine::IoTypes
+    
+    # Modules
+    LiteRTLM::Components
+    LiteRTLM::Conversation
+    LiteRTLM::Conversation::IoTypes
+    LiteRTLM::Core
+    LiteRTLM::Core::EngineImpl
+    LiteRTLM::Core::Tasks
+    
+    # Pending Refactor
+    runtime_executor_libs
+    runtime_executor_executor_settings_base
+    runtime_executor_llm_executor_settings
+    runtime_util_libs
+    runtime_util_litert_status_util
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- Folder Facade ---
 add_library(runtime_engine_libs INTERFACE)
+add_library(LiteRTLM::Engine ALIAS runtime_engine_libs)
+
 target_link_libraries(runtime_engine_libs INTERFACE
-  runtime_engine_engine_interface
-  runtime_engine_engine_settings
-  runtime_engine_io_types
-  runtime_engine_litert_lm_lib
-  runtime_engine_shared_flags
+  LiteRTLM::Engine::Interface
+  LiteRTLM::Engine::Settings
+  LiteRTLM::Engine::IoTypes
+  LiteRTLM::Engine::Lib
+  LiteRTLM::Engine::SharedFlags
 )

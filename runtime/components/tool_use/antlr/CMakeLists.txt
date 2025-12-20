@@ -1,24 +1,24 @@
-set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}) 
+set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(ANTLR_TOOL_JAR "${PROJECT_ROOT}/antlr-4.13.2-complete.jar")
 
 # Ensure the output directory exists
 set(ANTLR_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/antlr_generated)
 file(MAKE_DIRECTORY ${ANTLR_GENERATED_DIR})
 
-
+# --- JSON Parser Generation ---
 add_custom_command(
     OUTPUT
-        ${PKG_ROOT}/AntlrJsonLexer.h
-        ${PKG_ROOT}/AntlrJsonParser.h
-        ${PKG_ROOT}/AntlrJsonLexer.cc
-        ${PKG_ROOT}/AntlrJsonParser.cc
-        ${PKG_ROOT}/AntlrJsonParserBaseListener.h
-        ${PKG_ROOT}/AntlrJsonParserListener.h
+        ${ANTLR_GENERATED_DIR}/AntlrJsonLexer.h
+        ${ANTLR_GENERATED_DIR}/AntlrJsonParser.h
+        ${ANTLR_GENERATED_DIR}/AntlrJsonLexer.cpp
+        ${ANTLR_GENERATED_DIR}/AntlrJsonParser.cpp
+        ${ANTLR_GENERATED_DIR}/AntlrJsonParserBaseListener.h
+        ${ANTLR_GENERATED_DIR}/AntlrJsonParserListener.h
         
     COMMAND java -jar ${ANTLR_TOOL_JAR}
             -Dlanguage=Cpp
-            -listener -visitor # Replicates Bazel's listener=True
-            -o ${PKG_ROOT}
+            -listener -visitor
+            -o ${ANTLR_GENERATED_DIR}
             -package antlr_json_tool_call_parser
             ${PKG_ROOT}/AntlrJsonLexer.g4 
             ${PKG_ROOT}/AntlrJsonParser.g4
@@ -27,31 +27,33 @@ add_custom_command(
     COMMENT "Generating JSON Parser C++ code..."
 )
 
-add_library(antlr_json_tool_call_parser STATIC 
-    ${PKG_ROOT}/AntlrJsonLexer.cpp
-    ${PKG_ROOT}/AntlrJsonParser.cpp
+# --- JSON Parser Library ---
+add_litertlm_library(antlr_json_tool_call_parser STATIC 
+    ${ANTLR_GENERATED_DIR}/AntlrJsonLexer.cpp
+    ${ANTLR_GENERATED_DIR}/AntlrJsonParser.cpp
 )
+add_library(LiteRTLM::ToolUse::Antlr::Json ALIAS antlr_json_tool_call_parser)
 
-# Set the interface for consumers (must be PUBLIC)
 target_include_directories(antlr_json_tool_call_parser
     PUBLIC
-    ${PKG_ROOT}
+        ${ANTLR_GENERATED_DIR} # Need to expose generated headers
+        ${PKG_ROOT}
 )
 
-# Link to the ANTLR C++ runtime library
 target_link_libraries(antlr_json_tool_call_parser
     PUBLIC
-    antlr4_static
+        antlr4_static # Assuming this target is defined in modules.cmake
 )
 
+# --- Python Parser Generation ---
 add_custom_command(
     OUTPUT
-        ${PKG_ROOT}/AntlrPythonLexer.h
-        ${PKG_ROOT}/AntlrPythonParser.h
-        ${PKG_ROOT}/AntlrPythonLexer.cc
-        ${PKG_ROOT}/AntlrPythonParser.cc
-        ${PKG_ROOT}/AntlrPythonParserBaseListener.h
-        ${PKG_ROOT}/AntlrPythonParserListener.h
+        ${ANTLR_GENERATED_DIR}/AntlrPythonLexer.h
+        ${ANTLR_GENERATED_DIR}/AntlrPythonParser.h
+        ${ANTLR_GENERATED_DIR}/AntlrPythonLexer.cpp
+        ${ANTLR_GENERATED_DIR}/AntlrPythonParser.cpp
+        ${ANTLR_GENERATED_DIR}/AntlrPythonParserBaseListener.h
+        ${ANTLR_GENERATED_DIR}/AntlrPythonParserListener.h
         
     COMMAND java -jar ${ANTLR_TOOL_JAR}
             -Dlanguage=Cpp
@@ -65,17 +67,29 @@ add_custom_command(
     COMMENT "Generating Python Parser C++ code..."
 )
 
-add_library(antlr_python_tool_call_parser STATIC 
-    ${PKG_ROOT}/AntlrPythonLexer.cpp
-    ${PKG_ROOT}/AntlrPythonParser.cpp
+# --- Python Parser Library ---
+add_litertlm_library(antlr_python_tool_call_parser STATIC 
+    ${ANTLR_GENERATED_DIR}/AntlrPythonLexer.cpp
+    ${ANTLR_GENERATED_DIR}/AntlrPythonParser.cpp
 )
+add_library(LiteRTLM::ToolUse::Antlr::Python ALIAS antlr_python_tool_call_parser)
 
 target_include_directories(antlr_python_tool_call_parser
     PUBLIC
-    ${PKG_ROOT}
+        ${ANTLR_GENERATED_DIR}
+        ${PKG_ROOT}
 )
 
 target_link_libraries(antlr_python_tool_call_parser
     PUBLIC
-    antlr4_static
+        antlr4_static
+)
+
+# --- Folder Facade ---
+add_library(runtime_components_tool_use_antlr_libs INTERFACE)
+add_library(LiteRTLM::ToolUse::Antlr ALIAS runtime_components_tool_use_antlr_libs)
+
+target_link_libraries(runtime_components_tool_use_antlr_libs INTERFACE
+    LiteRTLM::ToolUse::Antlr::Json
+    LiteRTLM::ToolUse::Antlr::Python
 )
