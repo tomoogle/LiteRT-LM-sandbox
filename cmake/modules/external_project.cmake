@@ -1,6 +1,6 @@
 set(EXTERNAL_PROJECT_MODULES_DIR "${LITERTLM_MODULES_DIR}/external")
 
-
+include(${EXTERNAL_PROJECT_MODULES_DIR}/opencl.cmake)
 include(${EXTERNAL_PROJECT_MODULES_DIR}/absl.cmake)
 include(${EXTERNAL_PROJECT_MODULES_DIR}/gtest.cmake)
 include(${EXTERNAL_PROJECT_MODULES_DIR}/protobuf.cmake)

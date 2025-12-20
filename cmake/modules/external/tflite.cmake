@@ -7,7 +7,7 @@ set(TFLITE_CONFIG_CMAKE_FILE "${TFLITE_INSTALL_PREFIX}/lib/libtensorflow-lite.a"
 # --- Parameters for consumption by higher layers (LiteRT-LM) ---
 set(TFLITE_INCLUDE_DIR ${TFLITE_INSTALL_PREFIX}/include)
 set(TFLITE_LIB_DIR     ${TFLITE_INSTALL_PREFIX}/lib)
-set(TFLITE_SRC_DIR     ${TFLITE_EXT_PREFIX}/src)
+set(TFLITE_SRC_DIR     ${TFLITE_EXT_PREFIX}/src/tflite_external/tensorflow/lite)
 set(TFLITE_BUILD_DIR   ${TFLITE_SRC_DIR}/tflite_external-build CACHE INTERNAL "")
 
 if(NOT EXISTS "${TFLITE_CONFIG_CMAKE_FILE}")
@@ -19,6 +19,7 @@ ExternalProject_Add(
     absl_external
     flatbuffers_external
     googletest_external
+    opencl_headers_external
     # protobuf and tokenizers are not required for TFLite Core
   GIT_REPOSITORY
     https://github.com/tensorflow/tensorflow.git
@@ -48,10 +49,19 @@ ExternalProject_Add(
     # --- Dependency Injection ---
     # TFLite uses find_package(absl), so we just point it to the config dir
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
-    
+    -D_abseil-cpp_LICENSE_FILE:FILEPATH=${ABSL_SRC_DIR}/absl_external/LICENSE
     # TFLite uses find_package(Flatbuffers), so we point it to the config dir
-    -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
-    
+
+    -DFLATBUFFERS_BUILD_FLATC=OFF
+    -DFlatBuffers_BINARY_DIR=${DFLATBUFFERS_BIN_DIR}
+    -DFLATBUFFERS_INSTALL=OFF
+    -DFLATBUFFERS_PROJECT_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
+    -DFlatBuffers_BINARY_DIR=${DFLATBUFFERS_BIN_DIR}
+    -DFlatBuffers_SOURCE_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
+    -D_flatbuffers_LICENSE_FILE:FILEPATH=${FLATBUFFERS_SRC_DIR}/flatbuffers_external/LICENSE
+
+
+
     # --- TFLite Specific Configuration ---
     -DTFLITE_ENABLE_INSTALL=OFF
     -DTFLITE_ENABLE_XNNPACK=ON
@@ -69,34 +79,6 @@ else()
         add_custom_target(tflite_external)
     endif()
 endif()
-
-
-
-# # --- TFLite Manual Imports ---
-
-# import_static_lib(imp_tflite_core "${TFLITE_LIB_DIR}/libtensorflow-lite.a")
-
-# import_static_lib(imp_xnnpack "${TFLITE_LIB_DIR}/libXNNPACK.a")
-# import_static_lib(imp_cpuinfo  "${TFLITE_LIB_DIR}/libcpuinfo.a")
-# import_static_lib(imp_pthreadpool "${TFLITE_LIB_DIR}/libpthreadpool.a")
-
-
-# if(NOT TARGET litertlm-tflite::runtime)
-#     add_library(litertlm-tflite::runtime INTERFACE)
-    
-#     target_link_libraries(litertlm-tflite::runtime INTERFACE 
-#         imp_tflite_core
-#         imp_xnnpack
-#         imp_cpuinfo
-#         imp_pthreadpool
-#     )
-
-#     target_include_directories(litertlm-tflite::runtime INTERFACE 
-#         "${TFLITE_INCLUDE_DIR}"
-#         "${FLATBUFFERS_INSTALL_PREFIX}/include" 
-#     )
-#     add_dependencies(litertlm-tflite::runtime tflite_external)
-# endif()
 
 
 

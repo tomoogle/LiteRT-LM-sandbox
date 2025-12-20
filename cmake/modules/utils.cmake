@@ -57,22 +57,73 @@ function(generate_src_files OUTPUT_CLEAN_PATHS)
 endfunction()
 
 
-function(generate_protobuf target_name)
-  if(NOT TARGET protobuf_external)
-    message(FATAL_ERROR "ExternalProject_Add failed to create protobuf_external or generate_protobuf was called too soon!")
-  endif()
 
-  include(vendor/protobuf-generate)
-  message(STATUS "Protobuf_INCLUDE_DIR: ${Protobuf_INCLUDE_DIR}")
-  protobuf_generate(
-    TARGET ${target_name}
-    LANGUAGE cpp
-    IMPORT_DIRS ${PROJECT_ROOT} ${Protobuf_INCLUDE_DIR}
-    APPEND_PATH ${Protobuf_INCLUDE_DIR}
-    PROTOC_OUT_DIR ${CMAKE_BINARY_DIR}
-    PROTOS ${PROTO_FILES}
-  )
+
+
+function(generate_protobuf TARGET_NAME)
+    set(GENERATED_SRCS)
+    set(GENERATED_HDRS)
+
+    foreach(PROTO_FILE ${PROTO_FILES})
+        # Calculate the path relative to PROJECT_ROOT
+        # e.g., runtime/proto/engine.proto
+        file(RELATIVE_PATH REL_PROTO_PATH "${PROJECT_ROOT}" "${PROTO_FILE}")
+        
+        # Get the directory and filename
+        get_filename_component(REL_DIR "${REL_PROTO_PATH}" DIRECTORY)
+        get_filename_component(FIL_WE "${REL_PROTO_PATH}" NAME_WE)
+
+        # Construct the expected output paths
+        # This forces the output to sit in build/runtime/proto/, not just build/
+        set(OUT_DIR "${CMAKE_BINARY_DIR}/${REL_DIR}")
+        set(SRC_FILE "${OUT_DIR}/${FIL_WE}.pb.cc")
+        set(HDR_FILE "${OUT_DIR}/${FIL_WE}.pb.h")
+
+        # Ensure the output directory exists before protoc runs
+        file(MAKE_DIRECTORY "${OUT_DIR}")
+
+        add_custom_command(
+            OUTPUT "${SRC_FILE}" "${HDR_FILE}"
+            
+            # Run protoc with -I set to PROJECT_ROOT.
+            # This is critical! It tells protoc that "runtime/proto/..." is the package root.
+            COMMAND protobuf::protoc
+            ARGS --cpp_out "${CMAKE_BINARY_DIR}" 
+                 -I "${PROJECT_ROOT}" 
+                 "${PROTO_FILE}"
+                 
+            DEPENDS "${PROTO_FILE}" protobuf::protoc
+            COMMENT "Generating C++ from ${REL_PROTO_PATH}"
+            VERBATIM
+        )
+
+        list(APPEND GENERATED_SRCS "${SRC_FILE}")
+        list(APPEND GENERATED_HDRS "${HDR_FILE}")
+    endforeach()
+
+    # Add the generated files to the target
+    target_sources(${TARGET_NAME} PRIVATE ${GENERATED_SRCS} ${GENERATED_HDRS})
 endfunction()
+
+
+
+
+# function(generate_protobuf target_name)
+#   if(NOT TARGET protobuf_external)
+#     message(FATAL_ERROR "ExternalProject_Add failed to create protobuf_external or generate_protobuf was called too soon!")
+#   endif()
+
+#   include(vendor/protobuf-generate)
+#   message(STATUS "Protobuf_INCLUDE_DIR: ${Protobuf_INCLUDE_DIR}")
+#   protobuf_generate(
+#     TARGET ${target_name}
+#     LANGUAGE cpp
+#     IMPORT_DIRS ${PROJECT_ROOT} ${Protobuf_INCLUDE_DIR}
+#     APPEND_PATH ${Protobuf_INCLUDE_DIR}
+#     PROTOC_OUT_DIR ${CMAKE_BINARY_DIR}
+#     PROTOS ${PROTO_FILES}
+#   )
+# endfunction()
 
 
 function(compile_flatbuffer_files flatb_files)

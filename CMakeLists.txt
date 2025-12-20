@@ -52,6 +52,7 @@ include(fetch_content)
 
 # LITERTLM_INCLUDE_PATHS must be updated before collect_dependencies is called
 list(APPEND LITERTLM_INCLUDE_PATHS
+  ${OPENCL_HDR_DIR}
   ${ABSL_INCLUDE_DIR}
   ${FLATBUFFERS_INCLUDE_DIR}
   ${GTEST_INCLUDE_DIR}
