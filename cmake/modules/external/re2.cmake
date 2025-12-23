@@ -26,7 +26,7 @@ if(NOT EXISTS "${RE2_CONFIG_CMAKE_FILE}")
       -DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX}
       -DCMAKE_INSTALL_PREFIX=${RE2_INSTALL_PREFIX}
     STEP_TARGET
-      step_verify_install
+      verify_install
   )
 
   verify_install(re2_external ${RE2_CONFIG_CMAKE_FILE})

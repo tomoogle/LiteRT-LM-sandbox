@@ -28,7 +28,7 @@ ExternalProject_Add(
   GIT_REPOSITORY
     https://github.com/tensorflow/tensorflow.git
   GIT_TAG
-    v2.20.0
+    3ff0c6925854ce2eb21b921e2eb010690488c2e5
   PREFIX
     ${TFLITE_EXT_PREFIX}
   SOURCE_SUBDIR
