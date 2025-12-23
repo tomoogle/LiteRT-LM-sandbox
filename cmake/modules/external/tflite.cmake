@@ -28,13 +28,14 @@ ExternalProject_Add(
   GIT_REPOSITORY
     https://github.com/tensorflow/tensorflow.git
   GIT_TAG
-    3ff0c6925854ce2eb21b921e2eb010690488c2e5
+    v2.20.0
   PREFIX
     ${TFLITE_EXT_PREFIX}
   SOURCE_SUBDIR
     tensorflow/lite
   PATCH_COMMAND
     sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
+    COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5

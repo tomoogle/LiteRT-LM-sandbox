@@ -52,7 +52,7 @@ ExternalProject_Add(
   GIT_REPOSITORY
     https://github.com/google-ai-edge/LiteRT.git
   GIT_TAG
-    v2.0.2
+    v2.1.0
   PREFIX
     ${LITERT_EXT_PREFIX}
   SOURCE_SUBDIR
@@ -63,27 +63,35 @@ ExternalProject_Add(
   # ---------------------------------------------------------
   PATCH_COMMAND 
     # [A] Fix Compilation Errors (Return types & Missing dirs)
-    sed -i "s/ return litert_cpu_buffer_requirements/return litert::Expected<const LiteRtTensorBufferRequirementsT*>(litert_cpu_buffer_requirements)/" <SOURCE_DIR>/litert/runtime/compiled_model.cc &&
-    sed -i "s|add_subdirectory(compiler_plugin)|add_subdirectory(compiler)|g" <SOURCE_DIR>/litert/CMakeLists.txt &&
+    sed -i "s/ return litert_cpu_buffer_requirements/return litert::Expected<const LiteRtTensorBufferRequirementsT*>(litert_cpu_buffer_requirements)/" <SOURCE_DIR>/litert/runtime/compiled_model.cc
+    COMMAND sed -i "s|add_subdirectory(compiler_plugin)|add_subdirectory(compiler)|g" <SOURCE_DIR>/litert/CMakeLists.txt
 
     # [B] Fix Google's CMake Structure (Comment out overrides)
-    sed -i "s|set(TFLITE_BUILD_DIR|#set(TFLITE_BUILD_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt &&
-    sed -i "s|set(TFLITE_SOURCE_DIR|#set(TFLITE_SOURCE_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt &&
+    COMMAND sed -i "s|set(TFLITE_BUILD_DIR|#set(TFLITE_BUILD_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt
+    COMMAND sed -i "s|set(TFLITE_SOURCE_DIR|#set(TFLITE_SOURCE_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt
 
     # [C] Fix Missing/Moved Source Files
-    sed -i "s|    litert_accelerator.cc|    internal/litert_accelerator.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt &&
-    sed -i "s|    litert_accelerator_registration.cc|    internal/litert_accelerator_registration.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt &&
+    COMMAND sed -i "s|    litert_accelerator.cc|    internal/litert_accelerator.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt
+    COMMAND sed -i "s|    litert_accelerator_registration.cc|    internal/litert_accelerator_registration.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt
     
     # [D] Comment out broken files we don't need
-    sed -i "s|    model_graph.cc|#    model_graph.cc|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt &&
-    sed -i "s|    tensor_buffer_conversion.cc|#    tensor_buffer_conversion.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt &&
-    sed -i "s|    webgpu_buffer.cc|#    webgpu_buffer.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt &&
+    COMMAND sed -i "s|    model_graph.cc|#    model_graph.cc|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
+    COMMAND sed -i "s|    tensor_buffer_conversion.cc|#    tensor_buffer_conversion.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
+    COMMAND sed -i "s|    webgpu_buffer.cc|#    webgpu_buffer.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
 
     # [E] THE NUCLEAR OPTION (Versioning)
     # Recursively find ALL generated headers and force them to accept our FlatBuffers version.
-    find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MAJOR == 25/FLATBUFFERS_VERSION_MAJOR >= 24/g" {} + &&
-    find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} + &&
-    find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
+    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MAJOR == 25/FLATBUFFERS_VERSION_MAJOR >= 24/g" {} +
+    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
+    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
+
+    # [Fix Root Overlay Path]
+    # COMMAND sed -i "s|set(_overlay_root.*)|set(_overlay_root \"${TFLITE_SRC_DIR}/converter\")|g" <SOURCE_DIR>/litert/CMakeLists.txt
+
+    # [Fix Model Schema Output Path]
+    # COMMAND sed -i "s|generated/include/tflite/schema/mutable|generated/include/converter/schema/mutable|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
+
+    # COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/CMakeLists.txt
 
   # ---------------------------------------------------------
   #  CMAKE ARGUMENTS
