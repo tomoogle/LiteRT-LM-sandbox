@@ -1,4 +1,11 @@
-cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+if(CMAKE_VERSION VERSION_LESS "3.25")
+    message(FATAL_ERROR 
+        "CMake 3.25+ is required because we use the 'block()' command for variable isolation.\n"
+        "Your current version is: ${CMAKE_VERSION}.\n"
+        "Please upgrade CMake to proceed."
+    )
+endif()
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 project(LiteRT-LM LANGUAGES C CXX)
 
 
