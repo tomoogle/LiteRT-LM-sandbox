@@ -126,27 +126,53 @@ endfunction()
 # endfunction()
 
 
-function(compile_flatbuffer_files flatb_files)
-    set(output_dir "${GENERATED_SRC_DIR}/schema/core")
+# function(compile_flatbuffer_files flatb_files)
+#     set(output_dir "${GENERATED_SRC_DIR}/schema/core")
 
-    file(MAKE_DIRECTORY "${output_dir}")
+#     file(MAKE_DIRECTORY "${output_dir}")
 
-    foreach(fbf ${flatb_files})
-        get_filename_component(fbf_name ${fbf} NAME)
+#     foreach(fbf ${flatb_files})
+#         get_filename_component(fbf_name ${fbf} NAME)
         
-        message(STATUS " [FlatBuffers] Generating header for ${fbf_name}...")
+#         message(STATUS " [FlatBuffers] Generating header for ${fbf_name}...")
 
-        execute_process(
-            COMMAND flatc --gen-mutable --gen-object-api --cpp -o "${output_dir}/" "${fbf}"
-            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-            RESULT_VARIABLE ret_code
-            OUTPUT_VARIABLE flatc_output
-            ERROR_VARIABLE flatc_error
-        )
+#         execute_process(
+#             COMMAND flatc --gen-mutable --gen-object-api --cpp -o "${output_dir}/" "${fbf}"
+#             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+#             RESULT_VARIABLE ret_code
+#             OUTPUT_VARIABLE flatc_output
+#             ERROR_VARIABLE flatc_error
+#         )
 
-        if(NOT "${ret_code}" STREQUAL "0")
-            message(FATAL_ERROR "flatc failed for ${fbf}: ${flatc_error}")
-        endif()
+#         if(NOT "${ret_code}" STREQUAL "0")
+#             message(FATAL_ERROR "flatc failed for ${fbf}: ${flatc_error}")
+#         endif()
 
-    endforeach()
+#     endforeach()
+# endfunction()
+
+
+function(compile_flatbuffer_files FBS_FILE)
+    get_filename_component(FILE_NAME ${FBS_FILE} NAME_WE)
+    get_filename_component(FILE_DIR ${FBS_FILE} DIRECTORY)
+    
+    # The output file that will be generated
+    set(GENERATED_HEADER "${CMAKE_CURRENT_BINARY_DIR}/${FILE_NAME}_generated.h")
+
+    # The location where ExternalProject *will* put flatc
+    # (Ensure this variable matches where you defined it in flatbuffers.cmake)
+    set(FLATC_EXECUTABLE "${FLATBUFFERS_INSTALL_PREFIX}/bin/flatc")
+
+    add_custom_command(
+        OUTPUT ${GENERATED_HEADER}
+        COMMAND ${FLATC_EXECUTABLE} --cpp --gen-object-api --reflect-names --gen-mutable -o "${CMAKE_CURRENT_BINARY_DIR}" "${FBS_FILE}"
+        DEPENDS ${FBS_FILE} flatbuffers_external
+        COMMENT "Generating C++ header for ${FILE_NAME}.fbs"
+    )
+
+    # Allow the header to be added to library targets
+    set_source_files_properties(${GENERATED_HEADER} PROPERTIES GENERATED TRUE)
+    
+    # Return the generated file path so you can add it to your add_library() sources
+    set(GENERATED_FLATBUFFER_HEADERS ${GENERATED_FLATBUFFER_HEADERS} ${GENERATED_HEADER} PARENT_SCOPE)
 endfunction()
