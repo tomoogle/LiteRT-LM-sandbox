@@ -34,7 +34,8 @@ ExternalProject_Add(
   SOURCE_SUBDIR
     tensorflow/lite
   PATCH_COMMAND
-    sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
+    sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 1/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
+    # sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}

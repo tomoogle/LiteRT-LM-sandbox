@@ -79,11 +79,21 @@ ExternalProject_Add(
     COMMAND sed -i "s|    tensor_buffer_conversion.cc|#    tensor_buffer_conversion.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
     COMMAND sed -i "s|    webgpu_buffer.cc|#    webgpu_buffer.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
 
+    # COMMAND sed -i "s|    message(FATAL_ERROR \"FlatBuffers|#    message(FATAL_ERROR \"FlatBuffers|" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
+    # COMMAND sed -i "s|    message(FATAL_ERROR \"FlatBuffers|#    message(FATAL_ERROR \"FlatBuffers|" <SOURCE_DIR>/litert/vender/CMakeLists.txt
+
     # [E] THE NUCLEAR OPTION (Versioning)
     # Recursively find ALL generated headers and force them to accept our FlatBuffers version.
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MAJOR == 25/FLATBUFFERS_VERSION_MAJOR >= 24/g" {} +
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
+
+    # Stop MediaTek from clearing our FLATC_EXECUTABLE variable
+    COMMAND sed -i "s/set(FLATC_EXECUTABLE \"\")/#set(FLATC_EXECUTABLE \"\")/g" <SOURCE_DIR>/litert/vendors/CMakeLists.txt
+
+    # [F] THE "EMPTY()" POLYFILL (Critical for v24 compatibility)
+    # The compiler is finding older headers first, so we replace .empty() with .size() != 0
+    COMMAND sed -i "s/!buffers->empty()/buffers->size() != 0/g" <SOURCE_DIR>/tflite/converter/core/model_builder_base.h
 
     # [Fix Root Overlay Path]
     # COMMAND sed -i "s|set(_overlay_root.*)|set(_overlay_root \"${TFLITE_SRC_DIR}/converter\")|g" <SOURCE_DIR>/litert/CMakeLists.txt
@@ -126,9 +136,18 @@ ExternalProject_Add(
     -Dabsl_BINARY_DIR=${ABSL_EXT_PREFIX}/absl_external-build
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
 
-    # Dependency Injection: FlatBuffers
-    -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
-    
+    # FlatBuffers
+    -DFLATBUFFERS_BUILD_FLATC=OFF
+    -DFLATBUFFERS_INSTALL=OFF
+    -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
+    -DFLATBUFFERS_PROJECT_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
+    -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
+    -DFlatBuffers_SOURCE_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
+    -D_flatbuffers_LICENSE_FILE:FILEPATH=${FLATBUFFERS_SRC_DIR}/flatbuffers_external/LICENSE
+    -DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}
+    -DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}
+    -DFLATC_EXECUTABLE=${FLATC_EXECUTABLE}
+
     # Dependency Injection: TFLite
     -DTFLite_DIR=${TFLITE_INSTALL_PREFIX}/lib
     -Dtensorflow-lite_DIR=${TFLITE_INSTALL_PREFIX}/lib
