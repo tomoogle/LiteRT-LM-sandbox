@@ -15,37 +15,45 @@ if(NOT EXISTS "${SENTENCE_CONFIG_CMAKE_FILE}")
   message(STATUS "Sentencepiece not found. Configuring external build...")
   ExternalProject_Add(
     sentencepiece_external
-    DEPENDS
-      protobuf_external
-    GIT_REPOSITORY
-      https://github.com/google/sentencepiece/
-    GIT_TAG
-      v0.2.1
-    PREFIX
-      ${SENTENCE_EXT_PREFIX}
+    GIT_REPOSITORY https://github.com/google/sentencepiece.git
+    GIT_TAG        v0.2.0
+    PREFIX         ${EXTERNAL_PROJECT_BINARY_DIR}/sentencepiece
     
-    CONFIGURE_COMMAND
-      ${CMAKE_COMMAND} -E env 
-      "LDFLAGS=-L${ABSL_INSTALL_PREFIX}/lib -L${PROTO_INSTALL_PREFIX}/lib"
-      "CXXFLAGS=-I${ABSL_INSTALL_PREFIX}/include -I${PROTO_INSTALL_PREFIX}/include"
-      ${CMAKE_COMMAND} -S <SOURCE_DIR> -B <BINARY_DIR>
-        -DCMAKE_INSTALL_PREFIX=${SENTENCE_INSTALL_PREFIX}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_CXX_STANDARD=17
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-        -DSPM_PROTOBUF_PROVIDER=package
-        -DSPM_ABSL_PROVIDER=package
-        
-        # Config Mode
-        -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf
-        -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
-        # Fallback
-        -DProtobuf_INCLUDE_DIR=${PROTO_INSTALL_PREFIX}/include
-        -DProtobuf_LITE_LIBRARY=${PROTO_INSTALL_PREFIX}/lib/libprotobuf.a
-        -DProtobuf_LIBRARY=${PROTO_INSTALL_PREFIX}/lib/libprotobuf.a
-        -DProtobuf_PROTOC_EXECUTABLE=${PROTO_INSTALL_PREFIX}/bin/protoc
-        
-        "-DCMAKE_CXX_STANDARD_LIBRARIES=-lprotobuf -lutf8_range -Wl,--start-group -labsl_status -labsl_statusor -labsl_raw_logging_internal -labsl_base -labsl_throw_delegate -labsl_int128 -labsl_log_internal_check_op -labsl_log_internal_message -labsl_log_internal_nullguard -labsl_strings -labsl_string_view -labsl_synchronization -labsl_debugging_internal -labsl_time -labsl_time_zone -labsl_utf8_for_code_point -Wl,--end-group -lpthread"
+    DEPENDS 
+      absl_external
+      protobuf_external
+
+    PATCH_COMMAND
+      # 1. DELETE the hardcoded C++17 requirement
+      # This is the root cause of the "partial_ordering" error. 
+      # It allows your -DCMAKE_CXX_STANDARD=20 to actually take effect.
+      sed -i "/set(CMAKE_CXX_STANDARD 17)/d" <SOURCE_DIR>/CMakeLists.txt &&
+      
+      # 2. REMOVE rogue commas from option() calls 
+      # Fixes the syntax error caused by auto-formatters.
+      # Transforms: option(VAR, "Help") -> option(VAR "Help")
+      sed -i "s/option(\\([^,]*\\),/option(\\1/g" <SOURCE_DIR>/CMakeLists.txt &&
+      
+      # 3. FORCE external Abseil usage
+      # We replace the internal logic with standard CMake finding
+      sed -i "s|add_subdirectory(third_party/abseil-cpp)|find_package(absl REQUIRED)|g" <SOURCE_DIR>/CMakeLists.txt
+
+    CMAKE_ARGS
+      -DCMAKE_INSTALL_PREFIX=${EXTERNAL_PROJECT_BINARY_DIR}/sentencepiece/install
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+      
+      # Force C++20 to match LiteRT/Abseil expectations
+      -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
+      -DCMAKE_CXX_STANDARD_REQUIRED=ON
+      
+      # SentencePiece Settings
+      -DSPM_USE_EXTERNAL_ABSL=ON
+      -DSPM_ENABLE_SHARED=OFF
+      
+      # Dependency Paths
+      -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
+      -DProtobuf_DIR=${PROTOBUF_INSTALL_PREFIX}/lib/cmake/protobuf
   )
 # verify_install(sentencepiece_external ${SENTENCE_CONFIG_CMAKE_FILE})
 

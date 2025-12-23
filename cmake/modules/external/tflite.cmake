@@ -2,15 +2,17 @@ include(ExternalProject)
 
 set(TFLITE_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/tensorflow)
 set(TFLITE_INSTALL_PREFIX ${TFLITE_EXT_PREFIX}/install)
-set(TFLITE_CONFIG_CMAKE_FILE "${TFLITE_INSTALL_PREFIX}/lib/libtensorflow-lite.a")
 
 # --- Parameters for consumption by higher layers (LiteRT-LM) ---
 set(TFLITE_INCLUDE_DIR ${TFLITE_INSTALL_PREFIX}/include)
 set(TFLITE_LIB_DIR     ${TFLITE_INSTALL_PREFIX}/lib)
 set(TFLITE_SRC_DIR     ${TFLITE_EXT_PREFIX}/src/tflite_external/tensorflow/lite)
-set(TFLITE_BUILD_DIR   ${TFLITE_SRC_DIR}/tflite_external-build CACHE INTERNAL "")
+set(TFLITE_BUILD_DIR   ${TFLITE_EXT_PREFIX}/src/tflite_external-build CACHE INTERNAL "")
+set(TENSORFLOW_SOURCE_DIR ${TFLITE_EXT_PREFIX}/src/tflite_external)
 
-if(NOT EXISTS "${TFLITE_CONFIG_CMAKE_FILE}")
+set(TFLITE_STATIC_LIB "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
+
+if(NOT EXISTS "${TFLITE_STATIC_LIB}")
   message(STATUS "TFLite not found. Configuring external build...")
 
 ExternalProject_Add(
@@ -20,6 +22,8 @@ ExternalProject_Add(
     flatbuffers_external
     googletest_external
     opencl_headers_external
+    protobuf_external
+    tokenizers-cpp_external
     # protobuf and tokenizers are not required for TFLite Core
   GIT_REPOSITORY
     https://github.com/tensorflow/tensorflow.git
@@ -29,18 +33,19 @@ ExternalProject_Add(
     ${TFLITE_EXT_PREFIX}
   SOURCE_SUBDIR
     tensorflow/lite
+  PATCH_COMMAND
+    sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DCMAKE_POLICY_DEFAULT_CMP0169=OLD
     -DCMAKE_POLICY_DEFAULT_CMP0170=OLD
-    -DCMAKE_CXX_STANDARD=17
+    -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     
     # Consolidated CXX Flags
-    # Removed OpenCL flags because GPU is disabled for TFLite
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
     
     # Consolidated C Flags
@@ -53,13 +58,19 @@ ExternalProject_Add(
     # TFLite uses find_package(Flatbuffers), so we point it to the config dir
 
     -DFLATBUFFERS_BUILD_FLATC=OFF
-    -DFlatBuffers_BINARY_DIR=${DFLATBUFFERS_BIN_DIR}
     -DFLATBUFFERS_INSTALL=OFF
+    -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
     -DFLATBUFFERS_PROJECT_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
-    -DFlatBuffers_BINARY_DIR=${DFLATBUFFERS_BIN_DIR}
+    -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
     -DFlatBuffers_SOURCE_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
     -D_flatbuffers_LICENSE_FILE:FILEPATH=${FLATBUFFERS_SRC_DIR}/flatbuffers_external/LICENSE
+    -DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}
+    -DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}
 
+
+    -Dprotobuf_BINARY_DIR=${PROTO_BIN_DIR}
+    -Dprotobuf_BUILD_PROTOC_BINARIES=OFF
+    -Dprotobuf_SOURCE_DIR=${PROTO_SRC_DIR}
 
 
     # --- TFLite Specific Configuration ---
@@ -68,13 +79,15 @@ ExternalProject_Add(
     -DTFLITE_ENABLE_RESOURCE_VARIABLE=OFF
     -DXNNPACK_SET_VERBOSITY=OFF
     -DTFLITE_ENABLE_GPU=OFF
+    -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR}
+    -DTFLITE_HOST_TOOLS_DIR=${FLATBUFFERS_BIN_DIR}
 )
   
   # Assuming you have a verify_install macro similar to your protobuf setup
   # verify_install(tflite_external ${TFLITE_CONFIG_MARKER})
 
 else()
-    message(STATUS "TFLite already installed at: ${TFLITE_INSTALL_PREFIX}")
+    message(STATUS "TFLite already installed at: ${TFLITE_STATIC_LIB}")
     if(NOT TARGET tflite_external)
         add_custom_target(tflite_external)
     endif()
@@ -121,7 +134,7 @@ import_static_lib(imp_ruy_trmul                  "${TFLITE_LIB_DIR}/libruy_trmul
 import_static_lib(imp_ruy_tune                   "${TFLITE_LIB_DIR}/libruy_tune.a")
 import_static_lib(imp_ruy_wait                   "${TFLITE_LIB_DIR}/libruy_wait.a")
 import_static_lib(imp_xnnpack-microkernels-prod  "${TFLITE_LIB_DIR}/libxnnpack-microkernels-prod.a")
-
+import_static_lib(impl_libflite                  "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
 
 
 add_library(tflite_libs INTERFACE)

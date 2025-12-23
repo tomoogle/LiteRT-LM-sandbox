@@ -5,13 +5,14 @@ set(PROTO_INSTALL_PREFIX ${PROTO_EXT_PREFIX}/install)
 set(PROTO_CONFIG_CMAKE_FILE "${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf/protobuf-config.cmake")
 
 
-set(Protobuf_SRC_DIR ${PROTO_INSTALL_PREFIX}/src/protobuf_external/src)
-set(Protobuf_INCLUDE_DIR ${PROTO_INSTALL_PREFIX}/include)
-set(Protobuf_LIB_DIR ${PROTO_INSTALL_PREFIX}/lib)
-set(Protobuf_LITE_LIBRARY ${PROTO_INSTALL_PREFIX}/lib/libprotobuf-lite.a)
+set(PROTO_SRC_DIR ${PROTO_INSTALL_PREFIX}/src/protobuf_external/src)
+set(PROTO_INCLUDE_DIR ${PROTO_INSTALL_PREFIX}/include)
+set(PROTO_LIB_DIR ${PROTO_INSTALL_PREFIX}/lib)
+set(PROTO_LITE_LIBRARY ${PROTO_INSTALL_PREFIX}/lib/libprotobuf-lite.a)
+set(PROTO_BIN_DIR ${PROTO_INSTALL_PREFIX}/bin)
 
-set(Protobuf_PROTOC_EXECUTABLE ${PROTO_INSTALL_PREFIX}/bin/protoc)
-set(protobuf_generate_PROTOC_EXE ${PROTO_INSTALL_PREFIX}/bin/protoc)
+set(PROTO_PROTOC_EXECUTABLE ${PROTO_BIN_DIR}/protoc)
+set(protobuf_generate_PROTOC_EXE ${PROTO_BIN_DIR}/bin/protoc)
 
 
 set(PROTO_FILES
@@ -44,7 +45,7 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
       -DCMAKE_INSTALL_PREFIX=${PROTO_INSTALL_PREFIX}
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DCMAKE_POLICY_DEFAULT_CMP0169=OLD
-      -DCMAKE_CXX_STANDARD=17
+      -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
       -DCMAKE_POSITION_INDEPENDENT_CODE=ON
@@ -81,7 +82,7 @@ endif()
 if(NOT TARGET protobuf::protoc)
     add_executable(protobuf::protoc IMPORTED GLOBAL)
     set_target_properties(protobuf::protoc PROPERTIES
-        IMPORTED_LOCATION "${Protobuf_PROTOC_EXECUTABLE}"
+        IMPORTED_LOCATION "${PROTO_PROTOC_EXECUTABLE}"
     )
 endif()
 
@@ -94,8 +95,8 @@ target_include_directories(proto_lib
   PUBLIC
     ${CMAKE_BINARY_DIR}
     ${PROJECT_ROOT}
-    ${Protobuf_SRC_DIR}
-    ${Protobuf_INCLUDE_DIR}
+    ${PROTO_SRC_DIR}
+    ${PROTO_INCLUDE_DIR}
     ${ABSL_INCLUDE_DIR}
 )
 target_link_libraries(proto_lib

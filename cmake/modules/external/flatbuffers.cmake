@@ -24,12 +24,12 @@ ExternalProject_Add(
       absl_external
       googletest_external
     GIT_REPOSITORY https://github.com/google/flatbuffers.git
-    GIT_TAG v25.9.23
+    GIT_TAG v24.3.25
     PREFIX ${FLATBUFFERS_EXT_PREFIX}
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${FLATBUFFERS_INSTALL_PREFIX}
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_CXX_STANDARD=17
+        -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DFLATBUFFERS_BUILD_TESTS=OFF
         -DFLATBUFFERS_INSTALL=ON
