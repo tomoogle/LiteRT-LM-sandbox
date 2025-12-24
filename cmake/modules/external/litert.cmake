@@ -95,7 +95,7 @@ ExternalProject_Add(
     # [Fix Model Schema Output Path]
     COMMAND sed -i "s|generated/include/tflite/schema/mutable|generated/include/converter/schema/mutable|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
 
-    COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/litert/core/model/MakeLists.txt
+    COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
 
         # [E] THE NUCLEAR OPTION (Versioning)
     # Recursively find ALL generated headers and force them to accept our FlatBuffers version.
@@ -131,7 +131,7 @@ ExternalProject_Add(
 
     # Dependency Injection: Abseil
     "-D_abseil-cpp_LICENSE_FILE:FILEPATH=${ABSL_EXT_PREFIX}/src/absl_external/LICENSE"
-    "-DFETCHCONTENT_SOURCE_DIR_ABSEIL_CPP=${ABSL_EXT_PREFIX}/src/absl_external"
+    "-DFETCHCONTENT_SOURCE_DIR_ABSEIL-CPP=${ABSL_EXT_PREFIX}/src/absl_external"
     -Dabsl_SOURCE_DIR=${ABSL_SRC_DIR}
     -Dabsl_BINARY_DIR=${ABSL_BUILD_DIR}
     -Dabsl_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
@@ -141,7 +141,6 @@ ExternalProject_Add(
     # FlatBuffers
     -DFLATBUFFERS_BUILD_FLATC=OFF
     -DFLATBUFFERS_INSTALL=OFF
-    -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
     -DFLATBUFFERS_PROJECT_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
     -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
     -DFlatBuffers_SOURCE_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
@@ -149,7 +148,9 @@ ExternalProject_Add(
     -DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}
     -DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}
     -DFLATC_EXECUTABLE=${FLATC_EXECUTABLE}
-
+    -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
+    -DFETCHCONTENT_SOURCE_DIR_FLATBUFFERS=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
+    
     # Dependency Injection: TFLite
     -DTFLite_DIR=${TFLITE_INSTALL_PREFIX}/lib
     -Dtensorflow-lite_DIR=${TFLITE_INSTALL_PREFIX}/lib
