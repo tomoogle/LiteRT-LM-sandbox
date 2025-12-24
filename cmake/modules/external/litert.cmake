@@ -132,9 +132,11 @@ ExternalProject_Add(
     # Dependency Injection: Abseil
     "-D_abseil-cpp_LICENSE_FILE:FILEPATH=${ABSL_EXT_PREFIX}/src/absl_external/LICENSE"
     "-DFETCHCONTENT_SOURCE_DIR_ABSEIL_CPP=${ABSL_EXT_PREFIX}/src/absl_external"
-    -Dabsl_SOURCE_DIR=${ABSL_EXT_PREFIX}/src/absl_external
-    -Dabsl_BINARY_DIR=${ABSL_EXT_PREFIX}/absl_external-build
-    -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
+    -Dabsl_SOURCE_DIR=${ABSL_SRC_DIR}
+    -Dabsl_BINARY_DIR=${ABSL_BUILD_DIR}
+    -Dabsl_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
+    -DABSL_LIBRARIES=${ABSL_LIB_DIR}
+    -Dabsl_DIR=${ABSL_LIB_DIR}/cmake/absl
 
     # FlatBuffers
     -DFLATBUFFERS_BUILD_FLATC=OFF

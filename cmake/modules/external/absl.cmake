@@ -7,15 +7,20 @@ set(ABSL_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/abseil-cpp)
 set(ABSL_INSTALL_PREFIX ${ABSL_EXT_PREFIX}/install)
 set(ABSL_INCLUDE_DIR ${ABSL_INSTALL_PREFIX}/include)
 set(ABSL_LIB_DIR ${ABSL_INSTALL_PREFIX}/lib)
+set(ABSL_SRC_DIR ${ABSL_EXT_PREFIX}/src/absl_external)
+set(ABSL_BUILD_DIR ${ABSL_EXT_PREFIX}/src/absl_external-build)
 set(ABSL_CONFIG_CMAKE_FILE "${ABSL_INSTALL_PREFIX}/lib/cmake/absl/abslConfig.cmake")
 
 if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
   message(STATUS "Abseil not found. Configuring external build...")
   ExternalProject_Add(
     absl_external
-    GIT_REPOSITORY https://github.com/abseil/abseil-cpp
-    GIT_TAG        d9e4955c65cd4367dd6bf46f4ccb8cd3d100540b # LTS 20240116.0
-    PREFIX         ${ABSL_EXT_PREFIX}
+    GIT_REPOSITORY 
+      https://github.com/abseil/abseil-cpp
+    GIT_TAG        
+      20250127.0
+    PREFIX
+      ${ABSL_EXT_PREFIX}
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${ABSL_INSTALL_PREFIX}
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -28,7 +33,8 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
       -DABSL_USE_GOOGLETEST_HEAD=OFF
       -DABSL_ENABLE_INSTALL=ON
       -DABSL_PROPAGATE_CXX_STD=ON
-    STEP_TARGETS   verify_install_step
+    STEP_TARGETS
+      verify_install_step
   )
   verify_install(absl_external ${ABSL_CONFIG_CMAKE_FILE})
 else()
