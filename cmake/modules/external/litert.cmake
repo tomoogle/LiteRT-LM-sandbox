@@ -101,7 +101,7 @@ ExternalProject_Add(
     # [Fix Model Schema Output Path]
     # COMMAND sed -i "s|generated/include/tflite/schema/mutable|generated/include/converter/schema/mutable|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
 
-    # COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/CMakeLists.txt
+    COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/CMakeLists.txt
 
   # ---------------------------------------------------------
   #  CMAKE ARGUMENTS
