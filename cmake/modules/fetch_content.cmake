@@ -31,6 +31,7 @@ block()
   set(PNG_EXECUTABLES OFF)
   set(SKIP_INSTALL_ALL ON)
 
+
   if(TARGET zlib)
     get_target_property(ZLIB_INCLUDE_DIR zlib INTERFACE_INCLUDE_DIRECTORIES)
     set(ZLIB_LIBRARY zlib)
