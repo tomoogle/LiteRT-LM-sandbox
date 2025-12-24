@@ -18,6 +18,7 @@ if(NOT EXISTS "${TOKENIZER_CONFIG_CMAKE_FILE}")
       absl_external
       protobuf_external
       googletest_external
+      sentencepiece_external
     GIT_REPOSITORY
         https://github.com/mlc-ai/tokenizers-cpp
     GIT_TAG
