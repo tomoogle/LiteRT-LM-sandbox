@@ -33,6 +33,38 @@ block()
 endblock()
 
 
+
+set(LIBPNG_SRC_DIR ${THIRD_PARTY_DIR}/libpng)
+FetchContent_Declare(
+  libpng_lib
+  GIT_REPOSITORY https://github.com/glennrp/libpng.git
+  GIT_TAG v1.6.40
+  GIT_SHALLOW true
+  SOURCE_DIR ${LIBPNG_SRC_DIR}
+)
+block()
+  set(PNG_SHARED OFF)
+  set(PNG_TESTS OFF)
+  set(PNG_EXECUTABLES OFF)
+  set(SKIP_INSTALL_ALL ON)
+
+  if(TARGET zlib)
+    get_target_property(ZLIB_INCLUDE_DIR zlib INTERFACE_INCLUDE_DIRECTORIES)
+    set(ZLIB_LIBRARY zlib)
+  elseif(TARGET zlibstatic)
+    get_target_property(ZLIB_INCLUDE_DIR zlibstatic INTERFACE_INCLUDE_DIRECTORIES)
+    set(ZLIB_LIBRARY zlibstatic)
+  endif()
+
+  FetchContent_MakeAvailable(libpng_lib)
+endblock()
+if(NOT TARGET PNG::PNG)
+  add_library(PNG::PNG ALIAS png_static)
+endif()
+
+
+
+
 set(MINIAUDIO_SRC_DIR ${THIRD_PARTY_DIR}/miniaudio)
 FetchContent_Declare(
   miniaudio_lib

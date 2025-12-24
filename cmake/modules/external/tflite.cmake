@@ -83,6 +83,11 @@ ExternalProject_Add(
     -DTFLITE_ENABLE_GPU=OFF
     -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR}
     -DTFLITE_HOST_TOOLS_DIR=${FLATBUFFERS_BIN_DIR}
+
+    "-DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX};${libpng_lib_BINARY_DIR}"
+    -DPNG_FOUND=ON
+    -DPNG_LIBRARY=${libpng_lib_BINARY_DIR}/libpng.a
+    -DPNG_PNG_INCLUDE_DIR=${libpng_lib_SOURCE_DIR}
 )
   
   # Assuming you have a verify_install macro similar to your protobuf setup
