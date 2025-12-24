@@ -103,6 +103,9 @@ ExternalProject_Add(
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
 
+    # COMMAND sed -i "s/constexpr Layout(const Dimensions/Layout(const Dimensions/g" <SOURCE_DIR>/litert/cc/litert_layout.hrm
+
+
   # ---------------------------------------------------------
   #  CMAKE ARGUMENTS
   # ---------------------------------------------------------

@@ -18,7 +18,7 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
     GIT_REPOSITORY 
       https://github.com/abseil/abseil-cpp
     GIT_TAG        
-      20250127.0
+      20250814.1
     PREFIX
       ${ABSL_EXT_PREFIX}
     CMAKE_ARGS
