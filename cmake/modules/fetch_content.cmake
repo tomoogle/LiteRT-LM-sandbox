@@ -17,23 +17,6 @@ block()
 endblock()
 
 
-set(KISSFFT_SRC_DIR ${THIRD_PARTY_DIR}/kissfft)
-FetchContent_Declare(
-  kissfft_lib
-  GIT_REPOSITORY https://github.com/mborgerding/kissfft
-  GIT_TAG master
-  GIT_SHALLOW true
-  SOURCE_DIR ${KISSFFT_SRC_DIR}
-)
-block()
-  cmake_policy(SET CMP0077 OLD)
-  set(KISSFFT_TEST OFF)
-  set(KISSFFT_TOOLS OFF)
-  FetchContent_MakeAvailable(kissfft_lib)
-endblock()
-
-
-
 set(LIBPNG_SRC_DIR ${THIRD_PARTY_DIR}/libpng)
 FetchContent_Declare(
   libpng_lib
@@ -61,6 +44,26 @@ endblock()
 if(NOT TARGET PNG::PNG)
   add_library(PNG::PNG ALIAS png_static)
 endif()
+
+
+set(KISSFFT_SRC_DIR ${THIRD_PARTY_DIR}/kissfft)
+FetchContent_Declare(
+  kissfft_lib
+  GIT_REPOSITORY https://github.com/mborgerding/kissfft
+  GIT_TAG master
+  GIT_SHALLOW true
+  SOURCE_DIR ${KISSFFT_SRC_DIR}
+)
+block()
+  cmake_policy(SET CMP0077 OLD)
+  set(KISSFFT_TEST OFF)
+  set(KISSFFT_TOOLS OFF)
+  FetchContent_MakeAvailable(kissfft_lib)
+endblock()
+
+
+
+
 
 
 
