@@ -87,7 +87,7 @@ ExternalProject_Add(
 
     # [F] THE "EMPTY()" POLYFILL (Critical for v24 compatibility)
     # The compiler is finding older headers first, so we replace .empty() with .size() != 0
-    COMMAND sed -i "s/!buffers->empty()/buffers->size() != 0/g" <SOURCE_DIR>/tflite/converter/core/model_builder_base.h
+    # COMMAND sed -i "s/!buffers->empty()/buffers->size() != 0/g" <SOURCE_DIR>/tflite/converter/core/model_builder_base.h
 
     # # [Fix Root Overlay Path]
     # COMMAND sed -i "s|set(_overlay_root.*)|set(_overlay_root \"${TFLITE_SRC_DIR}/converter\")|g" <SOURCE_DIR>/litert/CMakeLists.txt
@@ -103,7 +103,10 @@ ExternalProject_Add(
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
 
-    # COMMAND sed -i "s/constexpr Layout(const Dimensions/Layout(const Dimensions/g" <SOURCE_DIR>/litert/cc/litert_layout.hrm
+     # [Fix] Use double backslashes so CMake passes single backslashes to sed
+    COMMAND sed -i "s/constexpr \\(.*\\)Layout(/ \\1Layout(/g" <SOURCE_DIR>/litert/cc/litert_layout.h
+
+
 
 
   # ---------------------------------------------------------
@@ -173,6 +176,7 @@ ExternalProject_Add(
     -DLITERT_ENABLE_QUALCOMM=OFF    
     -DLITERT_DISABLE_KLEIDIAI=OFF
     -DLITERT_BUILD_C_API=ON
+    -DLITERT_BUILD_TOOLS=OFF
 
   INSTALL_COMMAND ""
 )
