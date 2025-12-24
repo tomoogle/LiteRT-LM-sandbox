@@ -63,11 +63,12 @@ ExternalProject_Add(
     -DFLATBUFFERS_INSTALL=OFF
     -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
     -DFLATBUFFERS_PROJECT_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
-    -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
     -DFlatBuffers_SOURCE_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
-    -D_flatbuffers_LICENSE_FILE:FILEPATH=${FLATBUFFERS_SRC_DIR}/flatbuffers_external/LICENSE
+    -D_flatbuffers_LICENSE_FILE=${FLATBUFFERS_SRC_DIR}/flatbuffers_external/LICENSE
     -DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}
     -DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}
+    -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
+
 
 
     -Dprotobuf_BINARY_DIR=${PROTO_BIN_DIR}

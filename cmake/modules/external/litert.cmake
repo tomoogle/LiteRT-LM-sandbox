@@ -89,19 +89,19 @@ ExternalProject_Add(
     # The compiler is finding older headers first, so we replace .empty() with .size() != 0
     COMMAND sed -i "s/!buffers->empty()/buffers->size() != 0/g" <SOURCE_DIR>/tflite/converter/core/model_builder_base.h
 
-    # [Fix Root Overlay Path]
-    COMMAND sed -i "s|set(_overlay_root.*)|set(_overlay_root \"${TFLITE_SRC_DIR}/converter\")|g" <SOURCE_DIR>/litert/CMakeLists.txt
+    # # [Fix Root Overlay Path]
+    # COMMAND sed -i "s|set(_overlay_root.*)|set(_overlay_root \"${TFLITE_SRC_DIR}/converter\")|g" <SOURCE_DIR>/litert/CMakeLists.txt
 
-    # [Fix Model Schema Output Path]
-    COMMAND sed -i "s|generated/include/tflite/schema/mutable|generated/include/converter/schema/mutable|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
+    # # [Fix Model Schema Output Path]
+    # COMMAND sed -i "s|generated/include/tflite/schema/mutable|generated/include/converter/schema/mutable|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
 
-    COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
+    # COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
 
         # [E] THE NUCLEAR OPTION (Versioning)
     # Recursively find ALL generated headers and force them to accept our FlatBuffers version.
-    COMMAND find <BUILD_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MAJOR == 25/FLATBUFFERS_VERSION_MAJOR >= 24/g" {} +
-    COMMAND find <BUILD_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
-    COMMAND find <BUILD_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
+    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MAJOR == 25/FLATBUFFERS_VERSION_MAJOR >= 24/g" {} +
+    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
+    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
 
   # ---------------------------------------------------------
   #  CMAKE ARGUMENTS
