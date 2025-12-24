@@ -3,7 +3,7 @@ include(ExternalProject)
 # --- OpenCL Headers ---
 set(OPENCL_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/opencl_headers)
 set(OPENCL_SRC_DIR ${OPENCL_EXT_PREFIX}/src/opencl_headers_external)
-set(OPENCL_HDR_DIR ${OPENCL_SRC_PREFIX}/CL)
+set(OPENCL_INCLUDE_DIR ${OPENCL_SRC_DIR}/CL)
 
 
 
@@ -26,4 +26,4 @@ ExternalProject_Add(
 # Create an Interface Library for easy linking
 add_library(opencl_headers_lib INTERFACE)
 add_dependencies(opencl_headers_lib opencl_headers_external)
-target_include_directories(opencl_headers_lib SYSTEM INTERFACE ${OPENCL_HDR_DIR})
+target_include_directories(opencl_headers_lib SYSTEM INTERFACE ${OPENCL_INCLUDE_DIR})
