@@ -1,6 +1,6 @@
 add_subdirectory(components)
 add_subdirectory(conversation)
-add_subdirectory(conversation/model_data_processor)
+# add_subdirectory(conversation/model_data_processor)
 add_subdirectory(core)
 add_subdirectory(engine)
 add_subdirectory(executor)

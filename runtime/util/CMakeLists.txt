@@ -2,7 +2,7 @@ set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # --- Convert Tensor Buffer ---
 add_litertlm_library(runtime_util_convert_tensor_buffer INTERFACE)
-add_library(LiteRT::Components::Util::ConvertTensorBuffer ALIAS runtime_util_convert_tensor_buffer)
+add_library(LiteRTLM::Runtime::Util::ConvertTensorBuffer ALIAS runtime_util_convert_tensor_buffer)
 
 target_include_directories(runtime_util_convert_tensor_buffer 
   INTERFACE
@@ -19,7 +19,7 @@ target_link_libraries(runtime_util_convert_tensor_buffer
 add_litertlm_library(runtime_util_executor_data_util STATIC
   executor_data_util.cc
 )
-add_library(LiteRT::Components::Util::ExecutorDataUtil ALIAS runtime_util_executor_data_util)
+add_library(LiteRTLM::Runtime::Util::ExecutorDataUtil ALIAS runtime_util_executor_data_util)
 
 target_include_directories(runtime_util_executor_data_util
   PRIVATE
@@ -30,8 +30,8 @@ target_include_directories(runtime_util_executor_data_util
 
 target_link_libraries(runtime_util_executor_data_util
   PUBLIC
-    LiteRT::Components::Util::ConvertTensorBuffer
-    LiteRT::Components::Util::TensorBufferUtil # (Defined below)
+    LiteRTLM::Runtime::Util::ConvertTensorBuffer
+    LiteRTLM::Runtime::Util::TensorBufferUtil # (Defined below)
     LiteRTLM::Executor::LLM::IoTypes
   PRIVATE 
     LITERTLM_DEPS
@@ -42,7 +42,7 @@ target_link_libraries(runtime_util_executor_data_util
 add_litertlm_library(runtime_util_file_format_util STATIC
   file_format_util.cc
 )
-add_library(LiteRT::Components::Util::FileFormatUtil ALIAS runtime_util_file_format_util)
+add_library(LiteRTLM::Runtime::Util::FileFormatUtil ALIAS runtime_util_file_format_util)
 
 target_include_directories(runtime_util_file_format_util 
   PRIVATE
@@ -54,9 +54,9 @@ target_include_directories(runtime_util_file_format_util
 target_link_libraries(runtime_util_file_format_util
   PUBLIC
     runtime_executor_executor_settings_base
-    LiteRT::Components::Util::StatusUtil # (Defined below)
-    LiteRT::Components::Util::MemoryMappedFile # (Defined below)
-    LiteRT::Components::Util::ScopedFile # (Defined below)
+    LiteRTLM::Runtime::Util::StatusUtil # (Defined below)
+    LiteRTLM::Runtime::Util::MemoryMappedFile # (Defined below)
+    LiteRTLM::Runtime::Util::ScopedFile # (Defined below)
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -66,7 +66,7 @@ target_link_libraries(runtime_util_file_format_util
 add_litertlm_library(runtime_util_file_util STATIC
   file_util.cc
 )
-add_library(LiteRT::Components::Util::FileUtil ALIAS runtime_util_file_util)
+add_library(LiteRTLM::Runtime::Util::FileUtil ALIAS runtime_util_file_util)
 
 target_include_directories(runtime_util_file_util
   PRIVATE
@@ -84,7 +84,7 @@ target_link_libraries(runtime_util_file_util
 add_litertlm_library(runtime_util_litert_lm_loader STATIC
   litert_lm_loader.cc
 )
-add_library(LiteRT::Components::Util::LMLoader ALIAS runtime_util_litert_lm_loader)
+add_library(LiteRTLM::Runtime::Util::LMLoader ALIAS runtime_util_litert_lm_loader)
 
 target_include_directories(runtime_util_litert_lm_loader
   PRIVATE
@@ -94,9 +94,9 @@ target_include_directories(runtime_util_litert_lm_loader
 
 target_link_libraries(runtime_util_litert_lm_loader 
   PUBLIC
-    LiteRT::Components::Util::StatusUtil
-    LiteRT::Components::Util::MemoryMappedFile
-    LiteRT::Components::Util::ScopedFile
+    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::MemoryMappedFile
+    LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -104,7 +104,7 @@ target_link_libraries(runtime_util_litert_lm_loader
 
 # --- LiteRT Status Util ---
 add_litertlm_library(runtime_util_litert_status_util INTERFACE)
-add_library(LiteRT::Components::Util::StatusUtil ALIAS runtime_util_litert_status_util)
+add_library(LiteRTLM::Runtime::Util::StatusUtil ALIAS runtime_util_litert_status_util)
 
 target_include_directories(runtime_util_litert_status_util 
   INTERFACE
@@ -119,7 +119,7 @@ target_link_libraries(runtime_util_litert_status_util
 
 # --- Logging ---
 add_litertlm_library(runtime_util_logging INTERFACE)
-add_library(LiteRT::Components::Util::Logging ALIAS runtime_util_logging)
+add_library(LiteRTLM::Runtime::Util::Logging ALIAS runtime_util_logging)
 
 target_include_directories(runtime_util_logging
   INTERFACE
@@ -136,7 +136,7 @@ target_link_libraries(runtime_util_logging
 add_litertlm_library(runtime_util_logging_tensor_buffer STATIC
   logging_tensor_buffer.cc
 )
-add_library(LiteRT::Components::Util::LoggingTensorBuffer ALIAS runtime_util_logging_tensor_buffer)
+add_library(LiteRTLM::Runtime::Util::LoggingTensorBuffer ALIAS runtime_util_logging_tensor_buffer)
 
 target_include_directories(runtime_util_logging_tensor_buffer 
   PRIVATE
@@ -154,7 +154,7 @@ target_link_libraries(runtime_util_logging_tensor_buffer
 add_litertlm_library(runtime_util_lora_data STATIC
   lora_data.cc
 )
-add_library(LiteRT::Components::Util::LoRAData ALIAS runtime_util_lora_data)
+add_library(LiteRTLM::Runtime::Util::LoRAData ALIAS runtime_util_lora_data)
 
 target_include_directories(runtime_util_lora_data
   PRIVATE
@@ -164,9 +164,9 @@ target_include_directories(runtime_util_lora_data
 
 target_link_libraries(runtime_util_lora_data
   PUBLIC
-    LiteRT::Components::Util::StatusUtil
-    LiteRT::Components::Util::LoRAUtil # (Defined below)
-    LiteRT::Components::Util::ScopedFile
+    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LoRAUtil # (Defined below)
+    LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -176,7 +176,7 @@ target_link_libraries(runtime_util_lora_data
 add_litertlm_library(runtime_util_lora_util STATIC
   lora_util.cc
 )
-add_library(LiteRT::Components::Util::LoRAUtil ALIAS runtime_util_lora_util)
+add_library(LiteRTLM::Runtime::Util::LoRAUtil ALIAS runtime_util_lora_util)
 
 target_include_directories(runtime_util_lora_util
   PRIVATE
@@ -188,9 +188,9 @@ target_include_directories(runtime_util_lora_util
 
 target_link_libraries(runtime_util_lora_util
   PUBLIC
-    LiteRT::Components::Util::StatusUtil
-    LiteRT::Components::Util::MemoryMappedFile
-    LiteRT::Components::Util::ScopedFile
+    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::MemoryMappedFile
+    LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -206,7 +206,7 @@ endif()
 add_litertlm_library(runtime_util_memory_mapped_file STATIC
   ${runtime_util_memory_mapped_file_src}
 )
-add_library(LiteRT::Components::Util::MemoryMappedFile ALIAS runtime_util_memory_mapped_file)
+add_library(LiteRTLM::Runtime::Util::MemoryMappedFile ALIAS runtime_util_memory_mapped_file)
 
 target_include_directories(runtime_util_memory_mapped_file
   PRIVATE
@@ -216,8 +216,8 @@ target_include_directories(runtime_util_memory_mapped_file
 
 target_link_libraries(runtime_util_memory_mapped_file 
   PUBLIC
-    LiteRT::Components::Util::StatusUtil
-    LiteRT::Components::Util::ScopedFile
+    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -227,7 +227,7 @@ target_link_libraries(runtime_util_memory_mapped_file
 add_litertlm_library(runtime_util_metadata_util STATIC
   metadata_util.cc
 )
-add_library(LiteRT::Components::Util::MetadataUtil ALIAS runtime_util_metadata_util)
+add_library(LiteRTLM::Runtime::Util::MetadataUtil ALIAS runtime_util_metadata_util)
 
 target_include_directories(runtime_util_metadata_util
   PRIVATE
@@ -246,7 +246,7 @@ target_link_libraries(runtime_util_metadata_util
 add_litertlm_library(runtime_util_model_asset_bundle_resources STATIC
   model_asset_bundle_resources.cc
 )
-add_library(LiteRT::Components::Util::ModelAssetBundleResources ALIAS runtime_util_model_asset_bundle_resources)
+add_library(LiteRTLM::Runtime::Util::ModelAssetBundleResources ALIAS runtime_util_model_asset_bundle_resources)
 
 target_include_directories(runtime_util_model_asset_bundle_resources 
   PRIVATE
@@ -256,10 +256,10 @@ target_include_directories(runtime_util_model_asset_bundle_resources
 
 target_link_libraries(runtime_util_model_asset_bundle_resources
   PUBLIC
-    LiteRT::Components::Util::StatusUtil
-    LiteRT::Components::Util::MemoryMappedFile
-    LiteRT::Components::Util::ScopedFile
-    LiteRT::Components::Util::ZipUtils # (Defined below)
+    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::MemoryMappedFile
+    LiteRTLM::Runtime::Util::ScopedFile
+    LiteRTLM::Runtime::Util::ZipUtils # (Defined below)
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -269,7 +269,7 @@ target_link_libraries(runtime_util_model_asset_bundle_resources
 add_litertlm_library(runtime_util_model_type_utils STATIC
   model_type_utils.cc
 )
-add_library(LiteRT::Components::Util::ModelTypeUtils ALIAS runtime_util_model_type_utils)
+add_library(LiteRTLM::Runtime::Util::ModelTypeUtils ALIAS runtime_util_model_type_utils)
 
 target_include_directories(runtime_util_model_type_utils
   PRIVATE
@@ -279,7 +279,7 @@ target_include_directories(runtime_util_model_type_utils
 
 target_link_libraries(runtime_util_model_type_utils 
   PUBLIC
-    LiteRT::Components::Util::StatusUtil
+    LiteRTLM::Runtime::Util::StatusUtil
   PRIVATE
     proto_lib
     litert_libs
@@ -296,7 +296,7 @@ endif()
 add_litertlm_library(runtime_util_scoped_file STATIC
   ${runtime_util_scoped_file_src}
 )
-add_library(LiteRT::Components::Util::ScopedFile ALIAS runtime_util_scoped_file)
+add_library(LiteRTLM::Runtime::Util::ScopedFile ALIAS runtime_util_scoped_file)
 
 target_include_directories(runtime_util_scoped_file
   PRIVATE
@@ -306,7 +306,7 @@ target_include_directories(runtime_util_scoped_file
 
 target_link_libraries(runtime_util_scoped_file
   PUBLIC
-    LiteRT::Components::Util::StatusUtil 
+    LiteRTLM::Runtime::Util::StatusUtil 
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -316,7 +316,7 @@ target_link_libraries(runtime_util_scoped_file
 add_litertlm_library(runtime_util_tensor_buffer_util STATIC
   tensor_buffer_util.cc
 )
-add_library(LiteRT::Components::Util::TensorBufferUtil ALIAS runtime_util_tensor_buffer_util)
+add_library(LiteRTLM::Runtime::Util::TensorBufferUtil ALIAS runtime_util_tensor_buffer_util)
 
 target_include_directories(runtime_util_tensor_buffer_util
   PRIVATE
@@ -333,7 +333,7 @@ target_link_libraries(runtime_util_tensor_buffer_util
 
 # --- Test Utils ---
 add_litertlm_library(runtime_util_test_utils INTERFACE)
-add_library(LiteRT::Components::Util::TestUtils ALIAS runtime_util_test_utils)
+add_library(LiteRTLM::Runtime::Util::TestUtils ALIAS runtime_util_test_utils)
 
 target_include_directories(runtime_util_test_utils 
   INTERFACE
@@ -350,7 +350,7 @@ target_link_libraries(runtime_util_test_utils
 add_litertlm_library(runtime_util_zip_readonly_mem_file STATIC
   zip_readonly_mem_file.cc
 )
-add_library(LiteRT::Components::Util::ZipReadonlyMemFile ALIAS runtime_util_zip_readonly_mem_file)
+add_library(LiteRTLM::Runtime::Util::ZipReadonlyMemFile ALIAS runtime_util_zip_readonly_mem_file)
 
 target_include_directories(runtime_util_zip_readonly_mem_file
   PRIVATE
@@ -371,7 +371,7 @@ target_link_libraries(runtime_util_zip_readonly_mem_file
 add_litertlm_library(runtime_util_zip_utils STATIC
   zip_utils.cc
 )
-add_library(LiteRT::Components::Util::ZipUtils ALIAS runtime_util_zip_utils)
+add_library(LiteRTLM::Runtime::Util::ZipUtils ALIAS runtime_util_zip_utils)
 
 target_include_directories(runtime_util_zip_utils
   PRIVATE
@@ -383,8 +383,8 @@ target_include_directories(runtime_util_zip_utils
 
 target_link_libraries(runtime_util_zip_utils
   PUBLIC
-    LiteRT::Components::Util::StatusUtil
-    LiteRT::Components::Util::ZipReadonlyMemFile
+    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::ZipReadonlyMemFile
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -393,23 +393,23 @@ target_link_libraries(runtime_util_zip_utils
 
 # --- Folder Facade ---
 add_library(runtime_util_libs INTERFACE)
-add_library(LiteRT::Components::Util ALIAS runtime_util_libs)
+add_library(LiteRTLM::Runtime::Util ALIAS runtime_util_libs)
 
 target_link_libraries(runtime_util_libs INTERFACE
-  LiteRT::Components::Util::ConvertTensorBuffer
-  LiteRT::Components::Util::ExecutorDataUtil
-  LiteRT::Components::Util::FileFormatUtil
-  LiteRT::Components::Util::FileUtil
-  LiteRT::Components::Util::LMLoader
-  LiteRT::Components::Util::LoggingTensorBuffer
-  LiteRT::Components::Util::LoRAData
-  LiteRT::Components::Util::LoRAUtil
-  LiteRT::Components::Util::MemoryMappedFile
-  LiteRT::Components::Util::MetadataUtil
-  LiteRT::Components::Util::ModelAssetBundleResources
-  LiteRT::Components::Util::ModelTypeUtils
-  LiteRT::Components::Util::ScopedFile
-  LiteRT::Components::Util::TensorBufferUtil
-  LiteRT::Components::Util::ZipReadonlyMemFile
-  LiteRT::Components::Util::ZipUtils
+  LiteRTLM::Runtime::Util::ConvertTensorBuffer
+  LiteRTLM::Runtime::Util::ExecutorDataUtil
+  LiteRTLM::Runtime::Util::FileFormatUtil
+  LiteRTLM::Runtime::Util::FileUtil
+  LiteRTLM::Runtime::Util::LMLoader
+  LiteRTLM::Runtime::Util::LoggingTensorBuffer
+  LiteRTLM::Runtime::Util::LoRAData
+  LiteRTLM::Runtime::Util::LoRAUtil
+  LiteRTLM::Runtime::Util::MemoryMappedFile
+  LiteRTLM::Runtime::Util::MetadataUtil
+  LiteRTLM::Runtime::Util::ModelAssetBundleResources
+  LiteRTLM::Runtime::Util::ModelTypeUtils
+  LiteRTLM::Runtime::Util::ScopedFile
+  LiteRTLM::Runtime::Util::TensorBufferUtil
+  LiteRTLM::Runtime::Util::ZipReadonlyMemFile
+  LiteRTLM::Runtime::Util::ZipUtils
 )

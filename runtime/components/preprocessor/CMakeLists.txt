@@ -2,7 +2,7 @@ set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # --- Audio Preprocessor Interface ---
 add_litertlm_library(runtime_components_preprocessor_audio_preprocessor INTERFACE)
-add_library(LiteRT::Components::Preprocessor::Audio ALIAS runtime_components_preprocessor_audio_preprocessor)
+add_library(LiteRTLM::Components::Preprocessor::Audio ALIAS runtime_components_preprocessor_audio_preprocessor)
 
 target_include_directories(runtime_components_preprocessor_audio_preprocessor 
   INTERFACE
@@ -14,7 +14,7 @@ target_include_directories(runtime_components_preprocessor_audio_preprocessor
 add_litertlm_library(runtime_components_preprocessor_audio_preprocessor_miniaudio STATIC
   audio_preprocessor_miniaudio.cc
 )
-add_library(LiteRT::Components::Preprocessor::AudioMiniAudio ALIAS runtime_components_preprocessor_audio_preprocessor_miniaudio)
+add_library(LiteRTLM::Components::Preprocessor::AudioMiniAudio ALIAS runtime_components_preprocessor_audio_preprocessor_miniaudio)
 
 target_include_directories(runtime_components_preprocessor_audio_preprocessor_miniaudio
   PRIVATE
@@ -25,8 +25,8 @@ target_include_directories(runtime_components_preprocessor_audio_preprocessor_mi
 
 target_link_libraries(runtime_components_preprocessor_audio_preprocessor_miniaudio
   PUBLIC
-    LiteRT::Components::Preprocessor::Audio
-    LiteRT::Components::Preprocessor::MelFilterBank
+    LiteRTLM::Components::Preprocessor::Audio
+    LiteRTLM::Components::Preprocessor::MelFilterBank
     runtime_engine_io_types
     runtime_util_litert_status_util
   PRIVATE
@@ -37,7 +37,7 @@ target_link_libraries(runtime_components_preprocessor_audio_preprocessor_miniaud
 
 # --- Bypass Audio Preprocessor ---
 add_litertlm_library(runtime_components_preprocessor_by_pass_audio_preprocessor INTERFACE)
-add_library(LiteRT::Components::Preprocessor::AudioBypass ALIAS runtime_components_preprocessor_by_pass_audio_preprocessor)
+add_library(LiteRTLM::Components::Preprocessor::AudioBypass ALIAS runtime_components_preprocessor_by_pass_audio_preprocessor)
 
 target_include_directories(runtime_components_preprocessor_by_pass_audio_preprocessor
   INTERFACE
@@ -47,7 +47,7 @@ target_include_directories(runtime_components_preprocessor_by_pass_audio_preproc
 
 # --- Bypass Image Preprocessor ---
 add_litertlm_library(runtime_components_preprocessor_by_pass_image_preprocessor INTERFACE)
-add_library(LiteRT::Components::Preprocessor::ImageBypass ALIAS runtime_components_preprocessor_by_pass_image_preprocessor)
+add_library(LiteRTLM::Components::Preprocessor::ImageBypass ALIAS runtime_components_preprocessor_by_pass_image_preprocessor)
 
 target_include_directories(runtime_components_preprocessor_by_pass_image_preprocessor
   INTERFACE
@@ -57,7 +57,7 @@ target_include_directories(runtime_components_preprocessor_by_pass_image_preproc
 
 # --- Image Preprocessor Interface ---
 add_litertlm_library(runtime_components_preprocessor_image_preprocessor INTERFACE)
-add_library(LiteRT::Components::Preprocessor::Image ALIAS runtime_components_preprocessor_image_preprocessor)
+add_library(LiteRTLM::Components::Preprocessor::Image ALIAS runtime_components_preprocessor_image_preprocessor)
 
 target_include_directories(runtime_components_preprocessor_image_preprocessor
   INTERFACE
@@ -70,7 +70,7 @@ target_include_directories(runtime_components_preprocessor_image_preprocessor
 add_litertlm_library(runtime_components_preprocessor_mel_filterbank STATIC
   mel_filterbank.cc
 )
-add_library(LiteRT::Components::Preprocessor::MelFilterBank ALIAS runtime_components_preprocessor_mel_filterbank)
+add_library(LiteRTLM::Components::Preprocessor::MelFilterBank ALIAS runtime_components_preprocessor_mel_filterbank)
 
 target_include_directories(runtime_components_preprocessor_mel_filterbank
   PUBLIC
@@ -87,7 +87,7 @@ target_link_libraries(runtime_components_preprocessor_mel_filterbank
 
 # --- Signal Vector Util ---
 add_litertlm_library(runtime_components_preprocessor_signal_vector_util INTERFACE)
-add_library(LiteRT::Components::Preprocessor::SignalVectorUtil ALIAS runtime_components_preprocessor_signal_vector_util)
+add_library(LiteRTLM::Components::Preprocessor::SignalVectorUtil ALIAS runtime_components_preprocessor_signal_vector_util)
 
 target_include_directories(runtime_components_preprocessor_signal_vector_util 
   INTERFACE 
@@ -99,7 +99,7 @@ target_include_directories(runtime_components_preprocessor_signal_vector_util
 add_litertlm_library(runtime_components_preprocessor_stb_image_preprocessor STATIC
   stb_image_preprocessor.cc
 )
-add_library(LiteRT::Components::Preprocessor::StbImage ALIAS runtime_components_preprocessor_stb_image_preprocessor)
+add_library(LiteRTLM::Components::Preprocessor::StbImage ALIAS runtime_components_preprocessor_stb_image_preprocessor)
 
 target_include_directories(runtime_components_preprocessor_stb_image_preprocessor
   PRIVATE
@@ -110,7 +110,7 @@ target_include_directories(runtime_components_preprocessor_stb_image_preprocesso
 
 target_link_libraries(runtime_components_preprocessor_stb_image_preprocessor
   PUBLIC
-    LiteRT::Components::Preprocessor::Image
+    LiteRTLM::Components::Preprocessor::Image
     runtime_engine_io_types
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
@@ -121,15 +121,15 @@ target_link_libraries(runtime_components_preprocessor_stb_image_preprocessor
 
 # --- Folder Facade ---
 add_library(runtime_components_preprocessor_libs INTERFACE)
-add_library(LiteRT::Components::Preprocessor ALIAS runtime_components_preprocessor_libs)
+add_library(LiteRTLM::Components::Preprocessor ALIAS runtime_components_preprocessor_libs)
 
 target_link_libraries(runtime_components_preprocessor_libs INTERFACE
-  LiteRT::Components::Preprocessor::Audio
-  LiteRT::Components::Preprocessor::AudioMiniAudio
-  LiteRT::Components::Preprocessor::AudioBypass
-  LiteRT::Components::Preprocessor::ImageBypass
-  LiteRT::Components::Preprocessor::Image
-  LiteRT::Components::Preprocessor::MelFilterBank
-  LiteRT::Components::Preprocessor::SignalVectorUtil
-  LiteRT::Components::Preprocessor::StbImage
+  LiteRTLM::Components::Preprocessor::Audio
+  LiteRTLM::Components::Preprocessor::AudioMiniAudio
+  LiteRTLM::Components::Preprocessor::AudioBypass
+  LiteRTLM::Components::Preprocessor::ImageBypass
+  LiteRTLM::Components::Preprocessor::Image
+  LiteRTLM::Components::Preprocessor::MelFilterBank
+  LiteRTLM::Components::Preprocessor::SignalVectorUtil
+  LiteRTLM::Components::Preprocessor::StbImage
 )
