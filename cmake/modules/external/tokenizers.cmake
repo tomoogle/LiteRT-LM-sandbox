@@ -9,7 +9,7 @@ set(TOKENIZER_SRC_DIR ${TOKENIZER_EXT_PREFIX}/src/tokenizers-cpp_external)
 set(TOKENIZER_INSTALL_PREFIX ${TOKENIZER_EXT_PREFIX}/install)
 set(TOKENIZER_INCLUDE_DIR 
   ${TOKENIZER_INSTALL_PREFIX}/include
-  ${TOKENIZER_SRC_DIR}/include
+  ${TOKENIZER_SRC_DIR}
 )
 
 set(TOKENIZER_CONFIG_CMAKE_FILE "${TOKENIZER_INSTALL_PREFIX}/lib/cmake/msgpack-cxx/msgpack-cxx-config.cmake")

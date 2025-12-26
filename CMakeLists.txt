@@ -21,7 +21,10 @@ set(THIRD_PARTY_DIR             "${CMAKE_BINARY_DIR}/third_party")
 
 set(GENERATED_SRC_DIR           "${PROJECT_ROOT}/cmake/generated/src")
 
-set(LITERTLM_INCLUDE_PATHS      "${GENERATED_SRC_DIR}")
+set(LITERTLM_INCLUDE_PATHS      
+  "${GENERATED_SRC_DIR}"
+  "${CMAKE_BINARY_DIR}"
+)
 
 
 # --- Environment
