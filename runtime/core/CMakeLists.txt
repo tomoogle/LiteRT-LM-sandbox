@@ -14,7 +14,7 @@ target_include_directories(runtime_core_engine_impl
 
 target_link_libraries(runtime_core_engine_impl 
   PUBLIC
-    LiteRTLM::Runtime::Components::::ModelResources::Interface
+    LiteRTLM::Runtime::Components::ModelResources::Interface
     runtime_core_session_factory
     runtime_core_tasks
     runtime_engine_engine_interface
@@ -57,7 +57,7 @@ target_include_directories(runtime_core_engine_impl_cpu_only
 
 target_link_libraries(runtime_core_engine_impl_cpu_only
   PUBLIC
-    LiteRTLM::Runtime::Components::::ModelResources::Interface
+    LiteRTLM::Runtime::Components::ModelResources::Interface
     runtime_core_tasks
     runtime_engine_engine_interface
     runtime_engine_engine_settings
@@ -100,12 +100,12 @@ target_include_directories(runtime_core_pipeline
 target_link_libraries(runtime_core_pipeline
   PUBLIC
     runtime_core_tasks
-    LiteRTLM::Runtime::Components::::Sampler::Interface
-    LiteRTLM::Runtime::Components::::ScoringCpuUtil
-    LiteRTLM::Runtime::Components::::StopTokenDetector
+    LiteRTLM::Runtime::Components::Sampler::Interface
+    LiteRTLM::Runtime::Components::ScoringCpuUtil
+    LiteRTLM::Runtime::Components::StopTokenDetector
     LiteRTLM::Runtime::Components::TokenIdUtil
     LiteRTLM::Runtime::Components::Tokenizer::Interface
-    LiteRTLM::Runtime::Components::::Sampler::TopP
+    LiteRTLM::Runtime::Components::Sampler::TopP
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Decoder
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_engine_io_types
@@ -138,9 +138,9 @@ target_link_libraries(runtime_core_session_basic
   PUBLIC
     runtime_core_tasks
     runtime_core_pipeline
-    LiteRTLM::Runtime::Components::::Sampler::Interface
-    LiteRTLM::Runtime::Components::::Sampler::Factory
-    LiteRTLM::Runtime::Components::::StopTokenDetector
+    LiteRTLM::Runtime::Components::Sampler::Interface
+    LiteRTLM::Runtime::Components::Sampler::Factory
+    LiteRTLM::Runtime::Components::StopTokenDetector
     LiteRTLM::Runtime::Components::Tokenizer::Interface
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_engine_engine_interface

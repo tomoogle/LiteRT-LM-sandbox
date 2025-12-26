@@ -7,7 +7,7 @@ add_subdirectory(model_data_processor)
 add_litertlm_library(runtime_conversation_conversation STATIC
   conversation.cc
 )
-add_library(LiteRTLM::Runtime::Conversation::Conversation ALIAS runtime_conversation_conversation)
+add_library(LiteRTLM::Runtime::Conversation ALIAS runtime_conversation_conversation)
 
 target_include_directories(runtime_conversation_conversation
   PUBLIC
@@ -84,7 +84,7 @@ add_library(runtime_conversation_libs INTERFACE)
 add_library(LiteRTLM::Runtime::Conversation ALIAS runtime_conversation_libs)
 
 target_link_libraries(runtime_conversation_libs INTERFACE
-  LiteRTLM::Runtime::Conversation::Conversation
+  LiteRTLM::Runtime::Conversation
   LiteRTLM::Runtime::Conversation::InternalCallbackUtil
   LiteRTLM::Runtime::Conversation::IoTypes
   LiteRTLM::Runtime::Conversation::Processor
