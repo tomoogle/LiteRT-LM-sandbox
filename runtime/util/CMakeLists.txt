@@ -152,4 +152,264 @@ target_link_libraries(runtime_util_logging_tensor_buffer
 
 # --- LoRA Data ---
 add_litertlm_library(runtime_util_lora_data STATIC
-  lora_data.
+  lora_data.cc
+)
+add_library(LiteRTLM::Util::LoRAData ALIAS runtime_util_lora_data)
+
+target_include_directories(runtime_util_lora_data
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_lora_data
+  PUBLIC
+    LiteRTLM::Util::StatusUtil
+    LiteRTLM::Util::LoRAUtil # (Defined below)
+    LiteRTLM::Util::ScopedFile
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- LoRA Util ---
+add_litertlm_library(runtime_util_lora_util STATIC
+  lora_util.cc
+)
+add_library(LiteRTLM::Util::LoRAUtil ALIAS runtime_util_lora_util)
+
+target_include_directories(runtime_util_lora_util
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${CMAKE_BINARY_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+    ${THIRD_PARTY_DIR}/re2
+)
+
+target_link_libraries(runtime_util_lora_util
+  PUBLIC
+    LiteRTLM::Util::StatusUtil
+    LiteRTLM::Util::MemoryMappedFile
+    LiteRTLM::Util::ScopedFile
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- Memory Mapped File ---
+if(WIN32)
+  set(runtime_util_memory_mapped_file_src memory_mapped_file_win.cc)
+elseif(UNIX)
+  set(runtime_util_memory_mapped_file_src memory_mapped_file_posix.cc)
+endif()
+
+add_litertlm_library(runtime_util_memory_mapped_file STATIC
+  ${runtime_util_memory_mapped_file_src}
+)
+add_library(LiteRTLM::Util::MemoryMappedFile ALIAS runtime_util_memory_mapped_file)
+
+target_include_directories(runtime_util_memory_mapped_file
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_memory_mapped_file 
+  PUBLIC
+    LiteRTLM::Util::StatusUtil
+    LiteRTLM::Util::ScopedFile
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- Metadata Util ---
+add_litertlm_library(runtime_util_metadata_util STATIC
+  metadata_util.cc
+)
+add_library(LiteRTLM::Util::MetadataUtil ALIAS runtime_util_metadata_util)
+
+target_include_directories(runtime_util_metadata_util
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_metadata_util
+  PRIVATE
+    proto_lib
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- Model Asset Bundle Resources ---
+add_litertlm_library(runtime_util_model_asset_bundle_resources STATIC
+  model_asset_bundle_resources.cc
+)
+add_library(LiteRTLM::Util::ModelAssetBundleResources ALIAS runtime_util_model_asset_bundle_resources)
+
+target_include_directories(runtime_util_model_asset_bundle_resources 
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_model_asset_bundle_resources
+  PUBLIC
+    LiteRTLM::Util::StatusUtil
+    LiteRTLM::Util::MemoryMappedFile
+    LiteRTLM::Util::ScopedFile
+    LiteRTLM::Util::ZipUtils # (Defined below)
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- Model Type Utils ---
+add_litertlm_library(runtime_util_model_type_utils STATIC
+  model_type_utils.cc
+)
+add_library(LiteRTLM::Util::ModelTypeUtils ALIAS runtime_util_model_type_utils)
+
+target_include_directories(runtime_util_model_type_utils
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_model_type_utils 
+  PUBLIC
+    LiteRTLM::Util::StatusUtil
+  PRIVATE
+    proto_lib
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- Scoped File ---
+if(WIN32)
+  set(runtime_util_scoped_file_src scoped_file.cc scoped_file_win.cc)
+elseif(UNIX)
+  set(runtime_util_scoped_file_src scoped_file.cc scoped_file_posix.cc)
+endif()
+
+add_litertlm_library(runtime_util_scoped_file STATIC
+  ${runtime_util_scoped_file_src}
+)
+add_library(LiteRTLM::Util::ScopedFile ALIAS runtime_util_scoped_file)
+
+target_include_directories(runtime_util_scoped_file
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_scoped_file
+  PUBLIC
+    LiteRTLM::Util::StatusUtil 
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS
+)
+
+# --- Tensor Buffer Util ---
+add_litertlm_library(runtime_util_tensor_buffer_util STATIC
+  tensor_buffer_util.cc
+)
+add_library(LiteRTLM::Util::TensorBufferUtil ALIAS runtime_util_tensor_buffer_util)
+
+target_include_directories(runtime_util_tensor_buffer_util
+  PRIVATE
+    ${CMAKE_BINARY_DIR}
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_tensor_buffer_util
+  PRIVATE
+    LITERTLM_DEPS
+    litert_libs
+)
+
+# --- Test Utils ---
+add_litertlm_library(runtime_util_test_utils INTERFACE)
+add_library(LiteRTLM::Util::TestUtils ALIAS runtime_util_test_utils)
+
+target_include_directories(runtime_util_test_utils 
+  INTERFACE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_util_test_utils
+  INTERFACE
+    litert_libs
+)
+
+# --- Zip Readonly Mem File ---
+add_litertlm_library(runtime_util_zip_readonly_mem_file STATIC
+  zip_readonly_mem_file.cc
+)
+add_library(LiteRTLM::Util::ZipReadonlyMemFile ALIAS runtime_util_zip_readonly_mem_file)
+
+target_include_directories(runtime_util_zip_readonly_mem_file
+  PRIVATE
+    ${CMAKE_BINARY_DIR}
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+    ${THIRD_PARTY_DIR}/minizip
+)
+
+target_link_libraries(runtime_util_zip_readonly_mem_file 
+  PRIVATE
+    LITERTLM_DEPS
+    litert_libs
+    proto_lib
+)
+
+# --- Zip Utils ---
+add_litertlm_library(runtime_util_zip_utils STATIC
+  zip_utils.cc
+)
+add_library(LiteRTLM::Util::ZipUtils ALIAS runtime_util_zip_utils)
+
+target_include_directories(runtime_util_zip_utils
+  PRIVATE
+    ${CMAKE_BINARY_DIR}
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+    ${THIRD_PARTY_DIR} # Often needed for minizip headers
+)
+
+target_link_libraries(runtime_util_zip_utils
+  PUBLIC
+    LiteRTLM::Util::StatusUtil
+    LiteRTLM::Util::ZipReadonlyMemFile
+  PRIVATE
+    LITERTLM_DEPS
+    litert_libs
+    proto_lib
+)
+
+# --- Folder Facade ---
+add_library(runtime_util_libs INTERFACE)
+add_library(LiteRTLM::Util ALIAS runtime_util_libs)
+
+target_link_libraries(runtime_util_libs INTERFACE
+  LiteRTLM::Util::ConvertTensorBuffer
+  LiteRTLM::Util::ExecutorDataUtil
+  LiteRTLM::Util::FileFormatUtil
+  LiteRTLM::Util::FileUtil
+  LiteRTLM::Util::LMLoader
+  LiteRTLM::Util::LoggingTensorBuffer
+  LiteRTLM::Util::LoRAData
+  LiteRTLM::Util::LoRAUtil
+  LiteRTLM::Util::MemoryMappedFile
+  LiteRTLM::Util::MetadataUtil
+  LiteRTLM::Util::ModelAssetBundleResources
+  LiteRTLM::Util::ModelTypeUtils
+  LiteRTLM::Util::ScopedFile
+  LiteRTLM::Util::TensorBufferUtil
+  LiteRTLM::Util::ZipReadonlyMemFile
+  LiteRTLM::Util::ZipUtils
+)
