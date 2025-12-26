@@ -29,13 +29,13 @@ endif()
 
 # Inject the OpenCL "Type Mocks" to satisfy the compiler
 # We define these types as void* or ulong to match the binary ABI without headers.
-string(APPEND LITERT_CXX_FLAGS_Construct " \
-  -Dcl_command_buffer_khr=void* \
-  -Dcl_command_buffer_properties_khr=cl_ulong \
-  -Dcl_ndrange_kernel_command_properties_khr=cl_ulong \
-  -Dcl_sync_point_khr=void* \
-  -Dcl_mutable_command_khr=void* \
-  -Dcl_command_buffer_info_khr=cl_uint")
+# string(APPEND LITERT_CXX_FLAGS_Construct " \
+#   -Dcl_command_buffer_khr=void* \
+#   -Dcl_command_buffer_properties_khr=cl_ulong \
+#   -Dcl_ndrange_kernel_command_properties_khr=cl_ulong \
+#   -Dcl_sync_point_khr=void* \
+#   -Dcl_mutable_command_khr=void* \
+#   -Dcl_command_buffer_info_khr=cl_uint")
 
 # =========================================================
 #  3. The External Project Definition
@@ -106,7 +106,7 @@ ExternalProject_Add(
      # [Fix] Use double backslashes so CMake passes single backslashes to sed
     COMMAND sed -i "s/constexpr \\(.*\\)Layout(/ \\1Layout(/g" <SOURCE_DIR>/litert/cc/litert_layout.h
 
-    COMMAND sed -i "s|\\$<BUILD_INTERFACE:.*/opencl_headers>| ${OPENCL_INCLUDE_DIR}|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
+    COMMAND sed -i "s|\$<BUILD_INTERFACE:.*/opencl_headers>|        {OPENCL_INCLUDE_DIR}|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
 
 
 
