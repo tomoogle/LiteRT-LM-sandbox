@@ -4,7 +4,7 @@ set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 add_litertlm_library(runtime_core_engine_impl STATIC
   engine_impl.cc
 )
-add_library(LiteRTLM::Core::EngineImpl ALIAS runtime_core_engine_impl)
+add_library(LiteRTLM::Runtime::Core::EngineImpl ALIAS runtime_core_engine_impl)
 
 target_include_directories(runtime_core_engine_impl
   PUBLIC
@@ -47,7 +47,7 @@ target_link_libraries(runtime_core_engine_impl
 add_litertlm_library(runtime_core_engine_impl_cpu_only STATIC
   engine_impl.cc
 )
-add_library(LiteRTLM::Core::EngineImplCPU ALIAS runtime_core_engine_impl_cpu_only)
+add_library(LiteRTLM::Runtime::Core::EngineImplCPU ALIAS runtime_core_engine_impl_cpu_only)
 
 target_include_directories(runtime_core_engine_impl_cpu_only 
   PUBLIC
@@ -89,7 +89,7 @@ target_link_libraries(runtime_core_engine_impl_cpu_only
 add_litertlm_library(runtime_core_pipeline STATIC
   pipeline.cc
 )
-add_library(LiteRTLM::Core::Pipeline ALIAS runtime_core_pipeline)
+add_library(LiteRTLM::Runtime::Core::Pipeline ALIAS runtime_core_pipeline)
 
 target_include_directories(runtime_core_pipeline
   PRIVATE
@@ -126,7 +126,7 @@ target_link_libraries(runtime_core_pipeline
 add_litertlm_library(runtime_core_session_basic STATIC
   session_basic.cc
 )
-add_library(LiteRTLM::Core::SessionBasic ALIAS runtime_core_session_basic)
+add_library(LiteRTLM::Runtime::Core::SessionBasic ALIAS runtime_core_session_basic)
 
 target_include_directories(runtime_core_session_basic
   PRIVATE
@@ -167,7 +167,7 @@ target_link_libraries(runtime_core_session_basic
 add_litertlm_library(runtime_core_session_factory STATIC
   session_factory.cc
 )
-add_library(LiteRTLM::Core::SessionFactory ALIAS runtime_core_session_factory)
+add_library(LiteRTLM::Runtime::Core::SessionFactory ALIAS runtime_core_session_factory)
 
 target_include_directories(runtime_core_session_factory
   PRIVATE
@@ -199,7 +199,7 @@ target_link_libraries(runtime_core_session_factory
 add_litertlm_library(runtime_core_session_utils STATIC
   session_utils.cc
 )
-add_library(LiteRTLM::Core::SessionUtils ALIAS runtime_core_session_utils)
+add_library(LiteRTLM::Runtime::Core::SessionUtils ALIAS runtime_core_session_utils)
 
 target_include_directories(runtime_core_session_utils
   PRIVATE
@@ -230,7 +230,7 @@ target_link_libraries(runtime_core_session_utils
 add_litertlm_library(runtime_core_tasks STATIC
   tasks.cc
 )
-add_library(LiteRTLM::Core::Tasks ALIAS runtime_core_tasks)
+add_library(LiteRTLM::Runtime::Core::Tasks ALIAS runtime_core_tasks)
 
 target_include_directories(runtime_core_tasks
   PRIVATE
@@ -258,14 +258,14 @@ target_link_libraries(runtime_core_tasks
 
 # --- Facade ---
 add_library(runtime_core_libs INTERFACE)
-add_library(LiteRTLM::Core ALIAS runtime_core_libs)
+add_library(LiteRTLM::Runtime::Core ALIAS runtime_core_libs)
 
 target_link_libraries(runtime_core_libs INTERFACE
-  LiteRTLM::Core::EngineImpl
-  LiteRTLM::Core::EngineImplCPU
-  LiteRTLM::Core::Pipeline
-  LiteRTLM::Core::SessionBasic
-  LiteRTLM::Core::SessionFactory
-  LiteRTLM::Core::SessionUtils
-  LiteRTLM::Core::Tasks
+  LiteRTLM::Runtime::Core::EngineImpl
+  LiteRTLM::Runtime::Core::EngineImplCPU
+  LiteRTLM::Runtime::Core::Pipeline
+  LiteRTLM::Runtime::Core::SessionBasic
+  LiteRTLM::Runtime::Core::SessionFactory
+  LiteRTLM::Runtime::Core::SessionUtils
+  LiteRTLM::Runtime::Core::Tasks
 )

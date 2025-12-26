@@ -2,7 +2,7 @@ set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # --- Engine Interface ---
 add_litertlm_library(runtime_engine_engine_interface INTERFACE)
-add_library(LiteRTLM::Engine::Interface ALIAS runtime_engine_engine_interface)
+add_library(LiteRTLM::Runtime::Engine::Interface ALIAS runtime_engine_engine_interface)
 
 target_include_directories(runtime_engine_engine_interface
   INTERFACE
@@ -14,7 +14,7 @@ target_include_directories(runtime_engine_engine_interface
 add_litertlm_library(runtime_engine_engine_settings STATIC
   engine_settings.cc
 )
-add_library(LiteRTLM::Engine::Settings ALIAS runtime_engine_engine_settings)
+add_library(LiteRTLM::Runtime::Engine::Settings ALIAS runtime_engine_engine_settings)
 
 target_include_directories(runtime_engine_engine_settings 
   PRIVATE
@@ -41,7 +41,7 @@ target_link_libraries(runtime_engine_engine_settings
 add_litertlm_library(runtime_engine_io_types STATIC
   io_types.cc
 )
-add_library(LiteRTLM::Engine::IoTypes ALIAS runtime_engine_io_types)
+add_library(LiteRTLM::Runtime::Engine::IoTypes ALIAS runtime_engine_io_types)
 
 target_include_directories(runtime_engine_io_types
   PRIVATE 
@@ -65,7 +65,7 @@ target_link_libraries(runtime_engine_io_types
 add_litertlm_library(runtime_engine_litert_lm_lib STATIC
   litert_lm_lib.cc
 )
-add_library(LiteRTLM::Engine::Lib ALIAS runtime_engine_litert_lm_lib)
+add_library(LiteRTLM::Runtime::Engine::Lib ALIAS runtime_engine_litert_lm_lib)
 
 target_include_directories(runtime_engine_litert_lm_lib
   PUBLIC 
@@ -78,10 +78,10 @@ target_link_libraries(runtime_engine_litert_lm_lib
     # Refactored Modules
     LiteRTLM::Runtime::Components
     LiteRTLM::Runtime::Conversation
-    LiteRTLM::Core
-    LiteRTLM::Engine::Interface # (Self)
-    LiteRTLM::Engine::Settings  # (Self)
-    LiteRTLM::Engine::IoTypes   # (Self)
+    LiteRTLM::Runtime::Core
+    LiteRTLM::Runtime::Engine::Interface # (Self)
+    LiteRTLM::Runtime::Engine::Settings  # (Self)
+    LiteRTLM::Runtime::Engine::IoTypes   # (Self)
     
     # Not yet refactored
     runtime_executor_libs 
@@ -97,7 +97,7 @@ target_link_libraries(runtime_engine_litert_lm_lib
 add_litertlm_library(runtime_engine_shared_flags STATIC
   shared_flags.cc
 )
-add_library(LiteRTLM::Engine::SharedFlags ALIAS runtime_engine_shared_flags)
+add_library(LiteRTLM::Runtime::Engine::SharedFlags ALIAS runtime_engine_shared_flags)
 
 target_include_directories(runtime_engine_shared_flags
   PUBLIC
@@ -119,14 +119,14 @@ add_litertlm_executable(runtime_engine_litert_lm_advanced_main
 target_link_libraries(runtime_engine_litert_lm_advanced_main
   PUBLIC
     c_engine
-    LiteRTLM::Engine::Lib
-    LiteRTLM::Engine::SharedFlags
+    LiteRTLM::Runtime::Engine::Lib
+    LiteRTLM::Runtime::Engine::SharedFlags
     
     # Group dependencies
     LiteRTLM::Runtime::Components
     LiteRTLM::Runtime::Conversation
-    LiteRTLM::Core
-    LiteRTLM::Core::Tasks
+    LiteRTLM::Runtime::Core
+    LiteRTLM::Runtime::Core::Tasks
     runtime_executor_libs
     runtime_util_libs
     runtime_util_litert_status_util
@@ -146,17 +146,17 @@ target_link_libraries(runtime_engine_litert_lm_main
     c_engine
     
     # Engine Internal
-    LiteRTLM::Engine::Interface
-    LiteRTLM::Engine::Settings
-    LiteRTLM::Engine::IoTypes
+    LiteRTLM::Runtime::Engine::Interface
+    LiteRTLM::Runtime::Engine::Settings
+    LiteRTLM::Runtime::Engine::IoTypes
     
     # Modules
     LiteRTLM::Runtime::Components
     LiteRTLM::Runtime::Conversation
     LiteRTLM::Runtime::Conversation::IoTypes
-    LiteRTLM::Core
-    LiteRTLM::Core::EngineImpl
-    LiteRTLM::Core::Tasks
+    LiteRTLM::Runtime::Core
+    LiteRTLM::Runtime::Core::EngineImpl
+    LiteRTLM::Runtime::Core::Tasks
     
     # Pending Refactor
     runtime_executor_libs
@@ -171,12 +171,12 @@ target_link_libraries(runtime_engine_litert_lm_main
 
 # --- Folder Facade ---
 add_library(runtime_engine_libs INTERFACE)
-add_library(LiteRTLM::Engine ALIAS runtime_engine_libs)
+add_library(LiteRTLM::Runtime::Engine ALIAS runtime_engine_libs)
 
 target_link_libraries(runtime_engine_libs INTERFACE
-  LiteRTLM::Engine::Interface
-  LiteRTLM::Engine::Settings
-  LiteRTLM::Engine::IoTypes
-  LiteRTLM::Engine::Lib
-  LiteRTLM::Engine::SharedFlags
+  LiteRTLM::Runtime::Engine::Interface
+  LiteRTLM::Runtime::Engine::Settings
+  LiteRTLM::Runtime::Engine::IoTypes
+  LiteRTLM::Runtime::Engine::Lib
+  LiteRTLM::Runtime::Engine::SharedFlags
 )

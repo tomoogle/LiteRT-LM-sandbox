@@ -2,7 +2,7 @@ set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # --- Audio Executor Interface ---
 add_litertlm_library(runtime_executor_audio_executor INTERFACE)
-add_library(LiteRTLM::Executor::Audio::Interface ALIAS runtime_executor_audio_executor)
+add_library(LiteRTLM::Runtime::Executor::Audio::Interface ALIAS runtime_executor_audio_executor)
 
 target_include_directories(runtime_executor_audio_executor
   INTERFACE
@@ -13,7 +13,7 @@ target_include_directories(runtime_executor_audio_executor
 
 # --- Audio Executor Base ---
 add_litertlm_library(runtime_executor_audio_executor_base INTERFACE)
-add_library(LiteRTLM::Executor::Audio::Base ALIAS runtime_executor_audio_executor_base)
+add_library(LiteRTLM::Runtime::Executor::Audio::Base ALIAS runtime_executor_audio_executor_base)
 
 target_include_directories(runtime_executor_audio_executor_base
   INTERFACE
@@ -26,7 +26,7 @@ target_include_directories(runtime_executor_audio_executor_base
 add_litertlm_library(runtime_executor_audio_executor_settings STATIC
   audio_executor_settings.cc
 )
-add_library(LiteRTLM::Executor::Audio::Settings ALIAS runtime_executor_audio_executor_settings)
+add_library(LiteRTLM::Runtime::Executor::Audio::Settings ALIAS runtime_executor_audio_executor_settings)
 
 target_include_directories(runtime_executor_audio_executor_settings
   PRIVATE
@@ -37,7 +37,7 @@ target_include_directories(runtime_executor_audio_executor_settings
 
 target_link_libraries(runtime_executor_audio_executor_settings
   PUBLIC
-    LiteRTLM::Executor::SettingsBase # (Defined below)
+    LiteRTLM::Runtime::Executor::SettingsBase # (Defined below)
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
@@ -48,7 +48,7 @@ target_link_libraries(runtime_executor_audio_executor_settings
 add_litertlm_library(runtime_executor_audio_litert_compiled_model_executor STATIC
   audio_litert_compiled_model_executor.cc
 )
-add_library(LiteRTLM::Executor::Audio::CompiledModel ALIAS runtime_executor_audio_litert_compiled_model_executor)
+add_library(LiteRTLM::Runtime::Executor::Audio::CompiledModel ALIAS runtime_executor_audio_litert_compiled_model_executor)
 
 target_include_directories(runtime_executor_audio_litert_compiled_model_executor
   PUBLIC
@@ -59,13 +59,13 @@ target_include_directories(runtime_executor_audio_litert_compiled_model_executor
 
 target_link_libraries(runtime_executor_audio_litert_compiled_model_executor
   PUBLIC
-    LiteRTLM::Executor::Audio::Interface
-    LiteRTLM::Executor::Audio::Settings
-    LiteRTLM::Executor::SettingsBase
-    LiteRTLM::Executor::LLM::IoTypes # (Defined below)
+    LiteRTLM::Runtime::Executor::Audio::Interface
+    LiteRTLM::Runtime::Executor::Audio::Settings
+    LiteRTLM::Runtime::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::LLM::IoTypes # (Defined below)
     LiteRTLM::Runtime::Components::ModelResources::Interface
     runtime_util_litert_status_util
-    LiteRTLM::Executor::CompiledModelUtils # (Defined below)
+    LiteRTLM::Runtime::Executor::CompiledModelUtils # (Defined below)
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -75,7 +75,7 @@ target_link_libraries(runtime_executor_audio_litert_compiled_model_executor
 add_litertlm_library(runtime_executor_executor_settings_base STATIC
   executor_settings_base.cc
 )
-add_library(LiteRTLM::Executor::SettingsBase ALIAS runtime_executor_executor_settings_base)
+add_library(LiteRTLM::Runtime::Executor::SettingsBase ALIAS runtime_executor_executor_settings_base)
 
 target_include_directories(runtime_executor_executor_settings_base
   PUBLIC
@@ -96,7 +96,7 @@ target_link_libraries(runtime_executor_executor_settings_base
 add_litertlm_library(runtime_executor_fake_llm_executor STATIC
   fake_llm_executor.cc
 )
-add_library(LiteRTLM::Executor::LLM::Fake ALIAS runtime_executor_fake_llm_executor)
+add_library(LiteRTLM::Runtime::Executor::LLM::Fake ALIAS runtime_executor_fake_llm_executor)
 
 target_include_directories(runtime_executor_fake_llm_executor
   PRIVATE
@@ -107,10 +107,10 @@ target_include_directories(runtime_executor_fake_llm_executor
 
 target_link_libraries(runtime_executor_fake_llm_executor
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
-    LiteRTLM::Executor::LLM::Interface # (Defined below)
-    LiteRTLM::Executor::LLM::IoTypes
-    LiteRTLM::Executor::LLM::Settings # (Defined below)
+    LiteRTLM::Runtime::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::LLM::Interface # (Defined below)
+    LiteRTLM::Runtime::Executor::LLM::IoTypes
+    LiteRTLM::Runtime::Executor::LLM::Settings # (Defined below)
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
   PRIVATE
@@ -122,7 +122,7 @@ target_link_libraries(runtime_executor_fake_llm_executor
 add_litertlm_library(runtime_executor_litert_compiled_model_executor_utils STATIC
   litert_compiled_model_executor_utils.cc
 )
-add_library(LiteRTLM::Executor::CompiledModelUtils ALIAS runtime_executor_litert_compiled_model_executor_utils)
+add_library(LiteRTLM::Runtime::Executor::CompiledModelUtils ALIAS runtime_executor_litert_compiled_model_executor_utils)
 
 target_include_directories(runtime_executor_litert_compiled_model_executor_utils
   PRIVATE
@@ -133,7 +133,7 @@ target_include_directories(runtime_executor_litert_compiled_model_executor_utils
 
 target_link_libraries(runtime_executor_litert_compiled_model_executor_utils
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::SettingsBase
     LiteRTLM::Runtime::Components::ModelResources::Interface
     LiteRTLM::Runtime::Components::ModelResources::LiteRTLM
     LiteRTLM::Runtime::Components::ModelResources::Task
@@ -152,7 +152,7 @@ target_link_libraries(runtime_executor_litert_compiled_model_executor_utils
 
 # --- LLM Executor Interface ---
 add_litertlm_library(runtime_executor_llm_executor INTERFACE)
-add_library(LiteRTLM::Executor::LLM::Interface ALIAS runtime_executor_llm_executor)
+add_library(LiteRTLM::Runtime::Executor::LLM::Interface ALIAS runtime_executor_llm_executor)
 
 target_include_directories(runtime_executor_llm_executor 
   INTERFACE
@@ -163,7 +163,7 @@ target_include_directories(runtime_executor_llm_executor
 
 # --- LLM Executor Base ---
 add_litertlm_library(runtime_executor_llm_executor_base INTERFACE)
-add_library(LiteRTLM::Executor::LLM::Base ALIAS runtime_executor_llm_executor_base)
+add_library(LiteRTLM::Runtime::Executor::LLM::Base ALIAS runtime_executor_llm_executor_base)
 
 target_include_directories(runtime_executor_llm_executor_base
   INTERFACE
@@ -176,7 +176,7 @@ target_include_directories(runtime_executor_llm_executor_base
 add_litertlm_library(runtime_executor_llm_executor_io_types STATIC
   llm_executor_io_types.cc
 )
-add_library(LiteRTLM::Executor::LLM::IoTypes ALIAS runtime_executor_llm_executor_io_types)
+add_library(LiteRTLM::Runtime::Executor::LLM::IoTypes ALIAS runtime_executor_llm_executor_io_types)
 
 target_include_directories(runtime_executor_llm_executor_io_types
   PUBLIC
@@ -198,7 +198,7 @@ target_link_libraries(runtime_executor_llm_executor_io_types
 add_litertlm_library(runtime_executor_llm_executor_processed_tokens STATIC
   llm_executor_processed_tokens.cc
 )
-add_library(LiteRTLM::Executor::LLM::ProcessedTokens ALIAS runtime_executor_llm_executor_processed_tokens)
+add_library(LiteRTLM::Runtime::Executor::LLM::ProcessedTokens ALIAS runtime_executor_llm_executor_processed_tokens)
 
 target_include_directories(runtime_executor_llm_executor_processed_tokens
   PUBLIC
@@ -217,7 +217,7 @@ target_link_libraries(runtime_executor_llm_executor_processed_tokens
 add_litertlm_library(runtime_executor_llm_executor_settings STATIC
   llm_executor_settings.cc
 )
-add_library(LiteRTLM::Executor::LLM::Settings ALIAS runtime_executor_llm_executor_settings)
+add_library(LiteRTLM::Runtime::Executor::LLM::Settings ALIAS runtime_executor_llm_executor_settings)
 
 target_include_directories(runtime_executor_llm_executor_settings
   PUBLIC
@@ -228,7 +228,7 @@ target_include_directories(runtime_executor_llm_executor_settings
 
 target_link_libraries(runtime_executor_llm_executor_settings
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::SettingsBase
     runtime_util_litert_status_util
     runtime_util_logging
   PRIVATE
@@ -241,7 +241,7 @@ target_link_libraries(runtime_executor_llm_executor_settings
 add_litertlm_library(runtime_executor_llm_litert_compiled_model_cache_utils STATIC
   llm_litert_compiled_model_cache_utils.cc
 )
-add_library(LiteRTLM::Executor::LLM::CacheUtils ALIAS runtime_executor_llm_litert_compiled_model_cache_utils)
+add_library(LiteRTLM::Runtime::Executor::LLM::CacheUtils ALIAS runtime_executor_llm_litert_compiled_model_cache_utils)
 
 target_include_directories(runtime_executor_llm_litert_compiled_model_cache_utils
   PUBLIC
@@ -263,7 +263,7 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_cache_utils
 add_litertlm_library(runtime_executor_llm_litert_compiled_model_executor_factory STATIC
   llm_litert_compiled_model_executor_factory.cc
 )
-add_library(LiteRTLM::Executor::LLM::Factory ALIAS runtime_executor_llm_litert_compiled_model_executor_factory)
+add_library(LiteRTLM::Runtime::Executor::LLM::Factory ALIAS runtime_executor_llm_litert_compiled_model_executor_factory)
 
 target_include_directories(runtime_executor_llm_litert_compiled_model_executor_factory
   PRIVATE
@@ -274,16 +274,16 @@ target_include_directories(runtime_executor_llm_litert_compiled_model_executor_f
 
 target_link_libraries(runtime_executor_llm_litert_compiled_model_executor_factory
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
-    LiteRTLM::Executor::LLM::IoTypes
-    LiteRTLM::Executor::LLM::Settings
-    LiteRTLM::Executor::LLM::CompiledModel # (Defined below)
-    LiteRTLM::Executor::LLM::NpuCompiledModel # (Defined below)
-    LiteRTLM::Executor::CompiledModelUtils
-    LiteRTLM::Executor::LLM::Interface
-    LiteRTLM::Executor::LLM::ProcessedTokens
-    LiteRTLM::Executor::LLM::CacheUtils
-    LiteRTLM::Executor::MagicNumberConfigsHelper # (Defined below)
+    LiteRTLM::Runtime::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::LLM::IoTypes
+    LiteRTLM::Runtime::Executor::LLM::Settings
+    LiteRTLM::Runtime::Executor::LLM::CompiledModel # (Defined below)
+    LiteRTLM::Runtime::Executor::LLM::NpuCompiledModel # (Defined below)
+    LiteRTLM::Runtime::Executor::CompiledModelUtils
+    LiteRTLM::Runtime::Executor::LLM::Interface
+    LiteRTLM::Runtime::Executor::LLM::ProcessedTokens
+    LiteRTLM::Runtime::Executor::LLM::CacheUtils
+    LiteRTLM::Runtime::Executor::MagicNumberConfigsHelper # (Defined below)
     LiteRTLM::Runtime::Components::ModelResources::Interface
     LiteRTLM::Runtime::Components::ModelResources::LiteRTLM
     LiteRTLM::Runtime::Components::ModelResources::Task
@@ -305,7 +305,7 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_executor_factor
 add_litertlm_library(runtime_executor_llm_litert_compiled_model_executor STATIC
   llm_litert_compiled_model_executor.cc
 )
-add_library(LiteRTLM::Executor::LLM::CompiledModel ALIAS runtime_executor_llm_litert_compiled_model_executor)
+add_library(LiteRTLM::Runtime::Executor::LLM::CompiledModel ALIAS runtime_executor_llm_litert_compiled_model_executor)
 
 target_include_directories(runtime_executor_llm_litert_compiled_model_executor
   PRIVATE
@@ -316,14 +316,14 @@ target_include_directories(runtime_executor_llm_litert_compiled_model_executor
 
 target_link_libraries(runtime_executor_llm_litert_compiled_model_executor
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
-    LiteRTLM::Executor::LLM::IoTypes
-    LiteRTLM::Executor::LLM::Settings
-    LiteRTLM::Executor::CompiledModelUtils
-    LiteRTLM::Executor::LLM::Interface
-    LiteRTLM::Executor::LLM::ProcessedTokens
-    LiteRTLM::Executor::LLM::CacheUtils
-    LiteRTLM::Executor::MagicNumberConfigsHelper
+    LiteRTLM::Runtime::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::LLM::IoTypes
+    LiteRTLM::Runtime::Executor::LLM::Settings
+    LiteRTLM::Runtime::Executor::CompiledModelUtils
+    LiteRTLM::Runtime::Executor::LLM::Interface
+    LiteRTLM::Runtime::Executor::LLM::ProcessedTokens
+    LiteRTLM::Runtime::Executor::LLM::CacheUtils
+    LiteRTLM::Runtime::Executor::MagicNumberConfigsHelper
     LiteRTLM::Runtime::Components::ModelResources::Interface
     LiteRTLM::Runtime::Components::ModelResources::LiteRTLM
     LiteRTLM::Runtime::Components::ModelResources::Task
@@ -344,7 +344,7 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_executor
 add_litertlm_library(runtime_executor_llm_litert_npu_compiled_model_executor STATIC
   llm_litert_npu_compiled_model_executor.cc
 )
-add_library(LiteRTLM::Executor::LLM::NpuCompiledModel ALIAS runtime_executor_llm_litert_npu_compiled_model_executor)
+add_library(LiteRTLM::Runtime::Executor::LLM::NpuCompiledModel ALIAS runtime_executor_llm_litert_npu_compiled_model_executor)
 
 target_include_directories(runtime_executor_llm_litert_npu_compiled_model_executor
   PRIVATE
@@ -355,15 +355,15 @@ target_include_directories(runtime_executor_llm_litert_npu_compiled_model_execut
 
 target_link_libraries(runtime_executor_llm_litert_npu_compiled_model_executor
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
-    LiteRTLM::Executor::LLM::IoTypes
-    LiteRTLM::Executor::LLM::Settings
-    LiteRTLM::Executor::CompiledModelUtils
-    LiteRTLM::Executor::LLM::Interface
+    LiteRTLM::Runtime::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::LLM::IoTypes
+    LiteRTLM::Runtime::Executor::LLM::Settings
+    LiteRTLM::Runtime::Executor::CompiledModelUtils
+    LiteRTLM::Runtime::Executor::LLM::Interface
     LiteRTLM::Runtime::Components::ModelResources::Interface
     LiteRTLM::Runtime::Components::ModelResources::Task
     LiteRTLM::Runtime::Components::EmbeddingLookup::Manager
-    LiteRTLM::Executor::LLM::ProcessedTokens
+    LiteRTLM::Runtime::Executor::LLM::ProcessedTokens
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
   PRIVATE
@@ -375,7 +375,7 @@ target_link_libraries(runtime_executor_llm_litert_npu_compiled_model_executor
 add_litertlm_library(runtime_executor_magic_number_configs_helper STATIC
   magic_number_configs_helper.cc
 )
-add_library(LiteRTLM::Executor::MagicNumberConfigsHelper ALIAS runtime_executor_magic_number_configs_helper)
+add_library(LiteRTLM::Runtime::Executor::MagicNumberConfigsHelper ALIAS runtime_executor_magic_number_configs_helper)
 
 target_include_directories(runtime_executor_magic_number_configs_helper
   PRIVATE
@@ -386,7 +386,7 @@ target_include_directories(runtime_executor_magic_number_configs_helper
 
 target_link_libraries(runtime_executor_magic_number_configs_helper
   PUBLIC 
-    LiteRTLM::Executor::LLM::Settings
+    LiteRTLM::Runtime::Executor::LLM::Settings
     LiteRTLM::Runtime::Components::ModelResources::Interface
     runtime_util_litert_status_util
   PRIVATE
@@ -396,7 +396,7 @@ target_link_libraries(runtime_executor_magic_number_configs_helper
 
 # --- Vision Executor Interface ---
 add_litertlm_library(runtime_executor_vision_executor INTERFACE)
-add_library(LiteRTLM::Executor::Vision::Interface ALIAS runtime_executor_vision_executor)
+add_library(LiteRTLM::Runtime::Executor::Vision::Interface ALIAS runtime_executor_vision_executor)
 
 target_include_directories(runtime_executor_vision_executor 
   INTERFACE
@@ -407,7 +407,7 @@ target_include_directories(runtime_executor_vision_executor
 
 # --- Vision Executor Base ---
 add_litertlm_library(runtime_executor_vision_executor_base INTERFACE)
-add_library(LiteRTLM::Executor::Vision::Base ALIAS runtime_executor_vision_executor_base)
+add_library(LiteRTLM::Runtime::Executor::Vision::Base ALIAS runtime_executor_vision_executor_base)
 
 target_include_directories(runtime_executor_vision_executor_base 
   INTERFACE
@@ -420,7 +420,7 @@ target_include_directories(runtime_executor_vision_executor_base
 add_litertlm_library(runtime_executor_vision_executor_settings STATIC
   vision_executor_settings.cc
 )
-add_library(LiteRTLM::Executor::Vision::Settings ALIAS runtime_executor_vision_executor_settings)
+add_library(LiteRTLM::Runtime::Executor::Vision::Settings ALIAS runtime_executor_vision_executor_settings)
 
 target_include_directories(runtime_executor_vision_executor_settings
   PRIVATE
@@ -431,7 +431,7 @@ target_include_directories(runtime_executor_vision_executor_settings
 
 target_link_libraries(runtime_executor_vision_executor_settings
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::SettingsBase
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
@@ -442,7 +442,7 @@ target_link_libraries(runtime_executor_vision_executor_settings
 add_litertlm_library(runtime_executor_vision_litert_compiled_model_executor STATIC
   vision_litert_compiled_model_executor.cc
 )
-add_library(LiteRTLM::Executor::Vision::CompiledModel ALIAS runtime_executor_vision_litert_compiled_model_executor)
+add_library(LiteRTLM::Runtime::Executor::Vision::CompiledModel ALIAS runtime_executor_vision_litert_compiled_model_executor)
 
 target_include_directories(runtime_executor_vision_litert_compiled_model_executor
   PUBLIC
@@ -453,14 +453,14 @@ target_include_directories(runtime_executor_vision_litert_compiled_model_executo
 
 target_link_libraries(runtime_executor_vision_litert_compiled_model_executor
   PUBLIC
-    LiteRTLM::Executor::SettingsBase
-    LiteRTLM::Executor::LLM::IoTypes
-    LiteRTLM::Executor::Vision::Settings
+    LiteRTLM::Runtime::Executor::SettingsBase
+    LiteRTLM::Runtime::Executor::LLM::IoTypes
+    LiteRTLM::Runtime::Executor::Vision::Settings
     runtime_util_convert_tensor_buffer
-    LiteRTLM::Executor::CompiledModelUtils
+    LiteRTLM::Runtime::Executor::CompiledModelUtils
     runtime_util_litert_status_util
     LiteRTLM::Runtime::Components::ModelResources::Interface
-    LiteRTLM::Executor::Vision::Interface
+    LiteRTLM::Runtime::Executor::Vision::Interface
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -468,23 +468,23 @@ target_link_libraries(runtime_executor_vision_litert_compiled_model_executor
 
 # --- Folder Facade ---
 add_library(runtime_executor_libs INTERFACE)
-add_library(LiteRTLM::Executor ALIAS runtime_executor_libs)
+add_library(LiteRTLM::Runtime::Executor ALIAS runtime_executor_libs)
 
 target_link_libraries(runtime_executor_libs INTERFACE
-  LiteRTLM::Executor::Audio::Interface
-  LiteRTLM::Executor::Audio::Settings
-  LiteRTLM::Executor::Audio::CompiledModel
-  LiteRTLM::Executor::SettingsBase
-  LiteRTLM::Executor::LLM::Fake
-  LiteRTLM::Executor::CompiledModelUtils
-  LiteRTLM::Executor::LLM::IoTypes
-  LiteRTLM::Executor::LLM::ProcessedTokens
-  LiteRTLM::Executor::LLM::Settings
-  LiteRTLM::Executor::LLM::Factory
-  LiteRTLM::Executor::LLM::CacheUtils
-  LiteRTLM::Executor::LLM::CompiledModel
-  LiteRTLM::Executor::LLM::NpuCompiledModel
-  LiteRTLM::Executor::MagicNumberConfigsHelper
-  LiteRTLM::Executor::Vision::Settings
-  LiteRTLM::Executor::Vision::CompiledModel
+  LiteRTLM::Runtime::Executor::Audio::Interface
+  LiteRTLM::Runtime::Executor::Audio::Settings
+  LiteRTLM::Runtime::Executor::Audio::CompiledModel
+  LiteRTLM::Runtime::Executor::SettingsBase
+  LiteRTLM::Runtime::Executor::LLM::Fake
+  LiteRTLM::Runtime::Executor::CompiledModelUtils
+  LiteRTLM::Runtime::Executor::LLM::IoTypes
+  LiteRTLM::Runtime::Executor::LLM::ProcessedTokens
+  LiteRTLM::Runtime::Executor::LLM::Settings
+  LiteRTLM::Runtime::Executor::LLM::Factory
+  LiteRTLM::Runtime::Executor::LLM::CacheUtils
+  LiteRTLM::Runtime::Executor::LLM::CompiledModel
+  LiteRTLM::Runtime::Executor::LLM::NpuCompiledModel
+  LiteRTLM::Runtime::Executor::MagicNumberConfigsHelper
+  LiteRTLM::Runtime::Executor::Vision::Settings
+  LiteRTLM::Runtime::Executor::Vision::CompiledModel
 )

@@ -32,7 +32,7 @@ target_link_libraries(runtime_util_executor_data_util
   PUBLIC
     LiteRTLM::Runtime::Util::ConvertTensorBuffer
     LiteRTLM::Runtime::Util::TensorBufferUtil # (Defined below)
-    LiteRTLM::Executor::LLM::IoTypes
+    LiteRTLM::Runtime::Executor::LLM::IoTypes
   PRIVATE 
     LITERTLM_DEPS
     litert_libs
@@ -54,7 +54,7 @@ target_include_directories(runtime_util_file_format_util
 target_link_libraries(runtime_util_file_format_util
   PUBLIC
     runtime_executor_executor_settings_base
-    LiteRTLM::Runtime::Util::StatusUtil # (Defined below)
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil # (Defined below)
     LiteRTLM::Runtime::Util::MemoryMappedFile # (Defined below)
     LiteRTLM::Runtime::Util::ScopedFile # (Defined below)
   PRIVATE
@@ -94,7 +94,7 @@ target_include_directories(runtime_util_litert_lm_loader
 
 target_link_libraries(runtime_util_litert_lm_loader 
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
@@ -104,7 +104,7 @@ target_link_libraries(runtime_util_litert_lm_loader
 
 # --- LiteRT Status Util ---
 add_litertlm_library(runtime_util_litert_status_util INTERFACE)
-add_library(LiteRTLM::Runtime::Util::StatusUtil ALIAS runtime_util_litert_status_util)
+add_library(LiteRTLM::Runtime::Util::LiteRtStatusUtil ALIAS runtime_util_litert_status_util)
 
 target_include_directories(runtime_util_litert_status_util 
   INTERFACE
@@ -164,7 +164,7 @@ target_include_directories(runtime_util_lora_data
 
 target_link_libraries(runtime_util_lora_data
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::LoRAUtil # (Defined below)
     LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
@@ -188,7 +188,7 @@ target_include_directories(runtime_util_lora_util
 
 target_link_libraries(runtime_util_lora_util
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
@@ -216,7 +216,7 @@ target_include_directories(runtime_util_memory_mapped_file
 
 target_link_libraries(runtime_util_memory_mapped_file 
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::ScopedFile
   PRIVATE
     litert_libs
@@ -256,7 +256,7 @@ target_include_directories(runtime_util_model_asset_bundle_resources
 
 target_link_libraries(runtime_util_model_asset_bundle_resources
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
     LiteRTLM::Runtime::Util::ZipUtils # (Defined below)
@@ -279,7 +279,7 @@ target_include_directories(runtime_util_model_type_utils
 
 target_link_libraries(runtime_util_model_type_utils 
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
   PRIVATE
     proto_lib
     litert_libs
@@ -306,7 +306,7 @@ target_include_directories(runtime_util_scoped_file
 
 target_link_libraries(runtime_util_scoped_file
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil 
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil 
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -383,7 +383,7 @@ target_include_directories(runtime_util_zip_utils
 
 target_link_libraries(runtime_util_zip_utils
   PUBLIC
-    LiteRTLM::Runtime::Util::StatusUtil
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::ZipReadonlyMemFile
   PRIVATE
     LITERTLM_DEPS

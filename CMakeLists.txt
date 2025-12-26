@@ -85,5 +85,5 @@ generate_src_files(ALL_GENERATED_FILES ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES})
 
 
 add_subdirectory(c)
-# add_subdirectory(schema)
-# add_subdirectory(runtime)
+add_subdirectory(schema)
+add_subdirectory(runtime)
