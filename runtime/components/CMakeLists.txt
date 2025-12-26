@@ -149,7 +149,7 @@ target_link_libraries(runtime_components_model_resources_task
 add_litertlm_library(runtime_components_prompt_template STATIC
   prompt_template.cc
 )
-add_library(LiteRTLM::Runtime::Components::::PromptTemplate ALIAS runtime_components_prompt_template)
+add_library(LiteRTLM::Runtime::Components::PromptTemplate ALIAS runtime_components_prompt_template)
 
 target_include_directories(runtime_components_prompt_template
   PRIVATE
@@ -335,7 +335,7 @@ target_link_libraries(runtime_components_top_p_cpu_sampler
 
 # --- Folder Facade ---
 add_library(runtime_components_libs INTERFACE)
-add_library(LiteRTLM::Runtime::Components:: ALIAS runtime_components_libs)
+add_library(LiteRTLM::Runtime::Components ALIAS runtime_components_libs)
 
 target_link_libraries(runtime_components_libs INTERFACE
   # Subdirectories
@@ -351,7 +351,7 @@ target_link_libraries(runtime_components_libs INTERFACE
   LiteRTLM::Runtime::Components::ModelResources::Interface
   LiteRTLM::Runtime::Components::ModelResources::LiteRTLM
   LiteRTLM::Runtime::Components::ModelResources::Task
-  LiteRTLM::Runtime::Components::::PromptTemplate
+  LiteRTLM::Runtime::Components::PromptTemplate
   LiteRTLM::Runtime::Components::Sampler::Interface
   LiteRTLM::Runtime::Components::Sampler::Factory
   LiteRTLM::Runtime::Components::SamplingCpuUtil

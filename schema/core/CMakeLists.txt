@@ -76,9 +76,9 @@ target_include_directories(schema_core_litertlm_read
 
 target_link_libraries(schema_core_litertlm_read
   PUBLIC
-    LiteRTLM::Util::StatusUtil
-    LiteRTLM::Util::MemoryMappedFile
-    LiteRTLM::Util::ScopedFile
+    LiteRT::Components::Util::StatusUtil
+    LiteRT::Components::Util::MemoryMappedFile
+    LiteRT::Components::Util::ScopedFile
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Utils # (Defined below)

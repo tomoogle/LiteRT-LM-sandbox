@@ -66,7 +66,7 @@ target_link_libraries(runtime_conversation_model_data_processor_gemma3_data_proc
   PUBLIC
     runtime_conversation_io_types
     runtime_engine_io_types
-    LiteRTLM::Runtime::Components::Conversation::Processor::Gemma3Config
+    LiteRTLM::Runtime::Conversation::Processor::Gemma3Config
     LiteRTLM::Runtime::Components::Preprocessor::Audio
     LiteRTLM::Runtime::Components::Preprocessor::AudioMiniAudio
     LiteRTLM::Runtime::Components::Preprocessor::Image
@@ -75,8 +75,8 @@ target_link_libraries(runtime_conversation_model_data_processor_gemma3_data_proc
     LiteRTLM::Runtime::Components::ToolUse::PythonFormatUtils
     runtime_util_litert_status_util
     runtime_util_memory_mapped_file
-    LiteRTLM::Runtime::Components::Conversation::Processor::DataUtils  
-    LiteRTLM::Runtime::Components::Conversation::Processor::Interface    
+    LiteRTLM::Runtime::Conversation::Processor::DataUtils  
+    LiteRTLM::Runtime::Conversation::Processor::Interface    
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -106,12 +106,12 @@ target_include_directories(runtime_conversation_model_data_processor_generic_dat
 
 target_link_libraries(runtime_conversation_model_data_processor_generic_data_processor
   PUBLIC
-    LiteRTLM::Runtime::Components::Conversation::Processor::ConfigRegistry
-    LiteRTLM::Runtime::Components::Conversation::Processor::GenericConfig
+    LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry
+    LiteRTLM::Runtime::Conversation::Processor::GenericConfig
     runtime_conversation_io_types
     runtime_engine_io_types
     runtime_util_litert_status_util
-    LiteRTLM::Runtime::Components::Conversation::Processor::Interface
+    LiteRTLM::Runtime::Conversation::Processor::Interface
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -145,7 +145,7 @@ target_link_libraries(runtime_conversation_model_data_processor_qwen3_data_proce
     LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry
     LiteRTLM::Runtime::Conversation::Processor::Interface
     LiteRTLM::Runtime::Conversation::Processor::Qwen3Config
-    LiteRTLM::Runtime::ToolUse::ParserUtils
+    LiteRTLM::Runtime::Components::ToolUse::ParserUtils
     runtime_conversation_io_types
     runtime_engine_io_types
     runtime_util_litert_status_util
@@ -158,7 +158,7 @@ target_link_libraries(runtime_conversation_model_data_processor_qwen3_data_proce
 add_litertlm_library(runtime_conversation_model_data_processor_factory STATIC
   model_data_processor_factory.cc
 )
-add_library(LiteRTLM::Runtime::Components::Conversation::Processor::Factory ALIAS runtime_conversation_model_data_processor_factory)
+add_library(LiteRTLM::Runtime::Conversation::Processor::Factory ALIAS runtime_conversation_model_data_processor_factory)
 
 target_include_directories(runtime_conversation_model_data_processor_factory
   PUBLIC
@@ -187,7 +187,7 @@ target_link_libraries(runtime_conversation_model_data_processor_factory
 
 # --- Folder Facade ---
 add_library(runtime_conversation_model_data_processor_libs INTERFACE)
-add_library(LiteRTLM::Runtime::Components::Conversation::Processor ALIAS runtime_conversation_model_data_processor_libs)
+add_library(LiteRTLM::Runtime::Conversation::Processor ALIAS runtime_conversation_model_data_processor_libs)
 
 target_link_libraries(runtime_conversation_model_data_processor_libs INTERFACE
   LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry

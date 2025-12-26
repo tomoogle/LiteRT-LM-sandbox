@@ -77,7 +77,7 @@ target_link_libraries(runtime_engine_litert_lm_lib
   PUBLIC
     # Refactored Modules
     LiteRTLM::Runtime::Components::
-    LiteRTLM::Runtime::Components::Conversation
+    LiteRTLM::Runtime::Conversation
     LiteRTLM::Core
     LiteRTLM::Engine::Interface # (Self)
     LiteRTLM::Engine::Settings  # (Self)
@@ -124,7 +124,7 @@ target_link_libraries(runtime_engine_litert_lm_advanced_main
     
     # Group dependencies
     LiteRTLM::Runtime::Components::
-    LiteRTLM::Runtime::Components::Conversation
+    LiteRTLM::Runtime::Conversation
     LiteRTLM::Core
     LiteRTLM::Core::Tasks
     runtime_executor_libs
@@ -152,8 +152,8 @@ target_link_libraries(runtime_engine_litert_lm_main
     
     # Modules
     LiteRTLM::Runtime::Components::
-    LiteRTLM::Runtime::Components::Conversation
-    LiteRTLM::Runtime::Components::Conversation::IoTypes
+    LiteRTLM::Runtime::Conversation
+    LiteRTLM::Runtime::Conversation::IoTypes
     LiteRTLM::Core
     LiteRTLM::Core::EngineImpl
     LiteRTLM::Core::Tasks

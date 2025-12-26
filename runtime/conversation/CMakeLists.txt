@@ -18,14 +18,14 @@ target_include_directories(runtime_conversation_conversation
 target_link_libraries(runtime_conversation_conversation
   PUBLIC
     # Local Dependencies
-    LiteRTLM::Runtime::Components::Conversation::InternalCallbackUtil # (Defined below)
-    LiteRTLM::Runtime::Components::Conversation::IoTypes # (Defined below)
-    LiteRTLM::Runtime::Components::Conversation::Processor::ConfigRegistry
-    LiteRTLM::Runtime::Components::Conversation::Processor::Factory
-    LiteRTLM::Runtime::Components::Conversation::Processor::Interface
+    LiteRTLM::Runtime::Conversation::InternalCallbackUtil # (Defined below)
+    LiteRTLM::Runtime::Conversation::IoTypes # (Defined below)
+    LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry
+    LiteRTLM::Runtime::Conversation::Processor::Factory
+    LiteRTLM::Runtime::Conversation::Processor::Interface
 
     # Cross-Module Dependencies
-    LiteRTLM::Runtime::Components::::PromptTemplate
+    LiteRTLM::Runtime::Components::PromptTemplate
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     # runtime_engine_engine_interface (Likely defined in runtime/engine)
     # runtime_engine_engine_settings (Likely defined in runtime/engine)
@@ -52,9 +52,9 @@ target_include_directories(runtime_conversation_internal_callback_util
 
 target_link_libraries(runtime_conversation_internal_callback_util
   PUBLIC
-    LiteRTLM::Runtime::Components::Conversation::IoTypes # (Defined below)
-    LiteRTLM::Runtime::Components::Conversation::Processor::ConfigRegistry
-    LiteRTLM::Runtime::Components::Conversation::Processor::Interface
+    LiteRTLM::Runtime::Conversation::IoTypes # (Defined below)
+    LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry
+    LiteRTLM::Runtime::Conversation::Processor::Interface
     # runtime_engine_io_types (Likely defined in runtime/engine)
   PRIVATE
     LITERTLM_DEPS
