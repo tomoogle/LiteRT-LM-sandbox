@@ -106,6 +106,7 @@ ExternalProject_Add(
      # [Fix] Use double backslashes so CMake passes single backslashes to sed
     COMMAND sed -i "s/constexpr \\(.*\\)Layout(/ \\1Layout(/g" <SOURCE_DIR>/litert/cc/litert_layout.h
 
+    COMMAND sed -i "s|$<BUILD_INTERFACE:${TFLITE_BUILD_DIR}/opencl_headers>| ${OPENCL_INCLUDE_DIR}|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
 
 
 

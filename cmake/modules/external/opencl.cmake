@@ -3,7 +3,7 @@ include(ExternalProject)
 # --- OpenCL Headers ---
 set(OPENCL_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/opencl_headers)
 set(OPENCL_SRC_DIR ${OPENCL_EXT_PREFIX}/src/opencl_headers_external)
-set(OPENCL_INCLUDE_DIR ${OPENCL_SRC_DIR}/CL)
+set(OPENCL_INCLUDE_DIR ${OPENCL_SRC_DIR}/CL CACHE INTERNAL "" FORCE)
 
 
 
