@@ -9,6 +9,7 @@ set(LITERT_BUILD_DIR     ${LITERT_EXT_PREFIX}/src/litert_external-build)
 set(LITERT_SOURCE_DIR    ${LITERT_EXT_PREFIX}/src/litert_external)
 set(LITERT_INCLUDE_PATHS
   ${LITERT_SOURCE_DIR}
+  ${LITERT_BUILD_DIR}/include
   ${LITERT_BUILD_DIR}/c/include
   ${LITERT_BUILD_DIR}/cc/include
   ${LITERT_BUILD_DIR}/compiler/include
