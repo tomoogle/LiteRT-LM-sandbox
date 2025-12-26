@@ -2,7 +2,7 @@ set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # --- Interface ---
 add_litertlm_library(runtime_components_embedding_lookup_embedding_lookup INTERFACE)
-add_library(LiteRTLM::EmbeddingLookup::Interface ALIAS runtime_components_embedding_lookup_embedding_lookup)
+add_library(LiteRTLM::Runtime::Components::EmbeddingLookup::Interface ALIAS runtime_components_embedding_lookup_embedding_lookup)
 
 target_include_directories(runtime_components_embedding_lookup_embedding_lookup
   INTERFACE
@@ -15,7 +15,7 @@ target_include_directories(runtime_components_embedding_lookup_embedding_lookup
 add_litertlm_library(runtime_components_embedding_lookup_embedding_lookup_end_of_multi_modal STATIC
   embedding_lookup_end_of_multi_modal.cc
 )
-add_library(LiteRTLM::EmbeddingLookup::EndOfMultiModal ALIAS runtime_components_embedding_lookup_embedding_lookup_end_of_multi_modal)
+add_library(LiteRTLM::Runtime::Components::EmbeddingLookup::EndOfMultiModal ALIAS runtime_components_embedding_lookup_embedding_lookup_end_of_multi_modal)
 
 target_include_directories(runtime_components_embedding_lookup_embedding_lookup_end_of_multi_modal 
   PUBLIC
@@ -26,7 +26,7 @@ target_include_directories(runtime_components_embedding_lookup_embedding_lookup_
 
 target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_end_of_multi_modal
   PUBLIC
-    LiteRTLM::EmbeddingLookup::Interface
+    LiteRTLM::Runtime::Components::EmbeddingLookup::Interface
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
@@ -37,7 +37,7 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_end_o
 add_litertlm_library(runtime_components_embedding_lookup_embedding_lookup_manager STATIC
   embedding_lookup_manager.cc
 )
-add_library(LiteRTLM::EmbeddingLookup::Manager ALIAS runtime_components_embedding_lookup_embedding_lookup_manager)
+add_library(LiteRTLM::Runtime::Components::EmbeddingLookup::Manager ALIAS runtime_components_embedding_lookup_embedding_lookup_manager)
 
 target_include_directories(runtime_components_embedding_lookup_embedding_lookup_manager 
   PUBLIC
@@ -49,9 +49,9 @@ target_include_directories(runtime_components_embedding_lookup_embedding_lookup_
 target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_manager
   PUBLIC
     runtime_executor_llm_executor_io_types
-    LiteRTLM::EmbeddingLookup::EndOfMultiModal
-    LiteRTLM::EmbeddingLookup::MultiModal
-    LiteRTLM::EmbeddingLookup::Text
+    LiteRTLM::Runtime::Components::EmbeddingLookup::EndOfMultiModal
+    LiteRTLM::Runtime::Components::EmbeddingLookup::MultiModal
+    LiteRTLM::Runtime::Components::EmbeddingLookup::Text
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
@@ -62,7 +62,7 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_manag
 add_litertlm_library(runtime_components_embedding_lookup_embedding_lookup_multi_modal STATIC
   embedding_lookup_multi_modal.cc
 )
-add_library(LiteRTLM::EmbeddingLookup::MultiModal ALIAS runtime_components_embedding_lookup_embedding_lookup_multi_modal)
+add_library(LiteRTLM::Runtime::Components::EmbeddingLookup::MultiModal ALIAS runtime_components_embedding_lookup_embedding_lookup_multi_modal)
 
 target_include_directories(runtime_components_embedding_lookup_embedding_lookup_multi_modal
   PUBLIC
@@ -73,7 +73,7 @@ target_include_directories(runtime_components_embedding_lookup_embedding_lookup_
 
 target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_multi_modal
   PUBLIC
-    LiteRTLM::EmbeddingLookup::Interface
+    LiteRTLM::Runtime::Components::EmbeddingLookup::Interface
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
   PRIVATE
@@ -85,7 +85,7 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_multi
 add_litertlm_library(runtime_components_embedding_lookup_embedding_lookup_text STATIC
   embedding_lookup_text.cc
 )
-add_library(LiteRTLM::EmbeddingLookup::Text ALIAS runtime_components_embedding_lookup_embedding_lookup_text)
+add_library(LiteRTLM::Runtime::Components::EmbeddingLookup::Text ALIAS runtime_components_embedding_lookup_embedding_lookup_text)
 
 target_include_directories(runtime_components_embedding_lookup_embedding_lookup_text 
   PUBLIC
@@ -96,7 +96,7 @@ target_include_directories(runtime_components_embedding_lookup_embedding_lookup_
 
 target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_text
   PUBLIC
-    LiteRTLM::EmbeddingLookup::Interface
+    LiteRTLM::Runtime::Components::EmbeddingLookup::Interface
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
@@ -105,11 +105,11 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_text
 
 # --- Facade ---
 add_library(runtime_components_embedding_lookup_libs INTERFACE)
-add_library(LiteRTLM::EmbeddingLookup ALIAS runtime_components_embedding_lookup_libs)
+add_library(LiteRTLM::Runtime::Components::EmbeddingLookup ALIAS runtime_components_embedding_lookup_libs)
 
 target_link_libraries(runtime_components_embedding_lookup_libs INTERFACE
-  LiteRTLM::EmbeddingLookup::EndOfMultiModal
-  LiteRTLM::EmbeddingLookup::Manager
-  LiteRTLM::EmbeddingLookup::MultiModal
-  LiteRTLM::EmbeddingLookup::Text
+  LiteRTLM::Runtime::Components::EmbeddingLookup::EndOfMultiModal
+  LiteRTLM::Runtime::Components::EmbeddingLookup::Manager
+  LiteRTLM::Runtime::Components::EmbeddingLookup::MultiModal
+  LiteRTLM::Runtime::Components::EmbeddingLookup::Text
 )

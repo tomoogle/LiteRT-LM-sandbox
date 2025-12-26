@@ -7,7 +7,7 @@ add_subdirectory(model_data_processor)
 add_litertlm_library(runtime_conversation_conversation STATIC
   conversation.cc
 )
-add_library(LiteRTLM::Conversation::Conversation ALIAS runtime_conversation_conversation)
+add_library(LiteRTLM::Runtime::Conversation::Conversation ALIAS runtime_conversation_conversation)
 
 target_include_directories(runtime_conversation_conversation
   PUBLIC
@@ -18,15 +18,15 @@ target_include_directories(runtime_conversation_conversation
 target_link_libraries(runtime_conversation_conversation
   PUBLIC
     # Local Dependencies
-    LiteRTLM::Conversation::InternalCallbackUtil # (Defined below)
-    LiteRTLM::Conversation::IoTypes # (Defined below)
-    LiteRTLM::Conversation::Processor::ConfigRegistry
-    LiteRTLM::Conversation::Processor::Factory
-    LiteRTLM::Conversation::Processor::Interface
+    LiteRTLM::Runtime::Components::Conversation::InternalCallbackUtil # (Defined below)
+    LiteRTLM::Runtime::Components::Conversation::IoTypes # (Defined below)
+    LiteRTLM::Runtime::Components::Conversation::Processor::ConfigRegistry
+    LiteRTLM::Runtime::Components::Conversation::Processor::Factory
+    LiteRTLM::Runtime::Components::Conversation::Processor::Interface
 
     # Cross-Module Dependencies
-    LiteRTLM::Components::PromptTemplate
-    LiteRTLM::ConstrainedDecoding::Constraint
+    LiteRTLM::Runtime::Components::::PromptTemplate
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     # runtime_engine_engine_interface (Likely defined in runtime/engine)
     # runtime_engine_engine_settings (Likely defined in runtime/engine)
     # runtime_engine_io_types (Likely defined in runtime/engine)
@@ -42,7 +42,7 @@ target_link_libraries(runtime_conversation_conversation
 add_litertlm_library(runtime_conversation_internal_callback_util STATIC
   internal_callback_util.cc
 )
-add_library(LiteRTLM::Conversation::InternalCallbackUtil ALIAS runtime_conversation_internal_callback_util)
+add_library(LiteRTLM::Runtime::Conversation::InternalCallbackUtil ALIAS runtime_conversation_internal_callback_util)
 
 target_include_directories(runtime_conversation_internal_callback_util
   PUBLIC
@@ -52,9 +52,9 @@ target_include_directories(runtime_conversation_internal_callback_util
 
 target_link_libraries(runtime_conversation_internal_callback_util
   PUBLIC
-    LiteRTLM::Conversation::IoTypes # (Defined below)
-    LiteRTLM::Conversation::Processor::ConfigRegistry
-    LiteRTLM::Conversation::Processor::Interface
+    LiteRTLM::Runtime::Components::Conversation::IoTypes # (Defined below)
+    LiteRTLM::Runtime::Components::Conversation::Processor::ConfigRegistry
+    LiteRTLM::Runtime::Components::Conversation::Processor::Interface
     # runtime_engine_io_types (Likely defined in runtime/engine)
   PRIVATE
     LITERTLM_DEPS
@@ -65,7 +65,7 @@ target_link_libraries(runtime_conversation_internal_callback_util
 add_litertlm_library(runtime_conversation_io_types STATIC
   io_types.cc
 )
-add_library(LiteRTLM::Conversation::IoTypes ALIAS runtime_conversation_io_types)
+add_library(LiteRTLM::Runtime::Conversation::IoTypes ALIAS runtime_conversation_io_types)
 
 target_include_directories(runtime_conversation_io_types
   PUBLIC
@@ -81,11 +81,11 @@ target_link_libraries(runtime_conversation_io_types
 
 # --- Folder Facade ---
 add_library(runtime_conversation_libs INTERFACE)
-add_library(LiteRTLM::Conversation ALIAS runtime_conversation_libs)
+add_library(LiteRTLM::Runtime::Conversation ALIAS runtime_conversation_libs)
 
 target_link_libraries(runtime_conversation_libs INTERFACE
-  LiteRTLM::Conversation::Conversation
-  LiteRTLM::Conversation::InternalCallbackUtil
-  LiteRTLM::Conversation::IoTypes
-  LiteRTLM::Conversation::Processor
+  LiteRTLM::Runtime::Conversation::Conversation
+  LiteRTLM::Runtime::Conversation::InternalCallbackUtil
+  LiteRTLM::Runtime::Conversation::IoTypes
+  LiteRTLM::Runtime::Conversation::Processor
 )

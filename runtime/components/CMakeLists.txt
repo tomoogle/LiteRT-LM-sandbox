@@ -12,7 +12,7 @@ add_subdirectory(tool_use)
 add_litertlm_library(runtime_components_huggingface_tokenizer STATIC
   huggingface_tokenizer.cc
 )
-add_library(LiteRTLM::Components::Tokenizer::HuggingFace ALIAS runtime_components_huggingface_tokenizer)
+add_library(LiteRTLM::Runtime::Components::Tokenizer::HuggingFace ALIAS runtime_components_huggingface_tokenizer)
 
 target_include_directories(runtime_components_huggingface_tokenizer
   PRIVATE
@@ -25,7 +25,7 @@ target_include_directories(runtime_components_huggingface_tokenizer
 
 target_link_libraries(runtime_components_huggingface_tokenizer
   PUBLIC
-    LiteRTLM::Components::Tokenizer::Interface # (Defined below)
+    LiteRTLM::Runtime::Components::Tokenizer::Interface # (Defined below)
     runtime_util_litert_status_util
     runtime_util_memory_mapped_file
   PRIVATE
@@ -37,7 +37,7 @@ target_link_libraries(runtime_components_huggingface_tokenizer
 add_litertlm_library(runtime_components_lora STATIC
   lora.cc
 )
-add_library(LiteRTLM::Components::LoRA ALIAS runtime_components_lora)
+add_library(LiteRTLM::Runtime::Components::::LoRA ALIAS runtime_components_lora)
 
 target_include_directories(runtime_components_lora
   PRIVATE
@@ -61,7 +61,7 @@ target_link_libraries(runtime_components_lora
 add_litertlm_library(runtime_components_lora_manager STATIC
   lora_manager.cc
 )
-add_library(LiteRTLM::Components::LoRAManager ALIAS runtime_components_lora_manager)
+add_library(LiteRTLM::Runtime::Components::::LoRAManager ALIAS runtime_components_lora_manager)
 
 target_include_directories(runtime_components_lora_manager
   PRIVATE
@@ -72,7 +72,7 @@ target_include_directories(runtime_components_lora_manager
 
 target_link_libraries(runtime_components_lora_manager
   PUBLIC
-    LiteRTLM::Components::LoRA
+    LiteRTLM::Runtime::Components::::LoRA
     runtime_util_litert_status_util
     runtime_util_lora_data
     runtime_executor_executor_settings_base
@@ -83,7 +83,7 @@ target_link_libraries(runtime_components_lora_manager
 
 # --- Model Resources Interface ---
 add_litertlm_library(runtime_components_model_resources INTERFACE)
-add_library(LiteRTLM::Components::ModelResources::Interface ALIAS runtime_components_model_resources)
+add_library(LiteRTLM::Runtime::Components::::ModelResources::Interface ALIAS runtime_components_model_resources)
 
 target_include_directories(runtime_components_model_resources
   INTERFACE
@@ -95,7 +95,7 @@ target_include_directories(runtime_components_model_resources
 add_litertlm_library(runtime_components_model_resources_litert_lm STATIC
   model_resources_litert_lm.cc
 )
-add_library(LiteRTLM::Components::ModelResources::LiteRTLM ALIAS runtime_components_model_resources_litert_lm)
+add_library(LiteRTLM::Runtime::Components::::ModelResources::LiteRTLM ALIAS runtime_components_model_resources_litert_lm)
 
 target_include_directories(runtime_components_model_resources_litert_lm
   PRIVATE
@@ -106,12 +106,12 @@ target_include_directories(runtime_components_model_resources_litert_lm
 
 target_link_libraries(runtime_components_model_resources_litert_lm 
   PUBLIC
-    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
     runtime_util_litert_lm_loader
     runtime_util_litert_status_util
-    LiteRTLM::Components::Tokenizer::HuggingFace
-    LiteRTLM::Components::Tokenizer::SentencePiece # (Defined below)
-    LiteRTLM::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::Tokenizer::HuggingFace
+    LiteRTLM::Runtime::Components::Tokenizer::SentencePiece # (Defined below)
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
   PRIVATE
     proto_lib
     LITERTLM_DEPS
@@ -122,7 +122,7 @@ target_link_libraries(runtime_components_model_resources_litert_lm
 add_litertlm_library(runtime_components_model_resources_task STATIC
   model_resources_task.cc
 )
-add_library(LiteRTLM::Components::ModelResources::Task ALIAS runtime_components_model_resources_task)
+add_library(LiteRTLM::Runtime::Components::::ModelResources::Task ALIAS runtime_components_model_resources_task)
 
 target_include_directories(runtime_components_model_resources_task
   PRIVATE
@@ -133,12 +133,12 @@ target_include_directories(runtime_components_model_resources_task
 
 target_link_libraries(runtime_components_model_resources_task
   PUBLIC
-    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
     runtime_util_model_asset_bundle_resources
     runtime_util_litert_status_util
     runtime_util_metadata_util
-    LiteRTLM::Components::Tokenizer::SentencePiece
-    LiteRTLM::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::Tokenizer::SentencePiece
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
   PRIVATE
     proto_lib 
     LITERTLM_DEPS
@@ -149,7 +149,7 @@ target_link_libraries(runtime_components_model_resources_task
 add_litertlm_library(runtime_components_prompt_template STATIC
   prompt_template.cc
 )
-add_library(LiteRTLM::Components::PromptTemplate ALIAS runtime_components_prompt_template)
+add_library(LiteRTLM::Runtime::Components::::PromptTemplate ALIAS runtime_components_prompt_template)
 
 target_include_directories(runtime_components_prompt_template
   PRIVATE
@@ -168,7 +168,7 @@ target_link_libraries(runtime_components_prompt_template
 
 # --- Sampler Interface ---
 add_litertlm_library(runtime_components_sampler INTERFACE)
-add_library(LiteRTLM::Components::Sampler::Interface ALIAS runtime_components_sampler)
+add_library(LiteRTLM::Runtime::Components::::Sampler::Interface ALIAS runtime_components_sampler)
 
 target_include_directories(runtime_components_sampler
   INTERFACE
@@ -181,7 +181,7 @@ target_include_directories(runtime_components_sampler
 add_litertlm_library(runtime_components_sampler_factory STATIC
   sampler_factory.cc
 )
-add_library(LiteRTLM::Components::Sampler::Factory ALIAS runtime_components_sampler_factory)
+add_library(LiteRTLM::Runtime::Components::::Sampler::Factory ALIAS runtime_components_sampler_factory)
 
 target_include_directories(runtime_components_sampler_factory 
   PRIVATE
@@ -195,8 +195,8 @@ target_link_libraries(runtime_components_sampler_factory
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor_settings 
     runtime_util_litert_status_util
-    LiteRTLM::Components::Sampler::Interface
-    LiteRTLM::Components::Sampler::TopP # (Defined below)
+    LiteRTLM::Runtime::Components::::Sampler::Interface
+    LiteRTLM::Runtime::Components::::Sampler::TopP # (Defined below)
   PRIVATE
     proto_lib
     litert_libs
@@ -207,7 +207,7 @@ target_link_libraries(runtime_components_sampler_factory
 add_litertlm_library(runtime_components_sampling_cpu_util STATIC
   sampling_cpu_util.cc
 )
-add_library(LiteRTLM::Components::SamplingCpuUtil ALIAS runtime_components_sampling_cpu_util)
+add_library(LiteRTLM::Runtime::Components::::SamplingCpuUtil ALIAS runtime_components_sampling_cpu_util)
 
 target_include_directories(runtime_components_sampling_cpu_util
   PRIVATE
@@ -226,7 +226,7 @@ target_link_libraries(runtime_components_sampling_cpu_util
 add_litertlm_library(runtime_components_scoring_cpu_util STATIC
   scoring_cpu_util.cc
 )
-add_library(LiteRTLM::Components::ScoringCpuUtil ALIAS runtime_components_scoring_cpu_util)
+add_library(LiteRTLM::Runtime::Components::::ScoringCpuUtil ALIAS runtime_components_scoring_cpu_util)
 
 target_include_directories(runtime_components_scoring_cpu_util
   PUBLIC
@@ -237,7 +237,7 @@ target_include_directories(runtime_components_scoring_cpu_util
 
 target_link_libraries(runtime_components_scoring_cpu_util
   PUBLIC
-    LiteRTLM::Components::SamplingCpuUtil 
+    LiteRTLM::Runtime::Components::::SamplingCpuUtil 
     runtime_util_litert_status_util
   PRIVATE
     litert_libs
@@ -248,7 +248,7 @@ target_link_libraries(runtime_components_scoring_cpu_util
 add_litertlm_library(runtime_components_sentencepiece_tokenizer STATIC
   sentencepiece_tokenizer.cc
 )
-add_library(LiteRTLM::Components::Tokenizer::SentencePiece ALIAS runtime_components_sentencepiece_tokenizer)
+add_library(LiteRTLM::Runtime::Components::Tokenizer::SentencePiece ALIAS runtime_components_sentencepiece_tokenizer)
 
 target_include_directories(runtime_components_sentencepiece_tokenizer
   PRIVATE
@@ -258,7 +258,7 @@ target_include_directories(runtime_components_sentencepiece_tokenizer
 
 target_link_libraries(runtime_components_sentencepiece_tokenizer
   PUBLIC
-    LiteRTLM::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -268,7 +268,7 @@ target_link_libraries(runtime_components_sentencepiece_tokenizer
 add_litertlm_library(runtime_components_stop_token_detector STATIC
   stop_token_detector.cc
 )
-add_library(LiteRTLM::Components::StopTokenDetector ALIAS runtime_components_stop_token_detector)
+add_library(LiteRTLM::Runtime::Components::::StopTokenDetector ALIAS runtime_components_stop_token_detector)
 
 target_include_directories(runtime_components_stop_token_detector
   PRIVATE
@@ -286,7 +286,7 @@ target_link_libraries(runtime_components_stop_token_detector
 add_litertlm_library(runtime_components_token_id_util STATIC
   token_id_util.cc
 )
-add_library(LiteRTLM::Components::TokenIdUtil ALIAS runtime_components_token_id_util)
+add_library(LiteRTLM::Runtime::Components::TokenIdUtil ALIAS runtime_components_token_id_util)
 
 target_include_directories(runtime_components_token_id_util
   PRIVATE
@@ -302,7 +302,7 @@ target_link_libraries(runtime_components_token_id_util
 
 # --- Tokenizer Interface ---
 add_litertlm_library(runtime_components_tokenizer INTERFACE)
-add_library(LiteRTLM::Components::Tokenizer::Interface ALIAS runtime_components_tokenizer)
+add_library(LiteRTLM::Runtime::Components::Tokenizer::Interface ALIAS runtime_components_tokenizer)
 
 target_include_directories(runtime_components_tokenizer
   INTERFACE
@@ -314,7 +314,7 @@ target_include_directories(runtime_components_tokenizer
 add_litertlm_library(runtime_components_top_p_cpu_sampler STATIC
   top_p_cpu_sampler.cc
 )
-add_library(LiteRTLM::Components::Sampler::TopP ALIAS runtime_components_top_p_cpu_sampler)
+add_library(LiteRTLM::Runtime::Components::::Sampler::TopP ALIAS runtime_components_top_p_cpu_sampler)
 
 target_include_directories(runtime_components_top_p_cpu_sampler
   PUBLIC
@@ -324,8 +324,8 @@ target_include_directories(runtime_components_top_p_cpu_sampler
 
 target_link_libraries(runtime_components_top_p_cpu_sampler
   PUBLIC
-    LiteRTLM::Components::Sampler::Interface
-    LiteRTLM::Components::SamplingCpuUtil
+    LiteRTLM::Runtime::Components::::Sampler::Interface
+    LiteRTLM::Runtime::Components::::SamplingCpuUtil
     runtime_util_convert_tensor_buffer
     runtime_util_tensor_buffer_util
   PRIVATE
@@ -335,30 +335,30 @@ target_link_libraries(runtime_components_top_p_cpu_sampler
 
 # --- Folder Facade ---
 add_library(runtime_components_libs INTERFACE)
-add_library(LiteRTLM::Components ALIAS runtime_components_libs)
+add_library(LiteRTLM::Runtime::Components:: ALIAS runtime_components_libs)
 
 target_link_libraries(runtime_components_libs INTERFACE
   # Subdirectories
-  LiteRTLM::ConstrainedDecoding
-  LiteRTLM::EmbeddingLookup
-  LiteRTLM::Preprocessor
-  LiteRTLM::ToolUse
+  LiteRTLM::Runtime::Components::ConstrainedDecoding
+  LiteRTLM::Runtime::Components::EmbeddingLookup
+  LiteRTLM::Runtime::Components::Preprocessor
+  LiteRTLM::Runtime::Components::ToolUse
   
   # Local Components
-  LiteRTLM::Components::Tokenizer::HuggingFace
-  LiteRTLM::Components::LoRA
-  LiteRTLM::Components::LoRAManager
-  LiteRTLM::Components::ModelResources::Interface
-  LiteRTLM::Components::ModelResources::LiteRTLM
-  LiteRTLM::Components::ModelResources::Task
-  LiteRTLM::Components::PromptTemplate
-  LiteRTLM::Components::Sampler::Interface
-  LiteRTLM::Components::Sampler::Factory
-  LiteRTLM::Components::SamplingCpuUtil
-  LiteRTLM::Components::ScoringCpuUtil
-  LiteRTLM::Components::Tokenizer::SentencePiece
-  LiteRTLM::Components::StopTokenDetector
-  LiteRTLM::Components::TokenIdUtil
-  LiteRTLM::Components::Tokenizer::Interface
-  LiteRTLM::Components::Sampler::TopP
+  LiteRTLM::Runtime::Components::Tokenizer::HuggingFace
+  LiteRTLM::Runtime::Components::::LoRA
+  LiteRTLM::Runtime::Components::::LoRAManager
+  LiteRTLM::Runtime::Components::::ModelResources::Interface
+  LiteRTLM::Runtime::Components::::ModelResources::LiteRTLM
+  LiteRTLM::Runtime::Components::::ModelResources::Task
+  LiteRTLM::Runtime::Components::::PromptTemplate
+  LiteRTLM::Runtime::Components::::Sampler::Interface
+  LiteRTLM::Runtime::Components::::Sampler::Factory
+  LiteRTLM::Runtime::Components::::SamplingCpuUtil
+  LiteRTLM::Runtime::Components::::ScoringCpuUtil
+  LiteRTLM::Runtime::Components::Tokenizer::SentencePiece
+  LiteRTLM::Runtime::Components::::StopTokenDetector
+  LiteRTLM::Runtime::Components::TokenIdUtil
+  LiteRTLM::Runtime::Components::Tokenizer::Interface
+  LiteRTLM::Runtime::Components::::Sampler::TopP
 )

@@ -7,7 +7,7 @@ add_subdirectory(antlr)
 add_litertlm_library(runtime_components_tool_use_json_parser_utils STATIC
   json_parser_utils.cc
 )
-add_library(LiteRTLM::ToolUse::JsonUtils ALIAS runtime_components_tool_use_json_parser_utils)
+add_library(LiteRTLM::Runtime::Components::ToolUse::JsonUtils ALIAS runtime_components_tool_use_json_parser_utils)
 
 target_include_directories(runtime_components_tool_use_json_parser_utils 
   PRIVATE
@@ -17,8 +17,8 @@ target_include_directories(runtime_components_tool_use_json_parser_utils
 
 target_link_libraries(runtime_components_tool_use_json_parser_utils
   PUBLIC
-    LiteRTLM::ToolUse::ParserCommon # (Defined below)
-    LiteRTLM::ToolUse::Antlr::Json  # Inherits generated headers path automatically
+    LiteRTLM::Runtime::Components::ToolUse::ParserCommon # (Defined below)
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Json  # Inherits generated headers path automatically
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -28,7 +28,7 @@ target_link_libraries(runtime_components_tool_use_json_parser_utils
 add_litertlm_library(runtime_components_tool_use_parser_common STATIC
   parser_common.cc
 )
-add_library(LiteRTLM::ToolUse::ParserCommon ALIAS runtime_components_tool_use_parser_common)
+add_library(LiteRTLM::Runtime::Components::ToolUse::ParserCommon ALIAS runtime_components_tool_use_parser_common)
 
 target_include_directories(runtime_components_tool_use_parser_common
   PRIVATE
@@ -38,7 +38,7 @@ target_include_directories(runtime_components_tool_use_parser_common
 
 target_link_libraries(runtime_components_tool_use_parser_common
   PUBLIC
-    LiteRTLM::ToolUse::Antlr::Json
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -48,7 +48,7 @@ target_link_libraries(runtime_components_tool_use_parser_common
 add_litertlm_library(runtime_components_tool_use_parser_utils STATIC
   parser_utils.cc
 )
-add_library(LiteRTLM::ToolUse::ParserUtils ALIAS runtime_components_tool_use_parser_utils)
+add_library(LiteRTLM::Runtime::Components::ToolUse::ParserUtils ALIAS runtime_components_tool_use_parser_utils)
 
 target_include_directories(runtime_components_tool_use_parser_utils
   PRIVATE
@@ -58,10 +58,10 @@ target_include_directories(runtime_components_tool_use_parser_utils
 
 target_link_libraries(runtime_components_tool_use_parser_utils
   PUBLIC
-    LiteRTLM::ToolUse::Antlr::Json
-    LiteRTLM::ToolUse::Antlr::Python
-    LiteRTLM::ToolUse::JsonUtils
-    LiteRTLM::ToolUse::PythonUtils # (Defined below)
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Python
+    LiteRTLM::Runtime::Components::ToolUse::JsonUtils
+    LiteRTLM::Runtime::Components::ToolUse::PythonUtils # (Defined below)
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
@@ -72,7 +72,7 @@ target_link_libraries(runtime_components_tool_use_parser_utils
 add_litertlm_library(runtime_components_tool_use_python_parser_utils STATIC
   python_parser_utils.cc
 )
-add_library(LiteRTLM::ToolUse::PythonUtils ALIAS runtime_components_tool_use_python_parser_utils)
+add_library(LiteRTLM::Runtime::Components::ToolUse::PythonUtils ALIAS runtime_components_tool_use_python_parser_utils)
 
 target_include_directories(runtime_components_tool_use_python_parser_utils 
   PRIVATE 
@@ -82,8 +82,8 @@ target_include_directories(runtime_components_tool_use_python_parser_utils
 
 target_link_libraries(runtime_components_tool_use_python_parser_utils
   PUBLIC
-    LiteRTLM::ToolUse::ParserCommon
-    LiteRTLM::ToolUse::Antlr::Python
+    LiteRTLM::Runtime::Components::ToolUse::ParserCommon
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Python
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -93,7 +93,7 @@ target_link_libraries(runtime_components_tool_use_python_parser_utils
 add_litertlm_library(runtime_components_tool_use_python_tool_format_utils STATIC
   python_tool_format_utils.cc
 )
-add_library(LiteRTLM::ToolUse::PythonFormatUtils ALIAS runtime_components_tool_use_python_tool_format_utils)
+add_library(LiteRTLM::Runtime::Components::ToolUse::PythonFormatUtils ALIAS runtime_components_tool_use_python_tool_format_utils)
 
 target_include_directories(runtime_components_tool_use_python_tool_format_utils
   PRIVATE
@@ -104,7 +104,7 @@ target_include_directories(runtime_components_tool_use_python_tool_format_utils
 target_link_libraries(runtime_components_tool_use_python_tool_format_utils
   PUBLIC
     runtime_util_litert_status_util
-    LiteRTLM::ToolUse::Antlr::Json
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
   PRIVATE
     LITERTLM_DEPS
     litert_libs
@@ -112,14 +112,14 @@ target_link_libraries(runtime_components_tool_use_python_tool_format_utils
 
 # --- Folder Facade ---
 add_library(runtime_components_tool_use_libs INTERFACE)
-add_library(LiteRTLM::ToolUse ALIAS runtime_components_tool_use_libs)
+add_library(LiteRTLM::Runtime::Components::ToolUse ALIAS runtime_components_tool_use_libs)
 
 target_link_libraries(runtime_components_tool_use_libs INTERFACE
-  LiteRTLM::ToolUse::Antlr::Json
-  LiteRTLM::ToolUse::Antlr::Python
-  LiteRTLM::ToolUse::JsonUtils
-  LiteRTLM::ToolUse::ParserCommon
-  LiteRTLM::ToolUse::ParserUtils
-  LiteRTLM::ToolUse::PythonUtils
-  LiteRTLM::ToolUse::PythonFormatUtils
+  LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
+  LiteRTLM::Runtime::Components::ToolUse::Antlr::Python
+  LiteRTLM::Runtime::Components::ToolUse::JsonUtils
+  LiteRTLM::Runtime::Components::ToolUse::ParserCommon
+  LiteRTLM::Runtime::Components::ToolUse::ParserUtils
+  LiteRTLM::Runtime::Components::ToolUse::PythonUtils
+  LiteRTLM::Runtime::Components::ToolUse::PythonFormatUtils
 )

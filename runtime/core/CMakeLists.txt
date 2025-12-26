@@ -14,7 +14,7 @@ target_include_directories(runtime_core_engine_impl
 
 target_link_libraries(runtime_core_engine_impl 
   PUBLIC
-    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
     runtime_core_session_factory
     runtime_core_tasks
     runtime_engine_engine_interface
@@ -57,7 +57,7 @@ target_include_directories(runtime_core_engine_impl_cpu_only
 
 target_link_libraries(runtime_core_engine_impl_cpu_only
   PUBLIC
-    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
     runtime_core_tasks
     runtime_engine_engine_interface
     runtime_engine_engine_settings
@@ -100,14 +100,14 @@ target_include_directories(runtime_core_pipeline
 target_link_libraries(runtime_core_pipeline
   PUBLIC
     runtime_core_tasks
-    LiteRTLM::Components::Sampler::Interface
-    LiteRTLM::Components::ScoringCpuUtil
-    LiteRTLM::Components::StopTokenDetector
-    LiteRTLM::Components::TokenIdUtil
-    LiteRTLM::Components::Tokenizer::Interface
-    LiteRTLM::Components::Sampler::TopP
-    LiteRTLM::ConstrainedDecoding::Decoder
-    LiteRTLM::ConstrainedDecoding::Constraint
+    LiteRTLM::Runtime::Components::::Sampler::Interface
+    LiteRTLM::Runtime::Components::::ScoringCpuUtil
+    LiteRTLM::Runtime::Components::::StopTokenDetector
+    LiteRTLM::Runtime::Components::TokenIdUtil
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::::Sampler::TopP
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Decoder
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_engine_io_types
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor
@@ -138,11 +138,11 @@ target_link_libraries(runtime_core_session_basic
   PUBLIC
     runtime_core_tasks
     runtime_core_pipeline
-    LiteRTLM::Components::Sampler::Interface
-    LiteRTLM::Components::Sampler::Factory
-    LiteRTLM::Components::StopTokenDetector
-    LiteRTLM::Components::Tokenizer::Interface
-    LiteRTLM::ConstrainedDecoding::Constraint
+    LiteRTLM::Runtime::Components::::Sampler::Interface
+    LiteRTLM::Runtime::Components::::Sampler::Factory
+    LiteRTLM::Runtime::Components::::StopTokenDetector
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_engine_engine_interface
     runtime_engine_engine_settings
     runtime_engine_io_types
@@ -179,7 +179,7 @@ target_link_libraries(runtime_core_session_factory
   PUBLIC
     runtime_core_tasks
     runtime_core_session_basic
-    LiteRTLM::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
     runtime_engine_engine_interface
     runtime_engine_engine_settings
     runtime_engine_io_types
@@ -211,7 +211,7 @@ target_link_libraries(runtime_core_session_utils
   PUBLIC
     runtime_core_tasks
     runtime_core_session_basic
-    LiteRTLM::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
     runtime_engine_engine_interface
     runtime_engine_engine_settings
     runtime_engine_io_types
@@ -241,7 +241,7 @@ target_include_directories(runtime_core_tasks
 target_link_libraries(runtime_core_tasks
   PUBLIC
     runtime_core_session_basic
-    LiteRTLM::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
     runtime_engine_engine_interface
     runtime_engine_engine_settings
     runtime_engine_io_types

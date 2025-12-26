@@ -63,7 +63,7 @@ target_link_libraries(runtime_executor_audio_litert_compiled_model_executor
     LiteRTLM::Executor::Audio::Settings
     LiteRTLM::Executor::SettingsBase
     LiteRTLM::Executor::LLM::IoTypes # (Defined below)
-    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
     runtime_util_litert_status_util
     LiteRTLM::Executor::CompiledModelUtils # (Defined below)
   PRIVATE
@@ -134,10 +134,10 @@ target_include_directories(runtime_executor_litert_compiled_model_executor_utils
 target_link_libraries(runtime_executor_litert_compiled_model_executor_utils
   PUBLIC
     LiteRTLM::Executor::SettingsBase
-    LiteRTLM::Components::ModelResources::Interface
-    LiteRTLM::Components::ModelResources::LiteRTLM
-    LiteRTLM::Components::ModelResources::Task
-    LiteRTLM::Components::Tokenizer::SentencePiece
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::LiteRTLM
+    LiteRTLM::Runtime::Components::::ModelResources::Task
+    LiteRTLM::Runtime::Components::Tokenizer::SentencePiece
     runtime_util_file_format_util
     runtime_util_litert_lm_loader
     runtime_util_litert_status_util
@@ -187,7 +187,7 @@ target_include_directories(runtime_executor_llm_executor_io_types
 
 target_link_libraries(runtime_executor_llm_executor_io_types
   PUBLIC
-    LiteRTLM::ConstrainedDecoding::Decoder
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Decoder
     runtime_util_logging_tensor_buffer
   PRIVATE 
     LITERTLM_DEPS
@@ -284,12 +284,12 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_executor_factor
     LiteRTLM::Executor::LLM::ProcessedTokens
     LiteRTLM::Executor::LLM::CacheUtils
     LiteRTLM::Executor::MagicNumberConfigsHelper # (Defined below)
-    LiteRTLM::Components::ModelResources::Interface
-    LiteRTLM::Components::ModelResources::LiteRTLM
-    LiteRTLM::Components::ModelResources::Task
-    LiteRTLM::Components::Sampler::Interface
-    LiteRTLM::Components::Sampler::Factory
-    LiteRTLM::EmbeddingLookup::Manager
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::LiteRTLM
+    LiteRTLM::Runtime::Components::::ModelResources::Task
+    LiteRTLM::Runtime::Components::::Sampler::Interface
+    LiteRTLM::Runtime::Components::::Sampler::Factory
+    LiteRTLM::Runtime::Components::EmbeddingLookup::Manager
     runtime_util_convert_tensor_buffer
     runtime_util_file_util
     runtime_util_litert_status_util
@@ -324,12 +324,12 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_executor
     LiteRTLM::Executor::LLM::ProcessedTokens
     LiteRTLM::Executor::LLM::CacheUtils
     LiteRTLM::Executor::MagicNumberConfigsHelper
-    LiteRTLM::Components::ModelResources::Interface
-    LiteRTLM::Components::ModelResources::LiteRTLM
-    LiteRTLM::Components::ModelResources::Task
-    LiteRTLM::Components::Sampler::Interface
-    LiteRTLM::Components::Sampler::Factory
-    LiteRTLM::EmbeddingLookup::Manager
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::LiteRTLM
+    LiteRTLM::Runtime::Components::::ModelResources::Task
+    LiteRTLM::Runtime::Components::::Sampler::Interface
+    LiteRTLM::Runtime::Components::::Sampler::Factory
+    LiteRTLM::Runtime::Components::EmbeddingLookup::Manager
     runtime_util_convert_tensor_buffer
     runtime_util_file_util
     runtime_util_litert_status_util
@@ -360,9 +360,9 @@ target_link_libraries(runtime_executor_llm_litert_npu_compiled_model_executor
     LiteRTLM::Executor::LLM::Settings
     LiteRTLM::Executor::CompiledModelUtils
     LiteRTLM::Executor::LLM::Interface
-    LiteRTLM::Components::ModelResources::Interface
-    LiteRTLM::Components::ModelResources::Task
-    LiteRTLM::EmbeddingLookup::Manager
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Task
+    LiteRTLM::Runtime::Components::EmbeddingLookup::Manager
     LiteRTLM::Executor::LLM::ProcessedTokens
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
@@ -387,7 +387,7 @@ target_include_directories(runtime_executor_magic_number_configs_helper
 target_link_libraries(runtime_executor_magic_number_configs_helper
   PUBLIC 
     LiteRTLM::Executor::LLM::Settings
-    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
@@ -459,7 +459,7 @@ target_link_libraries(runtime_executor_vision_litert_compiled_model_executor
     runtime_util_convert_tensor_buffer
     LiteRTLM::Executor::CompiledModelUtils
     runtime_util_litert_status_util
-    LiteRTLM::Components::ModelResources::Interface
+    LiteRTLM::Runtime::Components::::ModelResources::Interface
     LiteRTLM::Executor::Vision::Interface
   PRIVATE
     LITERTLM_DEPS

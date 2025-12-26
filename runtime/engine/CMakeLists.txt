@@ -24,7 +24,7 @@ target_include_directories(runtime_engine_engine_settings
 
 target_link_libraries(runtime_engine_engine_settings
   PUBLIC
-    LiteRTLM::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
     runtime_executor_audio_executor_settings
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor_settings
@@ -53,7 +53,7 @@ target_include_directories(runtime_engine_io_types
 
 target_link_libraries(runtime_engine_io_types
   PUBLIC
-    LiteRTLM::ConstrainedDecoding::Constraint
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_util_litert_status_util
     tflite_extra_libs
     litert_libs
@@ -76,8 +76,8 @@ target_include_directories(runtime_engine_litert_lm_lib
 target_link_libraries(runtime_engine_litert_lm_lib
   PUBLIC
     # Refactored Modules
-    LiteRTLM::Components
-    LiteRTLM::Conversation
+    LiteRTLM::Runtime::Components::
+    LiteRTLM::Runtime::Components::Conversation
     LiteRTLM::Core
     LiteRTLM::Engine::Interface # (Self)
     LiteRTLM::Engine::Settings  # (Self)
@@ -123,8 +123,8 @@ target_link_libraries(runtime_engine_litert_lm_advanced_main
     LiteRTLM::Engine::SharedFlags
     
     # Group dependencies
-    LiteRTLM::Components
-    LiteRTLM::Conversation
+    LiteRTLM::Runtime::Components::
+    LiteRTLM::Runtime::Components::Conversation
     LiteRTLM::Core
     LiteRTLM::Core::Tasks
     runtime_executor_libs
@@ -151,9 +151,9 @@ target_link_libraries(runtime_engine_litert_lm_main
     LiteRTLM::Engine::IoTypes
     
     # Modules
-    LiteRTLM::Components
-    LiteRTLM::Conversation
-    LiteRTLM::Conversation::IoTypes
+    LiteRTLM::Runtime::Components::
+    LiteRTLM::Runtime::Components::Conversation
+    LiteRTLM::Runtime::Components::Conversation::IoTypes
     LiteRTLM::Core
     LiteRTLM::Core::EngineImpl
     LiteRTLM::Core::Tasks

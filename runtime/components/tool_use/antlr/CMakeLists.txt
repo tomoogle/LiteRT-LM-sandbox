@@ -32,7 +32,7 @@ add_litertlm_library(antlr_json_tool_call_parser STATIC
     ${ANTLR_GENERATED_DIR}/AntlrJsonLexer.cpp
     ${ANTLR_GENERATED_DIR}/AntlrJsonParser.cpp
 )
-add_library(LiteRTLM::ToolUse::Antlr::Json ALIAS antlr_json_tool_call_parser)
+add_library(LiteRTLM::Runtime::Components::ToolUse::Antlr::Json ALIAS antlr_json_tool_call_parser)
 
 target_include_directories(antlr_json_tool_call_parser
     PUBLIC
@@ -72,7 +72,7 @@ add_litertlm_library(antlr_python_tool_call_parser STATIC
     ${ANTLR_GENERATED_DIR}/AntlrPythonLexer.cpp
     ${ANTLR_GENERATED_DIR}/AntlrPythonParser.cpp
 )
-add_library(LiteRTLM::ToolUse::Antlr::Python ALIAS antlr_python_tool_call_parser)
+add_library(LiteRTLM::Runtime::Components::ToolUse::Antlr::Python ALIAS antlr_python_tool_call_parser)
 
 target_include_directories(antlr_python_tool_call_parser
     PUBLIC
@@ -87,9 +87,9 @@ target_link_libraries(antlr_python_tool_call_parser
 
 # --- Folder Facade ---
 add_library(runtime_components_tool_use_antlr_libs INTERFACE)
-add_library(LiteRTLM::ToolUse::Antlr ALIAS runtime_components_tool_use_antlr_libs)
+add_library(LiteRTLM::Runtime::Components::ToolUse::Antlr ALIAS runtime_components_tool_use_antlr_libs)
 
 target_link_libraries(runtime_components_tool_use_antlr_libs INTERFACE
-    LiteRTLM::ToolUse::Antlr::Json
-    LiteRTLM::ToolUse::Antlr::Python
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Python
 )
