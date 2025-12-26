@@ -32,7 +32,7 @@ target_link_libraries(runtime_util_executor_data_util
   PUBLIC
     LiteRTLM::Runtime::Util::ConvertTensorBuffer
     LiteRTLM::Runtime::Util::TensorBufferUtil # (Defined below)
-    LiteRTLM::Runtime::Executor::LLM::IoTypes
+    LiteRTLM::Runtime::Executor::LLMExecutorIoTypes
   PRIVATE 
     LITERTLM_DEPS
     litert_libs
