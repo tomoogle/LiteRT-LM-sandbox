@@ -157,15 +157,11 @@ function(compile_flatbuffer_files FBS_FILE)
     get_filename_component(FILE_DIR ${FBS_FILE} DIRECTORY)
     
     # The output file that will be generated
-    set(GENERATED_HEADER "${CMAKE_CURRENT_BINARY_DIR}/${FILE_NAME}_generated.h")
-
-    # The location where ExternalProject *will* put flatc
-    # (Ensure this variable matches where you defined it in flatbuffers.cmake)
-    set(FLATC_EXECUTABLE "${FLATBUFFERS_INSTALL_PREFIX}/bin/flatc")
+    set(GENERATED_HEADER "${GENERATED_SRC_DIR}/${FILE_DIR}/${FILE_NAME}_generated.h")
 
     add_custom_command(
         OUTPUT ${GENERATED_HEADER}
-        COMMAND ${FLATC_EXECUTABLE} --cpp --gen-object-api --reflect-names --gen-mutable -o "${CMAKE_CURRENT_BINARY_DIR}" "${FBS_FILE}"
+        COMMAND ${FLATC_EXECUTABLE} --cpp --gen-object-api --reflect-names --gen-mutable -o "${PROJECT_ROOT}/${FILE_DIR}" "${FBS_FILE}"
         DEPENDS ${FBS_FILE} flatbuffers_external
         COMMENT "Generating C++ header for ${FILE_NAME}.fbs"
     )
