@@ -40,7 +40,9 @@ else()
 endif()
 
 
-import_static_lib(imp_re2                        "${RE2_LIB_DIR}/libre2.a")
+import_static_lib(imp_re2
+  "${RE2_LIB_DIR}/libre2.a"
+)
 
 add_library(re2_libs INTERFACE)
 target_link_libraries(re2_libs INTERFACE

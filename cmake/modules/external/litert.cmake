@@ -198,3 +198,21 @@ import_static_lib(imp_litert_core     "${LITERT_BUILD_DIR}/core/liblitert_core.a
 import_static_lib(imp_litert_core_model    "${LITERT_BUILD_DIR}/core/model/liblitert_core_model.a")
 
 import_static_lib(imp_litert_runtime  "${LITERT_BUILD_DIR}/runtime/liblitert_runtime.a")
+
+add_library(litert_libs INTERFACE)
+target_include_directories(litert_libs SYSTEM INTERFACE ${LITERT_INCLUDE_PATHS})
+
+target_link_libraries(litert_libs INTERFACE
+  # Using start-group / end-group to handle strict linkers and circular deps
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+    imp_litert_c_api
+    imp_litert_c_options
+    imp_litert_cc_api
+    imp_litert_cc_options
+    imp_litert_compiler_plugins
+    imp_litert_core
+    imp_litert_core_model
+    imp_litert_runtime
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+)
+
