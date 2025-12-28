@@ -109,7 +109,7 @@ import_static_lib(imp_cpuinfo                    "${TFLITE_LIB_DIR}/libcpuinfo.a
 import_static_lib(imp_eight_bit_int_gemm         "${TFLITE_LIB_DIR}/libeight_bit_int_gemm.a")
 import_static_lib(imp_fft2d_fftsg                "${TFLITE_LIB_DIR}/libfft2d_fftsg.a")
 import_static_lib(imp_fft2d_fftsg2d              "${TFLITE_LIB_DIR}/libfft2d_fftsg2d.a")
-import_static_lib(imp_flatbuffers                "${TFLITE_LIB_DIR}/libflatbuffers.a")
+#import_static_lib(imp_flatbuffers                "${TFLITE_LIB_DIR}/libflatbuffers.a")
 import_static_lib(imp_pthreadpool                "${TFLITE_LIB_DIR}/libpthreadpool.a")
 import_static_lib(imp_ruy_allocator              "${TFLITE_LIB_DIR}/libruy_allocator.a")
 import_static_lib(imp_ruy_apply_multiplier       "${TFLITE_LIB_DIR}/libruy_apply_multiplier.a")
@@ -152,7 +152,7 @@ target_link_libraries(tflite_libs INTERFACE
     imp_eight_bit_int_gemm
     imp_fft2d_fftsg
     imp_fft2d_fftsg2d
-    imp_flatbuffers
+    #imp_flatbuffers
     imp_pthreadpool
     imp_ruy_allocator
     imp_ruy_apply_multiplier
