@@ -3,22 +3,24 @@ include(ExternalProject)
 set(FLATBUFFERS_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/flatbuffers)
 set(FLATBUFFERS_INSTALL_PREFIX ${FLATBUFFERS_EXT_PREFIX}/install)
 set(FLATBUFFERS_INCLUDE_DIR ${FLATBUFFERS_INSTALL_PREFIX}/include)
-set(FLATBUFFERS_LIB_DIR ${FLATBUFFERS_INSTALL_PREFIX}/lib)
 set(FLATBUFFERS_SRC_DIR ${FLATBUFFERS_EXT_PREFIX}/src)
 set(FLATBUFFERS_BIN_DIR ${FLATBUFFERS_INSTALL_PREFIX}/bin)
 
-set(FLATBUFFERS_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers" CACHE INTERNAL "")
-set(FLATBUFFERS_CMAKE_CONFIG_FILE "${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers/flatbuffers-config.cmake")
+# [FIX] 1. Auto-detect lib vs lib64
+if(EXISTS "${FLATBUFFERS_INSTALL_PREFIX}/lib64")
+  set(FLATBUFFERS_LIB_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib64")
+else()
+  set(FLATBUFFERS_LIB_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib")
+endif()
 
-
-
+set(FLATBUFFERS_DIR "${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers" CACHE INTERNAL "")
+set(FLATBUFFERS_CMAKE_CONFIG_FILE "${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers/flatbuffers-config.cmake")
 set(FLATC_EXECUTABLE "${FLATBUFFERS_BIN_DIR}/flatc" CACHE INTERNAL "")
 
 if(NOT EXISTS "${FLATBUFFERS_CMAKE_CONFIG_FILE}")
   message(STATUS "Flatbuffers not found. Configuring external build...")
 
-
-ExternalProject_Add(
+  ExternalProject_Add(
     flatbuffers_external
     DEPENDS
       absl_external
@@ -41,7 +43,6 @@ ExternalProject_Add(
       step_verify_install
   )
   verify_install(flatbuffers_external ${FLATBUFFERS_CMAKE_CONFIG_FILE})
-
 else()
     message(STATUS "Flatbuffers already installed at: ${FLATBUFFERS_INSTALL_PREFIX}")
     if(NOT TARGET flatbuffers_external)
@@ -49,7 +50,15 @@ else()
     endif()
 endif()
 
+# [FIX] 2. Create the Import Target (Safety mechanism)
+import_static_lib(imp_flatbuffers "${FLATBUFFERS_LIB_DIR}/libflatbuffers.a")
 
+# [FIX] 3. Create the Interface Library
+add_library(flatbuffers_libs INTERFACE)
+target_link_libraries(flatbuffers_libs INTERFACE imp_flatbuffers)
+target_include_directories(flatbuffers_libs INTERFACE ${FLATBUFFERS_INCLUDE_DIR})
+
+# [FIX] 4. Compile Schema (Keep existing logic)
 set(schema_fbs
   "${PROJECT_ROOT}/schema/core/litertlm_header_schema.fbs"
 )

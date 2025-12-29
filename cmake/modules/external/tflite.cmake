@@ -142,17 +142,20 @@ import_static_lib(imp_ruy_trmul                  "${TFLITE_LIB_DIR}/libruy_trmul
 import_static_lib(imp_ruy_tune                   "${TFLITE_LIB_DIR}/libruy_tune.a")
 import_static_lib(imp_ruy_wait                   "${TFLITE_LIB_DIR}/libruy_wait.a")
 import_static_lib(imp_xnnpack-microkernels-prod  "${TFLITE_LIB_DIR}/libxnnpack-microkernels-prod.a")
-import_static_lib(impl_libflite                  "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
+import_static_lib(impl_libtflite                  "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
 
 
 add_library(tflite_libs INTERFACE)
 target_link_libraries(tflite_libs INTERFACE
+    # [CRITICAL] Add the main TFLite library here!
+    impl_libtflite 
+
     imp_XNNPACK
     imp_cpuinfo
     imp_eight_bit_int_gemm
     imp_fft2d_fftsg
     imp_fft2d_fftsg2d
-    #imp_flatbuffers
+    # imp_flatbuffers # (Keep commented if you use system flatbuffers)
     imp_pthreadpool
     imp_ruy_allocator
     imp_ruy_apply_multiplier
