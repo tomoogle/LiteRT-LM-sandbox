@@ -1,6 +1,8 @@
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-# --- Config Registry ---
+# ==============================================================================
+# 1. Config Registry
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor_config_registry INTERFACE)
 add_library(LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry ALIAS runtime_conversation_model_data_processor_config_registry)
 
@@ -10,7 +12,9 @@ target_include_directories(runtime_conversation_model_data_processor_config_regi
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-# --- Data Utils ---
+# ==============================================================================
+# 2. Data Utils
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor_data_utils STATIC
   data_utils.cc
 )
@@ -28,9 +32,12 @@ target_link_libraries(runtime_conversation_model_data_processor_data_utils
   PRIVATE
     litert_libs
     LITERTLM_DEPS
+    json_lib
 )
 
-# --- Gemma3 Data Processor Config ---
+# ==============================================================================
+# 3. Gemma3 Data Processor Config
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor_gemma3_data_processor_config INTERFACE)
 add_library(LiteRTLM::Runtime::Conversation::Processor::Gemma3Config ALIAS runtime_conversation_model_data_processor_gemma3_data_processor_config)
 
@@ -40,7 +47,33 @@ target_include_directories(runtime_conversation_model_data_processor_gemma3_data
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-# --- Model Data Processor Interface ---
+# ==============================================================================
+# 4. Generic Data Processor Config
+# ==============================================================================
+add_litertlm_library(runtime_conversation_model_data_processor_generic_data_processor_config INTERFACE)
+add_library(LiteRTLM::Runtime::Conversation::Processor::GenericConfig ALIAS runtime_conversation_model_data_processor_generic_data_processor_config)
+
+target_include_directories(runtime_conversation_model_data_processor_generic_data_processor_config
+  INTERFACE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+# ==============================================================================
+# 5. Qwen3 Data Processor Config
+# ==============================================================================
+add_litertlm_library(runtime_conversation_model_data_processor_qwen3_data_processor_config INTERFACE)
+add_library(LiteRTLM::Runtime::Conversation::Processor::Qwen3Config ALIAS runtime_conversation_model_data_processor_qwen3_data_processor_config)
+
+target_include_directories(runtime_conversation_model_data_processor_qwen3_data_processor_config
+  INTERFACE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+# ==============================================================================
+# 6. Model Data Processor Interface
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor INTERFACE)
 add_library(LiteRTLM::Runtime::Conversation::Processor::Interface ALIAS runtime_conversation_model_data_processor)
 
@@ -50,7 +83,19 @@ target_include_directories(runtime_conversation_model_data_processor
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-# --- Gemma3 Data Processor ---
+target_link_libraries(runtime_conversation_model_data_processor
+  INTERFACE
+    LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
+    runtime_conversation_io_types
+    runtime_engine_io_types
+    json_lib
+    LITERTLM_DEPS
+)
+
+# ==============================================================================
+# 7. Gemma3 Data Processor
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor_gemma3_data_processor STATIC
   gemma3_data_processor.cc
 )
@@ -67,6 +112,9 @@ target_link_libraries(runtime_conversation_model_data_processor_gemma3_data_proc
     runtime_conversation_io_types
     runtime_engine_io_types
     LiteRTLM::Runtime::Conversation::Processor::Gemma3Config
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::ConstraintProvider
     LiteRTLM::Runtime::Components::Preprocessor::Audio
     LiteRTLM::Runtime::Components::Preprocessor::AudioMiniAudio
     LiteRTLM::Runtime::Components::Preprocessor::Image
@@ -76,23 +124,17 @@ target_link_libraries(runtime_conversation_model_data_processor_gemma3_data_proc
     runtime_util_litert_status_util
     runtime_util_memory_mapped_file
     LiteRTLM::Runtime::Conversation::Processor::DataUtils  
-    LiteRTLM::Runtime::Conversation::Processor::Interface    
+    LiteRTLM::Runtime::Conversation::Processor::Interface     
   PRIVATE
     LITERTLM_DEPS
     litert_libs
+    json_lib
+    re2_libs # [FIX] Added missing RE2 dependency
 )
 
-# --- Generic Data Processor Config ---
-add_litertlm_library(runtime_conversation_model_data_processor_generic_data_processor_config INTERFACE)
-add_library(LiteRTLM::Runtime::Conversation::Processor::GenericConfig ALIAS runtime_conversation_model_data_processor_generic_data_processor_config)
-
-target_include_directories(runtime_conversation_model_data_processor_generic_data_processor_config
-  INTERFACE
-    ${GENERATED_SRC_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-# --- Generic Data Processor ---
+# ==============================================================================
+# 8. Generic Data Processor
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor_generic_data_processor STATIC
   generic_data_processor.cc
 )
@@ -115,20 +157,12 @@ target_link_libraries(runtime_conversation_model_data_processor_generic_data_pro
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-    proto_lib
+    json_lib
 )
 
-# --- Qwen3 Data Processor Config ---
-add_litertlm_library(runtime_conversation_model_data_processor_qwen3_data_processor_config INTERFACE)
-add_library(LiteRTLM::Runtime::Conversation::Processor::Qwen3Config ALIAS runtime_conversation_model_data_processor_qwen3_data_processor_config)
-
-target_include_directories(runtime_conversation_model_data_processor_qwen3_data_processor_config
-  INTERFACE
-    ${GENERATED_SRC_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-# --- Qwen3 Data Processor ---
+# ==============================================================================
+# 9. Qwen3 Data Processor
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor_qwen3_data_processor STATIC
   qwen3_data_processor.cc
 )
@@ -152,9 +186,12 @@ target_link_libraries(runtime_conversation_model_data_processor_qwen3_data_proce
   PRIVATE  
     litert_libs
     LITERTLM_DEPS
+    json_lib
 )
 
-# --- Model Data Processor Factory ---
+# ==============================================================================
+# 10. Model Data Processor Factory
+# ==============================================================================
 add_litertlm_library(runtime_conversation_model_data_processor_factory STATIC
   model_data_processor_factory.cc
 )
@@ -185,7 +222,9 @@ target_link_libraries(runtime_conversation_model_data_processor_factory
     LITERTLM_DEPS
 )
 
-# --- Folder Facade ---
+# ==============================================================================
+# 11. Folder Facade
+# ==============================================================================
 add_library(runtime_conversation_model_data_processor_libs INTERFACE)
 add_library(LiteRTLM::Runtime::Conversation::Processor ALIAS runtime_conversation_model_data_processor_libs)
 

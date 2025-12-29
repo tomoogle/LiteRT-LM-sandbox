@@ -13,6 +13,14 @@ target_include_directories(runtime_engine_engine_interface
     ${LITERTLM_INCLUDE_PATHS}
 )
 
+target_link_libraries(runtime_engine_engine_interface
+  INTERFACE
+    LiteRTLM::Runtime::Engine::Settings
+    LiteRTLM::Runtime::Engine::IoTypes
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LITERTLM_DEPS
+)
+
 # ==============================================================================
 # 2. Engine Settings
 #    Bazel: cc_library(name = "engine_settings" ...)
@@ -40,7 +48,7 @@ target_link_libraries(runtime_engine_engine_settings
     proto_lib
   PRIVATE
     litert_libs
-    LITERTLM_DEPS # Covers absl::status, strings, log
+    LITERTLM_DEPS 
 )
 
 # ==============================================================================
@@ -67,7 +75,7 @@ target_link_libraries(runtime_engine_io_types
     proto_lib
   PRIVATE
     litert_libs
-    LITERTLM_DEPS # Covers absl::base, log, status, strings, time
+    LITERTLM_DEPS 
 )
 
 # ==============================================================================
@@ -83,16 +91,14 @@ target_include_directories(runtime_engine_litert_lm_lib
   PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
-    ${THIRD_PARTY_DIR}/json/include # For nlohmann/json
+    ${THIRD_PARTY_DIR}/json/include
 )
 
 target_link_libraries(runtime_engine_litert_lm_lib
   PUBLIC
-    # Internal Modules
-    LiteRTLM::Runtime::Components
+    # Internal Modules (Bazel deps)
     LiteRTLM::Runtime::Conversation
     LiteRTLM::Runtime::Conversation::IoTypes
-    LiteRTLM::Runtime::Core
     LiteRTLM::Runtime::Core::EngineImpl
     LiteRTLM::Runtime::Engine::Interface
     LiteRTLM::Runtime::Engine::Settings
@@ -104,7 +110,7 @@ target_link_libraries(runtime_engine_litert_lm_lib
 
   PRIVATE
     # External Dependencies (Bazel deps)
-    litert_libs
+    litert_libs # Includes MemoryInfo and MemoryUsageMonitor
     LITERTLM_DEPS
     
     # Specific libs required by this file
@@ -131,7 +137,7 @@ target_include_directories(runtime_engine_shared_flags
 target_link_libraries(runtime_engine_shared_flags
   PRIVATE
     litert_libs
-    LITERTLM_DEPS # Covers absl::flags
+    LITERTLM_DEPS 
 )
 
 # ==============================================================================
@@ -142,13 +148,14 @@ add_litertlm_executable(runtime_engine_litert_lm_advanced_main
   litert_lm_advanced_main.cc
 )
 
-# [CRITICAL] Linker flags for symbol export
+# [CRITICAL] Linker flags for symbol export (Same as litert_lm_main)
 target_link_options(runtime_engine_litert_lm_advanced_main PRIVATE
   "LINKER:--export-dynamic-symbol=LiteRt*"
 )
 
 target_link_libraries(runtime_engine_litert_lm_advanced_main
   PRIVATE
+    # [CRITICAL] Start the Linker Group
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
       LiteRTLM::Runtime::Engine::IoTypes
       LiteRTLM::Runtime::Engine::Lib
@@ -184,26 +191,29 @@ target_include_directories(litert_lm_main PRIVATE
 
 target_link_libraries(litert_lm_main
   PRIVATE
-    # [CRITICAL] Wrap everything in a group to handle the circular deps
+    # [CRITICAL] Start the Linker Group (Solves Circular Deps)
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
       
       # 1. Internal Components (Mapped from Bazel deps)
-      LiteRTLM::C::Engine                 # :engine_interface, :engine_settings
-      LiteRTLM::Runtime::Engine::IoTypes  # :io_types
-      LiteRTLM::Runtime::Conversation     # //runtime/conversation
+      LiteRTLM::Runtime::Engine::Interface
+      LiteRTLM::Runtime::Engine::Settings
+      LiteRTLM::Runtime::Engine::IoTypes
+      
+      LiteRTLM::Runtime::Conversation
       LiteRTLM::Runtime::Conversation::IoTypes
-      LiteRTLM::Runtime::Core::EngineImpl # //runtime/core:engine_impl
+      LiteRTLM::Runtime::Core::EngineImpl
       
       runtime_executor_executor_settings_base
       runtime_executor_llm_executor_settings
       runtime_util_litert_status_util
 
       # 2. External Dependencies
-      litert_libs       # Covers @litert//litert/c/internal:litert_logging
-      LITERTLM_DEPS     # Covers absl (flags, log, strings, time) & json
+      litert_libs       
+      LITERTLM_DEPS     
       proto_lib
-      json_lib          # Explicitly add JSON just in case
+      json_lib          
       
+    # [CRITICAL] End the Linker Group
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 )
 

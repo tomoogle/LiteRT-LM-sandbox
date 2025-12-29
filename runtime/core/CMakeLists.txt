@@ -1,91 +1,51 @@
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-# --- Engine Impl ---
-add_litertlm_library(runtime_core_engine_impl STATIC
-  engine_impl.cc
+# ==============================================================================
+# 1. Tasks
+#    Bazel: cc_library(name = "tasks" ...)
+#    Status: Lowest level logic. MUST NOT depend on Session or Pipeline.
+# ==============================================================================
+add_litertlm_library(runtime_core_tasks STATIC
+  tasks.cc
 )
-add_library(LiteRTLM::Runtime::Core::EngineImpl ALIAS runtime_core_engine_impl)
+add_library(LiteRTLM::Runtime::Core::Tasks ALIAS runtime_core_tasks)
 
-target_include_directories(runtime_core_engine_impl
-  PUBLIC
+target_include_directories(runtime_core_tasks
+  PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-target_link_libraries(runtime_core_engine_impl 
+target_link_libraries(runtime_core_tasks
   PUBLIC
-    LiteRTLM::Runtime::Components::ModelResources::Interface
-    runtime_core_session_factory
-    runtime_core_tasks
-    runtime_engine_engine_interface
-    runtime_engine_engine_settings
+    LiteRTLM::Runtime::Components::Sampler::Interface
+    LiteRTLM::Runtime::Components::ScoringCpuUtil
+    LiteRTLM::Runtime::Components::StopTokenDetector
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Decoder
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
+    
     runtime_engine_io_types
-    runtime_executor_audio_executor
-    runtime_executor_audio_executor_settings
-    runtime_executor_audio_litert_compiled_model_executor
-    runtime_executor_executor_settings_base
-    runtime_executor_litert_compiled_model_executor_utils
+    
     runtime_executor_llm_executor
+    runtime_executor_llm_executor_io_types
     runtime_executor_llm_executor_settings
     runtime_executor_llm_litert_compiled_model_executor
-    runtime_executor_llm_litert_npu_compiled_model_executor
-    runtime_executor_magic_number_configs_helper
-    runtime_executor_vision_executor
-    runtime_executor_vision_executor_settings
-    runtime_executor_vision_litert_compiled_model_executor
+    
     runtime_framework_threadpool
-    runtime_executor_llm_litert_compiled_model_executor_factory
-    runtime_util_file_format_util
+    runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
   PRIVATE
+    litert_libs
     proto_lib
     LITERTLM_DEPS
-    litert_libs
 )
 
-# --- Engine Impl (CPU Only) ---
-add_litertlm_library(runtime_core_engine_impl_cpu_only STATIC
-  engine_impl.cc
-)
-add_library(LiteRTLM::Runtime::Core::EngineImplCPU ALIAS runtime_core_engine_impl_cpu_only)
-
-target_include_directories(runtime_core_engine_impl_cpu_only 
-  PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-target_link_libraries(runtime_core_engine_impl_cpu_only
-  PUBLIC
-    LiteRTLM::Runtime::Components::ModelResources::Interface
-    runtime_core_tasks
-    runtime_engine_engine_interface
-    runtime_engine_engine_settings
-    runtime_engine_io_types
-    runtime_executor_audio_executor
-    runtime_executor_audio_executor_settings
-    runtime_executor_audio_litert_compiled_model_executor
-    runtime_executor_executor_settings_base
-    runtime_executor_litert_compiled_model_executor_utils
-    runtime_executor_llm_executor
-    runtime_executor_llm_executor_settings
-    runtime_executor_llm_litert_compiled_model_executor
-    runtime_executor_llm_litert_npu_compiled_model_executor
-    runtime_executor_magic_number_configs_helper
-    runtime_executor_vision_executor
-    runtime_executor_vision_executor_settings
-    runtime_executor_vision_litert_compiled_model_executor
-    runtime_framework_threadpool
-    runtime_core_session_factory
-    runtime_util_file_format_util
-    runtime_util_litert_status_util
-  PRIVATE 
-    litert_libs
-    LITERTLM_DEPS
-    proto_lib
-)
-
-# --- Pipeline ---
+# ==============================================================================
+# 2. Pipeline
+#    Bazel: cc_library(name = "pipeline" ...)
+#    Status: Depends on Tasks.
+# ==============================================================================
 add_litertlm_library(runtime_core_pipeline STATIC
   pipeline.cc
 )
@@ -100,6 +60,7 @@ target_include_directories(runtime_core_pipeline
 target_link_libraries(runtime_core_pipeline
   PUBLIC
     runtime_core_tasks
+    
     LiteRTLM::Runtime::Components::Sampler::Interface
     LiteRTLM::Runtime::Components::ScoringCpuUtil
     LiteRTLM::Runtime::Components::StopTokenDetector
@@ -108,94 +69,27 @@ target_link_libraries(runtime_core_pipeline
     LiteRTLM::Runtime::Components::Sampler::TopP
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Decoder
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
+    
     runtime_engine_io_types
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor
     runtime_executor_llm_executor_io_types
     runtime_executor_llm_executor_settings
-    runtime_util_convert_tensor_buffer
-    runtime_util_litert_status_util     
     runtime_executor_llm_litert_compiled_model_executor
-  PRIVATE 
-    LITERTLM_DEPS
-    litert_libs
-    proto_lib
-)
-
-# --- Session Basic ---
-add_litertlm_library(runtime_core_session_basic STATIC
-  session_basic.cc
-)
-add_library(LiteRTLM::Runtime::Core::SessionBasic ALIAS runtime_core_session_basic)
-
-target_include_directories(runtime_core_session_basic
-  PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-target_link_libraries(runtime_core_session_basic
-  PUBLIC
-    runtime_core_tasks
-    runtime_core_pipeline
-    LiteRTLM::Runtime::Components::Sampler::Interface
-    LiteRTLM::Runtime::Components::Sampler::Factory
-    LiteRTLM::Runtime::Components::StopTokenDetector
-    LiteRTLM::Runtime::Components::Tokenizer::Interface
-    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
-    runtime_engine_engine_interface
-    runtime_engine_engine_settings
-    runtime_engine_io_types
-    runtime_executor_audio_executor
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor
-    runtime_executor_llm_executor_io_types
-    runtime_executor_vision_executor
-    runtime_framework_threadpool
+    
     runtime_util_convert_tensor_buffer
-    runtime_util_executor_data_util
     runtime_util_litert_status_util
-    runtime_util_model_type_utils
-    runtime_util_tensor_buffer_util
   PRIVATE
     LITERTLM_DEPS
     litert_libs
     proto_lib
 )
 
-# --- Session Factory ---
-add_litertlm_library(runtime_core_session_factory STATIC
-  session_factory.cc
-)
-add_library(LiteRTLM::Runtime::Core::SessionFactory ALIAS runtime_core_session_factory)
-
-target_include_directories(runtime_core_session_factory
-  PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-target_link_libraries(runtime_core_session_factory
-  PUBLIC
-    runtime_core_tasks
-    runtime_core_session_basic
-    LiteRTLM::Runtime::Components::Tokenizer::Interface
-    runtime_engine_engine_interface
-    runtime_engine_engine_settings
-    runtime_engine_io_types
-    runtime_executor_audio_executor
-    runtime_executor_llm_executor
-    runtime_executor_vision_executor
-    runtime_framework_threadpool
-    runtime_util_litert_status_util
-    runtime_core_session_utils
-  PRIVATE
-    LITERTLM_DEPS
-    litert_libs  
-    proto_lib
-)
-
-# --- Session Utils ---
+# ==============================================================================
+# 3. Session Utils
+#    Bazel: cc_library(name = "session_utils" ...)
+#    Status: Utility only. MUST NOT depend on SessionBasic.
+# ==============================================================================
 add_litertlm_library(runtime_core_session_utils STATIC
   session_utils.cc
 )
@@ -209,36 +103,83 @@ target_include_directories(runtime_core_session_utils
 
 target_link_libraries(runtime_core_session_utils
   PUBLIC
-    runtime_core_tasks
-    runtime_core_session_basic
     LiteRTLM::Runtime::Components::Tokenizer::Interface
-    runtime_engine_engine_interface
     runtime_engine_engine_settings
     runtime_engine_io_types
-    runtime_executor_audio_executor
-    runtime_executor_llm_executor
-    runtime_executor_vision_executor
-    runtime_framework_threadpool
     runtime_util_litert_status_util
   PRIVATE
     litert_libs
     proto_lib
-    LITERTLM_DEPS  
+    LITERTLM_DEPS
 )
 
-# --- Tasks ---
-add_litertlm_library(runtime_core_tasks STATIC
-  tasks.cc
+# ==============================================================================
+# 4. Session Basic
+#    Bazel: cc_library(name = "session_basic" ...)
+#    Status: The core logic. Aggregates Pipeline, Utils, and Tasks.
+# ==============================================================================
+add_litertlm_library(runtime_core_session_basic STATIC
+  session_basic.cc
 )
-add_library(LiteRTLM::Runtime::Core::Tasks ALIAS runtime_core_tasks)
+add_library(LiteRTLM::Runtime::Core::SessionBasic ALIAS runtime_core_session_basic)
 
-target_include_directories(runtime_core_tasks
+target_include_directories(runtime_core_session_basic
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-target_link_libraries(runtime_core_tasks
+target_link_libraries(runtime_core_session_basic
+  PUBLIC
+    runtime_core_pipeline
+    runtime_core_session_utils
+    # Tasks is implicitly linked via pipeline, but we can be explicit
+    runtime_core_tasks 
+    
+    LiteRTLM::Runtime::Components::Sampler::Interface
+    LiteRTLM::Runtime::Components::Sampler::Factory
+    LiteRTLM::Runtime::Components::StopTokenDetector
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
+    
+    runtime_engine_engine_interface
+    runtime_engine_engine_settings
+    runtime_engine_io_types
+    
+    runtime_executor_audio_executor
+    runtime_executor_executor_settings_base
+    runtime_executor_llm_executor
+    runtime_executor_llm_executor_io_types
+    runtime_executor_vision_executor
+    
+    runtime_framework_threadpool
+    runtime_util_convert_tensor_buffer
+    runtime_util_executor_data_util
+    runtime_util_litert_status_util
+    runtime_util_model_type_utils
+    runtime_util_tensor_buffer_util
+  PRIVATE
+    LITERTLM_DEPS
+    litert_libs
+    proto_lib
+)
+
+# ==============================================================================
+# 5. Session Factory
+#    Bazel: cc_library(name = "session_factory" ...)
+# ==============================================================================
+add_litertlm_library(runtime_core_session_factory STATIC
+  session_factory.cc
+)
+add_library(LiteRTLM::Runtime::Core::SessionFactory ALIAS runtime_core_session_factory)
+
+target_include_directories(runtime_core_session_factory
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_core_session_factory
   PUBLIC
     runtime_core_session_basic
     LiteRTLM::Runtime::Components::Tokenizer::Interface
@@ -251,12 +192,114 @@ target_link_libraries(runtime_core_tasks
     runtime_framework_threadpool
     runtime_util_litert_status_util
   PRIVATE
-    litert_libs     
-    proto_lib
     LITERTLM_DEPS
+    litert_libs
+    proto_lib
 )
 
-# --- Facade ---
+# ==============================================================================
+# 6. Engine Impl (Common Deps Wrapper)
+# ==============================================================================
+# NOTE: We don't define a separate target for "COMMON_DEPS", we just link them
+# directly to the impl targets below.
+
+# ==============================================================================
+# 7. Engine Impl
+#    Bazel: cc_library(name = "engine_impl" ...)
+# ==============================================================================
+add_litertlm_library(runtime_core_engine_impl STATIC
+  engine_impl.cc
+)
+add_library(LiteRTLM::Runtime::Core::EngineImpl ALIAS runtime_core_engine_impl)
+
+target_include_directories(runtime_core_engine_impl
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_core_engine_impl
+  PUBLIC
+    # --- Common Deps ---
+    runtime_core_session_factory
+    LiteRTLM::Runtime::Components::ModelResources::Interface
+    runtime_engine_engine_interface
+    runtime_engine_engine_settings
+    runtime_engine_io_types
+    runtime_executor_audio_executor
+    runtime_executor_audio_executor_settings
+    runtime_executor_audio_litert_compiled_model_executor
+    runtime_executor_executor_settings_base
+    runtime_executor_litert_compiled_model_executor_utils
+    runtime_executor_llm_executor
+    runtime_executor_llm_executor_settings
+    runtime_executor_llm_litert_compiled_model_executor
+    runtime_executor_magic_number_configs_helper
+    runtime_executor_vision_executor
+    runtime_executor_vision_litert_compiled_model_executor
+    runtime_framework_threadpool
+    runtime_executor_llm_litert_compiled_model_executor_factory
+    runtime_util_file_format_util
+    runtime_util_litert_status_util
+    
+    # --- GPU/NPU Specifics (Always link if they exist) ---
+    # These are present in the Bazel "engine_impl" target list
+    # runtime_executor_default_static_gpu_accelerator
+    # LiteRTLM::Runtime::Components::Sampler::GPU
+    
+  PRIVATE
+    proto_lib
+    LITERTLM_DEPS
+    litert_libs
+)
+
+# ==============================================================================
+# 8. Engine Impl (CPU Only)
+#    Bazel: cc_library(name = "engine_impl_cpu_only" ...)
+# ==============================================================================
+add_litertlm_library(runtime_core_engine_impl_cpu_only STATIC
+  engine_impl.cc
+)
+add_library(LiteRTLM::Runtime::Core::EngineImplCPU ALIAS runtime_core_engine_impl_cpu_only)
+
+target_include_directories(runtime_core_engine_impl_cpu_only
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(runtime_core_engine_impl_cpu_only
+  PUBLIC
+    # --- Common Deps Only (No GPU) ---
+    runtime_core_session_factory
+    LiteRTLM::Runtime::Components::ModelResources::Interface
+    runtime_engine_engine_interface
+    runtime_engine_engine_settings
+    runtime_engine_io_types
+    runtime_executor_audio_executor
+    runtime_executor_audio_executor_settings
+    runtime_executor_audio_litert_compiled_model_executor
+    runtime_executor_executor_settings_base
+    runtime_executor_litert_compiled_model_executor_utils
+    runtime_executor_llm_executor
+    runtime_executor_llm_executor_settings
+    runtime_executor_llm_litert_compiled_model_executor
+    runtime_executor_magic_number_configs_helper
+    runtime_executor_vision_executor
+    runtime_executor_vision_litert_compiled_model_executor
+    runtime_framework_threadpool
+    runtime_executor_llm_litert_compiled_model_executor_factory
+    runtime_util_file_format_util
+    runtime_util_litert_status_util
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS
+    proto_lib
+)
+
+# ==============================================================================
+# 9. Facade
+# ==============================================================================
 add_library(runtime_core_libs INTERFACE)
 add_library(LiteRTLM::Runtime::Core ALIAS runtime_core_libs)
 
