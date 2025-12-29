@@ -183,28 +183,45 @@ ExternalProject_Add(
   INSTALL_COMMAND ""
 )
 
+
+
+
+# ... (Keep the ExternalProject_Add part exactly as you have it) ...
+
 # =========================================================
-#  4. Import the Libraries
+#  4. Import the Libraries (Matched to your File List)
 # =========================================================
-import_static_lib(imp_litert_c_api    "${LITERT_BUILD_DIR}/c/liblitert_c_api.a")
-import_static_lib(imp_litert_c_options    "${LITERT_BUILD_DIR}/c/options/liblitert_c_options.a")
 
-import_static_lib(imp_litert_cc_api    "${LITERT_BUILD_DIR}/cc/liblitert_cc_api.a")
-import_static_lib(imp_litert_cc_options    "${LITERT_BUILD_DIR}/cc/options/liblitert_cc_options.a")
+# [FIX] Import the logger that we confirmed exists
+import_static_lib(imp_litert_logging         "${LITERT_BUILD_DIR}/c/liblitert_logging.a")
 
-import_static_lib(imp_litert_compiler_plugins    "${LITERT_BUILD_DIR}/compiler/liblitert_compiler_plugin.a")
+import_static_lib(imp_litert_c_api           "${LITERT_BUILD_DIR}/c/liblitert_c_api.a")
+import_static_lib(imp_litert_c_options       "${LITERT_BUILD_DIR}/c/options/liblitert_c_options.a")
 
-import_static_lib(imp_litert_core     "${LITERT_BUILD_DIR}/core/liblitert_core.a")
-import_static_lib(imp_litert_core_model    "${LITERT_BUILD_DIR}/core/model/liblitert_core_model.a")
+import_static_lib(imp_litert_cc_api          "${LITERT_BUILD_DIR}/cc/liblitert_cc_api.a")
+import_static_lib(imp_litert_cc_options      "${LITERT_BUILD_DIR}/cc/options/liblitert_cc_options.a")
 
-import_static_lib(imp_litert_runtime  "${LITERT_BUILD_DIR}/runtime/liblitert_runtime.a")
+import_static_lib(imp_litert_compiler_plugins "${LITERT_BUILD_DIR}/compiler/liblitert_compiler_plugin.a")
 
+import_static_lib(imp_litert_core            "${LITERT_BUILD_DIR}/core/liblitert_core.a")
+# Note: Core Cache wasn't in your previous list, but if you need it:
+# import_static_lib(imp_litert_core_cache    "${LITERT_BUILD_DIR}/core/cache/liblitert_core_cache.a")
+import_static_lib(imp_litert_core_model      "${LITERT_BUILD_DIR}/core/model/liblitert_core_model.a")
+
+import_static_lib(imp_litert_runtime         "${LITERT_BUILD_DIR}/runtime/liblitert_runtime.a")
+
+# =========================================================
+#  5. The Interface
+# =========================================================
 add_library(litert_libs INTERFACE)
 target_include_directories(litert_libs SYSTEM INTERFACE ${LITERT_INCLUDE_PATHS})
 
 target_link_libraries(litert_libs INTERFACE
-  # Using start-group / end-group to handle strict linkers and circular deps
+  # [CRITICAL] The Nuclear Option: Start Group
+  # This forces the linker to cycle through libs to resolve circular deps 
+  # (especially between options, c_api, and logging)
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+    imp_litert_logging       # <--- Added
     imp_litert_c_api
     imp_litert_c_options
     imp_litert_cc_api
@@ -215,4 +232,39 @@ target_link_libraries(litert_libs INTERFACE
     imp_litert_runtime
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 )
+
+
+
+# # =========================================================
+# #  4. Import the Libraries
+# # =========================================================
+# import_static_lib(imp_litert_c_api    "${LITERT_BUILD_DIR}/c/liblitert_c_api.a")
+# import_static_lib(imp_litert_c_options    "${LITERT_BUILD_DIR}/c/options/liblitert_c_options.a")
+
+# import_static_lib(imp_litert_cc_api    "${LITERT_BUILD_DIR}/cc/liblitert_cc_api.a")
+# import_static_lib(imp_litert_cc_options    "${LITERT_BUILD_DIR}/cc/options/liblitert_cc_options.a")
+
+# import_static_lib(imp_litert_compiler_plugins    "${LITERT_BUILD_DIR}/compiler/liblitert_compiler_plugin.a")
+
+# import_static_lib(imp_litert_core     "${LITERT_BUILD_DIR}/core/liblitert_core.a")
+# import_static_lib(imp_litert_core_model    "${LITERT_BUILD_DIR}/core/model/liblitert_core_model.a")
+
+# import_static_lib(imp_litert_runtime  "${LITERT_BUILD_DIR}/runtime/liblitert_runtime.a")
+
+# add_library(litert_libs INTERFACE)
+# target_include_directories(litert_libs SYSTEM INTERFACE ${LITERT_INCLUDE_PATHS})
+
+# target_link_libraries(litert_libs INTERFACE
+#   # Using start-group / end-group to handle strict linkers and circular deps
+#   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+#     imp_litert_c_api
+#     imp_litert_c_options
+#     imp_litert_cc_api
+#     imp_litert_cc_options
+#     imp_litert_compiler_plugins
+#     imp_litert_core
+#     imp_litert_core_model
+#     imp_litert_runtime
+#   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+# )
 

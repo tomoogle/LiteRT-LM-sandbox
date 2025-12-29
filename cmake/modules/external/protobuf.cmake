@@ -87,7 +87,6 @@ if(NOT TARGET protobuf::protoc)
 endif()
 
 
-
 add_library(proto_lib STATIC)
 add_dependencies(proto_lib protobuf_external)
 
@@ -99,11 +98,15 @@ target_include_directories(proto_lib
     ${PROTO_INCLUDE_DIR}
     ${ABSL_INCLUDE_DIR}
 )
+
 target_link_libraries(proto_lib
   PUBLIC
     protobuf::libprotobuf
   PRIVATE
     imp_absl_base
+    # [FIX] Add these so the linker finds the UTF-8 symbols!
+    imp_utf8_validity
+    imp_utf8_range
 )
 
 generate_protobuf(proto_lib)
