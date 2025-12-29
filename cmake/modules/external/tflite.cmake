@@ -53,10 +53,8 @@ ExternalProject_Add(
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
 
     # --- Dependency Injection ---
-    # TFLite uses find_package(absl), so we just point it to the config dir
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
-    -D_abseil-cpp_LICENSE_FILE:FILEPATH=${ABSL_SRC_DIR}/absl_external/LICENSE
-    # TFLite uses find_package(Flatbuffers), so we point it to the config dir
+    -D_abseil-cpp_LICENSE_FILE=${ABSL_SRC_DIR}/absl_external/LICENSE
 
     -DFLATBUFFERS_BUILD_FLATC=OFF
     -DFLATBUFFERS_INSTALL=OFF
@@ -147,9 +145,8 @@ import_static_lib(imp_xnnpack_delegate            "${TFLITE_BUILD_DIR}/libxnnpac
 
 add_library(tflite_libs INTERFACE)
 target_link_libraries(tflite_libs INTERFACE
-    # [CRITICAL] Add the main TFLite library here!
     imp_libtflite
-    imp_xnnpack_delegate  # [FIX] Added missing delegate lib
+    imp_xnnpack_delegate
 
     imp_XNNPACK
     imp_cpuinfo

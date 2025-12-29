@@ -12,7 +12,7 @@ set(PROTO_LITE_LIBRARY ${PROTO_INSTALL_PREFIX}/lib/libprotobuf-lite.a)
 set(PROTO_BIN_DIR ${PROTO_INSTALL_PREFIX}/bin)
 
 set(PROTO_PROTOC_EXECUTABLE ${PROTO_BIN_DIR}/protoc)
-set(protobuf_generate_PROTOC_EXE ${PROTO_BIN_DIR}/bin/protoc)
+set(protobuf_generate_PROTOC_EXE ${PROTO_BIN_DIR}/protoc)
 
 
 set(PROTO_FILES
