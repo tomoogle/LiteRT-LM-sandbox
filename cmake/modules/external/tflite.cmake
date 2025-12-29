@@ -46,49 +46,49 @@ ExternalProject_Add(
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     
-# Tell CMake to look in system paths for these two
-      "-DCMAKE_PREFIX_PATH=/usr"
-      "-DEIGEN3_INCLUDE_DIR=/usr/include/eigen3"
-      # This trick often stops TFLite from trying to download Farmhash source
-      "-DFARMHASH_SOURCE_DIR=/usr/include"
 
-
-    # Consolidated CXX Flags
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
     
     # Consolidated C Flags
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
 
+
+
     # [FORCE SYSTEM DEPENDENCIES]
-      # Tell FetchContent to stop trying to download things we already have
       -DFETCHCONTENT_FULLY_DISCONNECTED=ON
       -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=ALWAYS
 
     # --- Dependency Injection ---
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
     -D_abseil-cpp_LICENSE_FILE=${ABSL_SRC_DIR}/absl_external/LICENSE
+  
+    "-DEigen3_DIR=/usr/share/eigen3/cmake"
+    "-DEIGEN3_INCLUDE_DIR=/usr/include/eigen3"
+
+    "-DFARMHASH_SOURCE_DIR=/usr/include"
 
 
-      "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
-      "-DCMAKE_SHARED_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
-      
-      # The "Link Everything" List
-      "-DCMAKE_CXX_STANDARD_LIBRARIES= \
-          -lprotobuf -lutf8_validity \
-          -Wl,--start-group \
-          -labsl_leak_check \
-          -labsl_cordz_handle -labsl_crc32c -labsl_crc_internal -labsl_crc_cpu_detect \
-          -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_examine_stack \
-          -labsl_log_internal_check_op -labsl_log_internal_message \
-          -labsl_log_internal_globals -labsl_log_globals -labsl_log_sink \
-          -labsl_log_internal_log_sink_set -labsl_log_internal_format \
-          -labsl_log_internal_conditions -labsl_log_internal_nullguard \
-          -labsl_status -labsl_statusor -labsl_raw_logging_internal \
-          -labsl_base -labsl_throw_delegate -labsl_int128 \
-          -labsl_strings -labsl_string_view -labsl_synchronization \
-          -labsl_time -labsl_time_zone -labsl_utf8_for_code_point \
-          -Wl,--end-group \
-          -lpthread"
+
+    "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
+    "-DCMAKE_SHARED_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
+    
+    # The "Link Everything" List
+    "-DCMAKE_CXX_STANDARD_LIBRARIES= \
+        -lprotobuf -lutf8_validity \
+        -Wl,--start-group \
+        -labsl_leak_check \
+        -labsl_cordz_handle -labsl_crc32c -labsl_crc_internal -labsl_crc_cpu_detect \
+        -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_examine_stack \
+        -labsl_log_internal_check_op -labsl_log_internal_message \
+        -labsl_log_internal_globals -labsl_log_globals -labsl_log_sink \
+        -labsl_log_internal_log_sink_set -labsl_log_internal_format \
+        -labsl_log_internal_conditions -labsl_log_internal_nullguard \
+        -labsl_status -labsl_statusor -labsl_raw_logging_internal \
+        -labsl_base -labsl_throw_delegate -labsl_int128 \
+        -labsl_strings -labsl_string_view -labsl_synchronization \
+        -labsl_time -labsl_time_zone -labsl_utf8_for_code_point \
+        -Wl,--end-group \
+        -lpthread"
 
     -DFLATBUFFERS_BUILD_FLATC=OFF
     -DFLATBUFFERS_INSTALL=OFF
