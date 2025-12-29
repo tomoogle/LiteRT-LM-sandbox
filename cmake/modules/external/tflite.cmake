@@ -52,6 +52,11 @@ ExternalProject_Add(
     # Consolidated C Flags
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
 
+    # [FORCE SYSTEM DEPENDENCIES]
+      # Tell FetchContent to stop trying to download things we already have
+      -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=ALWAYS
+
     # --- Dependency Injection ---
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
     -D_abseil-cpp_LICENSE_FILE=${ABSL_SRC_DIR}/absl_external/LICENSE
@@ -71,6 +76,18 @@ ExternalProject_Add(
     -Dprotobuf_BINARY_DIR=${PROTO_BIN_DIR}
     -Dprotobuf_BUILD_PROTOC_BINARIES=OFF
     -Dprotobuf_SOURCE_DIR=${PROTO_SRC_DIR}
+    -DProtobuf_INCLUDE_DIR=${PROTO_INCLUDE_DIR}
+    -DProtobuf_PROTOC_EXECUTABLE=${PROTO_BIN_DIR}/protoc
+    -DProtobuf_LIBRARIES=${PROTO_LIB_DIR}/libprotobuf.a
+    -DProtobuf_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf.a
+    -DProtobuf_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf.a
+    -DProtobuf_LITE_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf-lite.a
+    -DProtobuf_LITE_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf-lite.a
+    -DProtobuf_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
+    -DProtobuf_PROTOC_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotoc.a
+    -DProtobuf_PROTOC_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotoc.a
+
+
 
 
     # --- TFLite Specific Configuration ---

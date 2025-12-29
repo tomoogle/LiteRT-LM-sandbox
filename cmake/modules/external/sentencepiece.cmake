@@ -27,11 +27,21 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
     PREFIX         ${SENTENCE_EXT_PREFIX}
     
     PATCH_COMMAND
-      ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/abseil-cpp &&
-      ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/protobuf &&
-      sed -i "/set(CMAKE_CXX_STANDARD 17)/d" <SOURCE_DIR>/CMakeLists.txt &&
-      sed -i "s|add_subdirectory(third_party/abseil-cpp)|find_package(absl REQUIRED CONFIG)|g" <SOURCE_DIR>/CMakeLists.txt &&
-      sed -i "s|add_subdirectory(third_party/protobuf)|find_package(Protobuf REQUIRED CONFIG)|g" <SOURCE_DIR>/CMakeLists.txt
+      ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/abseil-cpp
+      COMMAND ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/protobuf
+      
+      # Step 2: Remove C++17 enforcement
+      COMMAND sed -i "/set(CMAKE_CXX_STANDARD 17)/d" <SOURCE_DIR>/CMakeLists.txt
+      
+      # Step 3: Append logic to link Abseil to SentencePiece targets
+      # We use 'bash -c' because '>>' redirection is a shell feature.
+      COMMAND bash -c "echo '' >> <SOURCE_DIR>/src/CMakeLists.txt"
+      COMMAND bash -c "echo '# --- PATCH: Force link Abseil for Protobuf dependencies ---' >> <SOURCE_DIR>/src/CMakeLists.txt"
+      COMMAND bash -c "echo 'file(GLOB ALL_ABSL_LIBS \"${ABSL_INSTALL_PREFIX}/lib/libabsl_*.a\")' >> <SOURCE_DIR>/src/CMakeLists.txt"
+      COMMAND bash -c "echo 'target_link_libraries(sentencepiece-static PUBLIC \${ALL_ABSL_LIBS})' >> <SOURCE_DIR>/src/CMakeLists.txt"
+      COMMAND bash -c "echo 'target_link_libraries(sentencepiece_train-static PUBLIC \${ALL_ABSL_LIBS})' >> <SOURCE_DIR>/src/CMakeLists.txt"
+
+
 
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${SENTENCE_INSTALL_PREFIX}
@@ -48,6 +58,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DSPM_PROTOBUF_PROVIDER=package
       -DSPM_ENABLE_SHARED=OFF
       -DSPM_ENABLE_TCMALLOC=OFF
+      -DCMAKE_PREFIX_PATH="${ABSL_INSTALL_PREFIX};${PROTO_INSTALL_PREFIX}"
       
       -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
 
