@@ -1,4 +1,5 @@
 add_library(LITERTLM_DEPS INTERFACE)
+add_dependencies(LITERTLM_DEPS litert_external)
 target_link_libraries(LITERTLM_DEPS INTERFACE
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
     absl_libs
@@ -16,6 +17,10 @@ target_link_libraries(LITERTLM_DEPS INTERFACE
     proto_lib
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 )
+target_include_directories(LITERTLM_DEPS INTERFACE
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
 
 
 
