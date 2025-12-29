@@ -10,6 +10,10 @@ set(TENSORFLOW_SOURCE_DIR ${TFLITE_EXT_PREFIX}/src/tflite_external)
 
 set(TFLITE_STATIC_LIB "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
 
+file(GLOB_RECURSE ABSL_ALL_LIBS "${ABSL_INSTALL_PREFIX}/lib/libabsl_*.a")
+string(REPLACE ";" " " ABSL_LIBS_STR "${ABSL_ALL_LIBS}")
+
+
 if(NOT EXISTS "${TFLITE_STATIC_LIB}")
   message(STATUS "TFLite not found. Configuring external build...")
 
@@ -45,7 +49,8 @@ ExternalProject_Add(
     -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-    
+    -DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX};${libpng_lib_BINARY_DIR};${PROTO_INCLUDE_DIR}
+
 
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
     
@@ -55,17 +60,17 @@ ExternalProject_Add(
 
 
     # [FORCE SYSTEM DEPENDENCIES]
-      -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      # -DFETCHCONTENT_FULLY_DISCONNECTED=ON
       -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=ALWAYS
 
     # --- Dependency Injection ---
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
     -D_abseil-cpp_LICENSE_FILE=${ABSL_SRC_DIR}/absl_external/LICENSE
   
-    "-DEigen3_DIR=/usr/share/eigen3/cmake"
-    "-DEIGEN3_INCLUDE_DIR=/usr/include/eigen3"
+    # "-DEigen3_DIR=/usr/share/eigen3/cmake"
+    # "-DEIGEN3_INCLUDE_DIR=/usr/include/eigen3"
 
-    "-DFARMHASH_SOURCE_DIR=/usr/include"
+    # "-DFARMHASH_SOURCE_DIR=/usr/include"
 
 
 
@@ -73,23 +78,24 @@ ExternalProject_Add(
     "-DCMAKE_SHARED_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
     
     # The "Link Everything" List
-    "-DCMAKE_CXX_STANDARD_LIBRARIES= \
-        -lprotobuf -lutf8_validity \
-        -Wl,--start-group \
-        -labsl_leak_check \
-        -labsl_cordz_handle -labsl_crc32c -labsl_crc_internal -labsl_crc_cpu_detect \
-        -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_examine_stack \
-        -labsl_log_internal_check_op -labsl_log_internal_message \
-        -labsl_log_internal_globals -labsl_log_globals -labsl_log_sink \
-        -labsl_log_internal_log_sink_set -labsl_log_internal_format \
-        -labsl_log_internal_conditions -labsl_log_internal_nullguard \
-        -labsl_status -labsl_statusor -labsl_raw_logging_internal \
-        -labsl_base -labsl_throw_delegate -labsl_int128 \
-        -labsl_strings -labsl_string_view -labsl_synchronization \
-        -labsl_time -labsl_time_zone -labsl_utf8_for_code_point \
-        -Wl,--end-group \
-        -lpthread"
-
+    # "-DCMAKE_CXX_STANDARD_LIBRARIES= \
+        # -lprotobuf -lutf8_validity \
+        # -Wl,--start-group \
+        # -labsl_leak_check \
+        # -labsl_cordz_handle -labsl_crc32c -labsl_crc_internal -labsl_crc_cpu_detect \
+        # -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_examine_stack \
+        # -labsl_log_internal_check_op -labsl_log_internal_message \
+        # -labsl_log_internal_globals -labsl_log_globals -labsl_log_sink \
+        # -labsl_log_internal_log_sink_set -labsl_log_internal_format \
+        # -labsl_log_internal_conditions -labsl_log_internal_nullguard \
+        # -labsl_status -labsl_statusor -labsl_raw_logging_internal \
+        # -labsl_base -labsl_throw_delegate -labsl_int128 \
+        # -labsl_strings -labsl_string_view -labsl_synchronization \
+        # -labsl_time -labsl_time_zone -labsl_utf8_for_code_point \
+        # -Wl,--end-group \
+        # -lpthread"
+    "-DCMAKE_CXX_STANDARD_LIBRARIES=-lprotobuf -lutf8_validity -Wl,--start-group ${ABSL_LIBS_STR} -Wl,--end-group -lpthread"
+    
     -DFLATBUFFERS_BUILD_FLATC=OFF
     -DFLATBUFFERS_INSTALL=OFF
     -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
@@ -131,7 +137,6 @@ ExternalProject_Add(
     -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR}
     -DTFLITE_HOST_TOOLS_DIR=${FLATBUFFERS_BIN_DIR}
 
-    "-DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX};${libpng_lib_BINARY_DIR}"
     -DPNG_FOUND=ON
     -DPNG_LIBRARY=${libpng_lib_BINARY_DIR}/libpng.a
     -DPNG_PNG_INCLUDE_DIR=${libpng_lib_SOURCE_DIR}
