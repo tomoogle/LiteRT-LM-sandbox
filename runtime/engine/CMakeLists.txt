@@ -1,6 +1,9 @@
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-# --- Engine Interface ---
+# ==============================================================================
+# 1. Engine Interface
+#    Bazel: cc_library(name = "engine_interface" ...)
+# ==============================================================================
 add_litertlm_library(runtime_engine_engine_interface INTERFACE)
 add_library(LiteRTLM::Runtime::Engine::Interface ALIAS runtime_engine_engine_interface)
 
@@ -10,7 +13,10 @@ target_include_directories(runtime_engine_engine_interface
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-# --- Engine Settings ---
+# ==============================================================================
+# 2. Engine Settings
+#    Bazel: cc_library(name = "engine_settings" ...)
+# ==============================================================================
 add_litertlm_library(runtime_engine_engine_settings STATIC
   engine_settings.cc
 )
@@ -20,7 +26,7 @@ target_include_directories(runtime_engine_engine_settings
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
-  )
+)
 
 target_link_libraries(runtime_engine_engine_settings
   PUBLIC
@@ -28,16 +34,19 @@ target_link_libraries(runtime_engine_engine_settings
     runtime_executor_audio_executor_settings
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor_settings
+    runtime_executor_vision_executor_settings
     runtime_util_litert_status_util
     runtime_util_model_type_utils
-  PRIVATE
-    # tflite_extra_libs
-    litert_libs
-    LITERTLM_DEPS
     proto_lib
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS # Covers absl::status, strings, log
 )
 
-# --- IO Types ---
+# ==============================================================================
+# 3. IO Types
+#    Bazel: cc_library(name = "io_types" ...)
+# ==============================================================================
 add_litertlm_library(runtime_engine_io_types STATIC
   io_types.cc
 )
@@ -55,13 +64,16 @@ target_link_libraries(runtime_engine_io_types
   PUBLIC
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_util_litert_status_util
-    # tflite_extra_libs
-    litert_libs
-    LITERTLM_DEPS
     proto_lib
+  PRIVATE
+    litert_libs
+    LITERTLM_DEPS # Covers absl::base, log, status, strings, time
 )
 
-# --- Engine Lib (The Aggregator) ---
+# ==============================================================================
+# 4. Engine Lib (The Core Logic)
+#    Bazel: cc_library(name = "litert_lm_lib" ...)
+# ==============================================================================
 add_litertlm_library(runtime_engine_litert_lm_lib STATIC
   litert_lm_lib.cc
 )
@@ -71,29 +83,40 @@ target_include_directories(runtime_engine_litert_lm_lib
   PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
+    ${THIRD_PARTY_DIR}/json/include # For nlohmann/json
 )
 
 target_link_libraries(runtime_engine_litert_lm_lib
   PUBLIC
-    # Refactored Modules
+    # Internal Modules
     LiteRTLM::Runtime::Components
     LiteRTLM::Runtime::Conversation
+    LiteRTLM::Runtime::Conversation::IoTypes
     LiteRTLM::Runtime::Core
-    LiteRTLM::Runtime::Engine::Interface # (Self)
-    LiteRTLM::Runtime::Engine::Settings  # (Self)
-    LiteRTLM::Runtime::Engine::IoTypes   # (Self)
+    LiteRTLM::Runtime::Core::EngineImpl
+    LiteRTLM::Runtime::Engine::Interface
+    LiteRTLM::Runtime::Engine::Settings
+    LiteRTLM::Runtime::Engine::IoTypes
     
-    # Not yet refactored
-    runtime_executor_libs 
-    runtime_util_libs
-    
+    runtime_executor_executor_settings_base
+    runtime_executor_llm_executor_settings
+    runtime_util_litert_status_util
+
   PRIVATE
-    # tflite_extra_libs
+    # External Dependencies (Bazel deps)
     litert_libs
     LITERTLM_DEPS
+    
+    # Specific libs required by this file
+    json_lib        # @nlohmann_json//:json
+    re2_libs        # @com_googlesource_code_re2//:re2
+    stb_lib         # @stb//:stb_image
 )
 
-# --- Shared Flags ---
+# ==============================================================================
+# 5. Shared Flags
+#    Bazel: cc_library(name = "shared_flags" ...)
+# ==============================================================================
 add_litertlm_library(runtime_engine_shared_flags STATIC
   shared_flags.cc
 )
@@ -108,35 +131,42 @@ target_include_directories(runtime_engine_shared_flags
 target_link_libraries(runtime_engine_shared_flags
   PRIVATE
     litert_libs
-    LITERTLM_DEPS
+    LITERTLM_DEPS # Covers absl::flags
 )
 
-# --- Advanced Main Executable ---
+# ==============================================================================
+# 6. Advanced Main Executable
+#    Bazel: cc_binary(name = "litert_lm_advanced_main" ...)
+# ==============================================================================
 add_litertlm_executable(runtime_engine_litert_lm_advanced_main
   litert_lm_advanced_main.cc
 )
 
-target_link_libraries(runtime_engine_litert_lm_advanced_main
-  PUBLIC
-    c_engine
-    LiteRTLM::Runtime::Engine::Lib
-    LiteRTLM::Runtime::Engine::SharedFlags
-    
-    # Group dependencies
-    LiteRTLM::Runtime::Components
-    LiteRTLM::Runtime::Conversation
-    LiteRTLM::Runtime::Core
-    LiteRTLM::Runtime::Core::Tasks
-    runtime_executor_libs
-    runtime_util_libs
-    runtime_util_litert_status_util
-  PRIVATE
-    # tflite_extra_libs
-    litert_libs
-    LITERTLM_DEPS
+# [CRITICAL] Linker flags for symbol export
+target_link_options(runtime_engine_litert_lm_advanced_main PRIVATE
+  "LINKER:--export-dynamic-symbol=LiteRt*"
 )
 
-# --- Main Executable ---
+target_link_libraries(runtime_engine_litert_lm_advanced_main
+  PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+      LiteRTLM::Runtime::Engine::IoTypes
+      LiteRTLM::Runtime::Engine::Lib
+      LiteRTLM::Runtime::Engine::SharedFlags
+      
+      # Core/Util Dependencies
+      runtime_util_litert_status_util
+      
+      # External
+      litert_libs
+      LITERTLM_DEPS
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+)
+
+# ==============================================================================
+# 7. Main Executable (The Target We Care About)
+#    Bazel: cc_binary(name = "litert_lm_main" ...)
+# ==============================================================================
 add_litertlm_executable(litert_lm_main
   litert_lm_main.cc
 )
@@ -154,27 +184,37 @@ target_include_directories(litert_lm_main PRIVATE
 
 target_link_libraries(litert_lm_main
   PRIVATE
-    # Internal Components (Mapped from deps)
-    LiteRTLM::C::Engine                 # :engine_interface, :engine_settings
-    LiteRTLM::Runtime::Conversation     # //runtime/conversation
-    LiteRTLM::Runtime::Conversation::IoTypes
-    LiteRTLM::Runtime::Core::EngineImpl # //runtime/core:engine_impl
-    LiteRTLM::Runtime::Executor::ExecutorSettingsBase
-    LiteRTLM::Runtime::Executor::LLMExecutorSettings
-    LiteRTLM::Runtime::Util::LiteRtStatusUtil
+    # [CRITICAL] Wrap everything in a group to handle the circular deps
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+      
+      # 1. Internal Components (Mapped from Bazel deps)
+      LiteRTLM::C::Engine                 # :engine_interface, :engine_settings
+      LiteRTLM::Runtime::Engine::IoTypes  # :io_types
+      LiteRTLM::Runtime::Conversation     # //runtime/conversation
+      LiteRTLM::Runtime::Conversation::IoTypes
+      LiteRTLM::Runtime::Core::EngineImpl # //runtime/core:engine_impl
+      
+      runtime_executor_executor_settings_base
+      runtime_executor_llm_executor_settings
+      runtime_util_litert_status_util
 
-    # External Dependencies
-    litert_libs       # Covers @litert//litert/c/internal:litert_logging
-    LITERTLM_DEPS     # Covers absl (flags, log, strings, time) & json
-    proto_lib
+      # 2. External Dependencies
+      litert_libs       # Covers @litert//litert/c/internal:litert_logging
+      LITERTLM_DEPS     # Covers absl (flags, log, strings, time) & json
+      proto_lib
+      json_lib          # Explicitly add JSON just in case
+      
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 )
 
-# Optional: If on Android, you also need these (from the select block)
+# Android Specifics
 if(ANDROID)
   target_link_libraries(litert_lm_main PRIVATE EGL GLESv3)
 endif()
 
-# --- Folder Facade ---
+# ==============================================================================
+# 8. Folder Facade
+# ==============================================================================
 add_library(runtime_engine_libs INTERFACE)
 add_library(LiteRTLM::Runtime::Engine ALIAS runtime_engine_libs)
 
