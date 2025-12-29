@@ -26,11 +26,6 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
     GIT_TAG        v0.2.1
     PREFIX         ${SENTENCE_EXT_PREFIX}
     
-    # [NUCLEAR FIX + CONFIG MODE] 
-    # 1. DELETE internal deps so it CANNOT compile them.
-    # 2. DELETE hardcoded C++17.
-    # 3. FORCE find_package(... CONFIG). This is the key fix.
-    #    It tells CMake: "Ignore /usr/lib, look for the config file I gave you."
     PATCH_COMMAND
       ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/abseil-cpp &&
       ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/protobuf &&
@@ -54,10 +49,19 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DSPM_ENABLE_SHARED=OFF
       -DSPM_ENABLE_TCMALLOC=OFF
       
-      # [CRITICAL] Paths for Config Mode
-      # We still provide these, and now 'CONFIG' mode will actually use them.
-      -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf
       -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
+
+      -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf
+      -DProtobuf_LIBRARIES=${PROTO_LIB_DIR}
+      -DProtobuf_INCLUDE_DIR=${PROTO_INCLUDE_DIR}
+      -DProtobuf_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf.a
+      -DProtobuf_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf.a
+      -DProtobuf_LITE_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf-lite.a
+      -DProtobuf_LITE_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf-lite.a
+      -DProtobuf_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
+      -DProtobuf_PROTOC_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotoc.a
+      -DProtobuf_PROTOC_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotoc.a
+
   )
 else()
   if(NOT TARGET sentencepiece_external)
