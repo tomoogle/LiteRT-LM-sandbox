@@ -7,3 +7,4 @@
 cmake/src/
 *.bak
 __pycache__/
+*.back.back

@@ -142,13 +142,15 @@ import_static_lib(imp_ruy_trmul                  "${TFLITE_LIB_DIR}/libruy_trmul
 import_static_lib(imp_ruy_tune                   "${TFLITE_LIB_DIR}/libruy_tune.a")
 import_static_lib(imp_ruy_wait                   "${TFLITE_LIB_DIR}/libruy_wait.a")
 import_static_lib(imp_xnnpack-microkernels-prod  "${TFLITE_LIB_DIR}/libxnnpack-microkernels-prod.a")
-import_static_lib(impl_libtflite                  "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
+import_static_lib(imp_libtflite                  "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
+import_static_lib(imp_xnnpack_delegate            "${TFLITE_BUILD_DIR}/libxnnpack-delegate.a")
 
 
 add_library(tflite_libs INTERFACE)
 target_link_libraries(tflite_libs INTERFACE
     # [CRITICAL] Add the main TFLite library here!
-    impl_libtflite 
+    imp_libtflite
+    imp_xnnpack_delegate  # [FIX] Added missing delegate lib
 
     imp_XNNPACK
     imp_cpuinfo
