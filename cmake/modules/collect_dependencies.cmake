@@ -9,8 +9,8 @@ target_link_libraries(LITERTLM_DEPS INTERFACE
   minja_lib
   json_lib
   zlib_lib
-  re2_libs
-  sentencepiece_libs
+  #re2_libs
+  #sentencepiece_libs
   tflite_libs
 
 )

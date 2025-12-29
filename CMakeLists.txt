@@ -87,6 +87,12 @@ include(setup_generated_src_files)
 generate_src_files(ALL_GENERATED_FILES ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES})
 
 
+if(TARGET LITERTLM_DEPS)
+    message(STATUS "✅ DEBUG: LITERTLM_DEPS exists!")
+else()
+    message(FATAL_ERROR "❌ DEBUG: LITERTLM_DEPS is MISSING!")
+endif()
+
 add_subdirectory(c)
-add_subdirectory(schema)
 add_subdirectory(runtime)
+add_subdirectory(schema)

@@ -31,7 +31,7 @@ target_link_libraries(runtime_engine_engine_settings
     runtime_util_litert_status_util
     runtime_util_model_type_utils
   PRIVATE
-    tflite_extra_libs
+    # tflite_extra_libs
     litert_libs
     LITERTLM_DEPS
     proto_lib
@@ -55,7 +55,7 @@ target_link_libraries(runtime_engine_io_types
   PUBLIC
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_util_litert_status_util
-    tflite_extra_libs
+    # tflite_extra_libs
     litert_libs
     LITERTLM_DEPS
     proto_lib
@@ -88,7 +88,7 @@ target_link_libraries(runtime_engine_litert_lm_lib
     runtime_util_libs
     
   PRIVATE
-    tflite_extra_libs
+    # tflite_extra_libs
     litert_libs
     LITERTLM_DEPS
 )
@@ -131,43 +131,48 @@ target_link_libraries(runtime_engine_litert_lm_advanced_main
     runtime_util_libs
     runtime_util_litert_status_util
   PRIVATE
-    tflite_extra_libs
+    # tflite_extra_libs
     litert_libs
     LITERTLM_DEPS
 )
 
 # --- Main Executable ---
-add_litertlm_executable(runtime_engine_litert_lm_main
+add_litertlm_executable(litert_lm_main
   litert_lm_main.cc
 )
 
-target_link_libraries(runtime_engine_litert_lm_main
-  PUBLIC
-    c_engine
-    
-    # Engine Internal
-    LiteRTLM::Runtime::Engine::Interface
-    LiteRTLM::Runtime::Engine::Settings
-    LiteRTLM::Runtime::Engine::IoTypes
-    
-    # Modules
-    LiteRTLM::Runtime::Components
-    LiteRTLM::Runtime::Conversation
-    LiteRTLM::Runtime::Conversation::IoTypes
-    LiteRTLM::Runtime::Core
-    LiteRTLM::Runtime::Core::EngineImpl
-    LiteRTLM::Runtime::Core::Tasks
-    
-    # Pending Refactor
-    runtime_executor_libs
-    runtime_executor_executor_settings_base
-    runtime_executor_llm_executor_settings
-    runtime_util_libs
-    runtime_util_litert_status_util
-  PRIVATE
-    litert_libs
-    LITERTLM_DEPS
+# [CRITICAL] Export LiteRt symbols so the runtime can find them
+target_link_options(litert_lm_main PRIVATE
+  "LINKER:--export-dynamic-symbol=LiteRt*"
 )
+
+target_include_directories(litert_lm_main PRIVATE
+  ${LITERTLM_INCLUDE_PATHS}
+  ${LITERT_INCLUDE_PATHS}
+  ${THIRD_PARTY_DIR}/json/include
+)
+
+target_link_libraries(litert_lm_main
+  PRIVATE
+    # Internal Components (Mapped from deps)
+    LiteRTLM::C::Engine                 # :engine_interface, :engine_settings
+    LiteRTLM::Runtime::Conversation     # //runtime/conversation
+    LiteRTLM::Runtime::Conversation::IoTypes
+    LiteRTLM::Runtime::Core::EngineImpl # //runtime/core:engine_impl
+    LiteRTLM::Runtime::Executor::ExecutorSettingsBase
+    LiteRTLM::Runtime::Executor::LLMExecutorSettings
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
+
+    # External Dependencies
+    litert_libs       # Covers @litert//litert/c/internal:litert_logging
+    LITERTLM_DEPS     # Covers absl (flags, log, strings, time) & json
+    proto_lib
+)
+
+# Optional: If on Android, you also need these (from the select block)
+if(ANDROID)
+  target_link_libraries(litert_lm_main PRIVATE EGL GLESv3)
+endif()
 
 # --- Folder Facade ---
 add_library(runtime_engine_libs INTERFACE)
