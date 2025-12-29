@@ -46,6 +46,13 @@ ExternalProject_Add(
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     
+# Tell CMake to look in system paths for these two
+      "-DCMAKE_PREFIX_PATH=/usr"
+      "-DEIGEN3_INCLUDE_DIR=/usr/include/eigen3"
+      # This trick often stops TFLite from trying to download Farmhash source
+      "-DFARMHASH_SOURCE_DIR=/usr/include"
+
+
     # Consolidated CXX Flags
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
     
@@ -61,6 +68,28 @@ ExternalProject_Add(
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
     -D_abseil-cpp_LICENSE_FILE=${ABSL_SRC_DIR}/absl_external/LICENSE
 
+
+      "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
+      "-DCMAKE_SHARED_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
+      
+      # The "Link Everything" List
+      "-DCMAKE_CXX_STANDARD_LIBRARIES= \
+          -lprotobuf -lutf8_validity \
+          -Wl,--start-group \
+          -labsl_leak_check \
+          -labsl_cordz_handle -labsl_crc32c -labsl_crc_internal -labsl_crc_cpu_detect \
+          -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_examine_stack \
+          -labsl_log_internal_check_op -labsl_log_internal_message \
+          -labsl_log_internal_globals -labsl_log_globals -labsl_log_sink \
+          -labsl_log_internal_log_sink_set -labsl_log_internal_format \
+          -labsl_log_internal_conditions -labsl_log_internal_nullguard \
+          -labsl_status -labsl_statusor -labsl_raw_logging_internal \
+          -labsl_base -labsl_throw_delegate -labsl_int128 \
+          -labsl_strings -labsl_string_view -labsl_synchronization \
+          -labsl_time -labsl_time_zone -labsl_utf8_for_code_point \
+          -Wl,--end-group \
+          -lpthread"
+
     -DFLATBUFFERS_BUILD_FLATC=OFF
     -DFLATBUFFERS_INSTALL=OFF
     -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
@@ -70,6 +99,7 @@ ExternalProject_Add(
     -DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}
     -DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}
     -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
+    -DFlatBuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
 
 
 
@@ -91,6 +121,8 @@ ExternalProject_Add(
 
 
     # --- TFLite Specific Configuration ---
+    -DTFLITE_ENABLE_FLATBUFFERS_SCHEMA_COMPILE=OFF
+    -DFLATBUFFERS_BUILD_FLATC=OFF
     -DTFLITE_ENABLE_INSTALL=OFF
     -DTFLITE_ENABLE_XNNPACK=ON
     -DTFLITE_ENABLE_RESOURCE_VARIABLE=OFF
