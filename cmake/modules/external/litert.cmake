@@ -221,7 +221,6 @@ target_link_libraries(litert_libs INTERFACE
   # This forces the linker to cycle through libs to resolve circular deps 
   # (especially between options, c_api, and logging)
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-    imp_litert_logging       # <--- Added
     imp_litert_c_api
     imp_litert_c_options
     imp_litert_cc_api
@@ -230,6 +229,7 @@ target_link_libraries(litert_libs INTERFACE
     imp_litert_core
     imp_litert_core_model
     imp_litert_runtime
+    imp_litert_logging
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 )
 

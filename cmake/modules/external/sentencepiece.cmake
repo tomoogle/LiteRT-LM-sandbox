@@ -26,34 +26,38 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
     GIT_TAG        v0.2.1
     PREFIX         ${SENTENCE_EXT_PREFIX}
     
-    # [NUCLEAR FIX] 
+    # [NUCLEAR FIX + CONFIG MODE] 
     # 1. DELETE internal deps so it CANNOT compile them.
-    # 2. DELETE hardcoded C++17 so it inherits C++20.
+    # 2. DELETE hardcoded C++17.
+    # 3. FORCE find_package(... CONFIG). This is the key fix.
+    #    It tells CMake: "Ignore /usr/lib, look for the config file I gave you."
     PATCH_COMMAND
       ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/abseil-cpp &&
       ${CMAKE_COMMAND} -E remove_directory <SOURCE_DIR>/third_party/protobuf &&
-      sed -i "/set(CMAKE_CXX_STANDARD 17)/d" <SOURCE_DIR>/CMakeLists.txt
+      sed -i "/set(CMAKE_CXX_STANDARD 17)/d" <SOURCE_DIR>/CMakeLists.txt &&
+      sed -i "s|add_subdirectory(third_party/abseil-cpp)|find_package(absl REQUIRED CONFIG)|g" <SOURCE_DIR>/CMakeLists.txt &&
+      sed -i "s|add_subdirectory(third_party/protobuf)|find_package(Protobuf REQUIRED CONFIG)|g" <SOURCE_DIR>/CMakeLists.txt
 
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${SENTENCE_INSTALL_PREFIX}
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DCMAKE_POLICY_VERSION_MINIMUM=3.5
       
-      # Force C++20 (Required for partial_ordering)
+      # Force C++20
       -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
       -DCMAKE_CXX_STANDARD_REQUIRED=ON
       -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       
-      # Force External Packages
+      # Provider Settings
       -DSPM_ABSL_PROVIDER=package
       -DSPM_PROTOBUF_PROVIDER=package
       -DSPM_ENABLE_SHARED=OFF
       -DSPM_ENABLE_TCMALLOC=OFF
       
-      # Help it find them
-      "-DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX};${PROTO_INSTALL_PREFIX}"
-      -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
+      # [CRITICAL] Paths for Config Mode
+      # We still provide these, and now 'CONFIG' mode will actually use them.
       -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf
+      -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
   )
 else()
   if(NOT TARGET sentencepiece_external)
@@ -71,7 +75,6 @@ target_include_directories(sentencepiece_libs INTERFACE ${SENTENCE_INCLUDE_DIR})
 target_link_libraries(sentencepiece_libs INTERFACE 
     imp_sentencepiece
     imp_sentencepiece_train
-    # Explicitly link deps
     absl_libs 
     proto_lib
 )

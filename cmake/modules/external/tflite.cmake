@@ -2,8 +2,6 @@ include(ExternalProject)
 
 set(TFLITE_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/tensorflow)
 set(TFLITE_INSTALL_PREFIX ${TFLITE_EXT_PREFIX}/install)
-
-# --- Parameters for consumption by higher layers (LiteRT-LM) ---
 set(TFLITE_INCLUDE_DIR ${TFLITE_INSTALL_PREFIX}/include)
 set(TFLITE_LIB_DIR     ${TFLITE_INSTALL_PREFIX}/lib)
 set(TFLITE_SRC_DIR     ${TFLITE_EXT_PREFIX}/src/tflite_external/tensorflow/lite)
@@ -36,6 +34,7 @@ ExternalProject_Add(
   PATCH_COMMAND
     sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 1/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     # sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
+    COMMAND sed -i "/profiling\\/telemetry\\/telemetry_status.h/a \\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_info.cc\\n\\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_usage_monitor.cc" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
     COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
