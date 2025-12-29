@@ -61,11 +61,13 @@ target_link_libraries(runtime_components_tool_use_parser_utils
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Python
     LiteRTLM::Runtime::Components::ToolUse::JsonUtils
-    LiteRTLM::Runtime::Components::ToolUse::PythonUtils # (Defined below)
+    LiteRTLM::Runtime::Components::ToolUse::PythonUtils
     runtime_util_litert_status_util
   PRIVATE
     LITERTLM_DEPS
     litert_libs
+    # [FIX] Added missing RE2 dependency
+    re2_libs
 )
 
 # --- Python Parser Utils ---
