@@ -53,7 +53,7 @@ if(NOT EXISTS "${SENTENCE_CONFIG_CMAKE_FILE}")
       
       # Dependency Paths
       -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
-      -DProtobuf_DIR=${PROTOBUF_INSTALL_PREFIX}/lib/cmake/protobuf
+      -DProtobuf_DIR=${PROTO_PREFIX}/lib/cmake/protobuf
   )
 # verify_install(sentencepiece_external ${SENTENCE_CONFIG_CMAKE_FILE})
 

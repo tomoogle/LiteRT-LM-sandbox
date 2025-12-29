@@ -155,7 +155,7 @@ target_link_libraries(tflite_libs INTERFACE
     imp_eight_bit_int_gemm
     imp_fft2d_fftsg
     imp_fft2d_fftsg2d
-    # imp_flatbuffers # (Keep commented if you use system flatbuffers)
+    flatbuffers_libs
     imp_pthreadpool
     imp_ruy_allocator
     imp_ruy_apply_multiplier
