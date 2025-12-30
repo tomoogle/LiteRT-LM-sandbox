@@ -36,10 +36,15 @@ ExternalProject_Add(
   SOURCE_SUBDIR
     tensorflow/lite
   PATCH_COMMAND
-    sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 1/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
+
+    sed -i "s|FLATBUFFERS_VERSION_MAJOR == [0-9]*|FLATBUFFERS_VERSION_MAJOR >= 1|" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     # sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     COMMAND sed -i "/profiling\\/telemetry\\/telemetry_status.h/a \\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_info.cc\\n\\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_usage_monitor.cc" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+    
+    COMMAND find <SOURCE_DIR>/tensorflow/lite -name CMakeLists.txt -exec sed -i "s/EXPORT tensorflow-liteTargets//g" {} +
+    
     COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
+
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
@@ -49,7 +54,7 @@ ExternalProject_Add(
     -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-    -DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX};${libpng_lib_BINARY_DIR};${PROTO_INCLUDE_DIR}
+    -DCMAKE_PREFIX_PATH="${ABSL_INSTALL_PREFIX};${libpng_lib_BINARY_DIR};${PROTO_INCLUDE_DIR}"
 
 
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
@@ -75,8 +80,8 @@ ExternalProject_Add(
 
 
     "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
-    "-DCMAKE_SHARED_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib"
-    
+    "-DCMAKE_SHARED_LINKER_FLAGS=-L${ABSL_INSTALL_PREFIX}/lib -Wl,-z,muldefs"
+
     # The "Link Everything" List
     # "-DCMAKE_CXX_STANDARD_LIBRARIES= \
         # -lprotobuf -lutf8_validity \
@@ -129,7 +134,7 @@ ExternalProject_Add(
     # --- TFLite Specific Configuration ---
     -DTFLITE_ENABLE_FLATBUFFERS_SCHEMA_COMPILE=OFF
     -DFLATBUFFERS_BUILD_FLATC=OFF
-    -DTFLITE_ENABLE_INSTALL=OFF
+    # -DTFLITE_ENABLE_INSTALL=ON
     -DTFLITE_ENABLE_XNNPACK=ON
     -DTFLITE_ENABLE_RESOURCE_VARIABLE=OFF
     -DXNNPACK_SET_VERBOSITY=OFF
