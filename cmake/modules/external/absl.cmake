@@ -18,7 +18,7 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
     GIT_REPOSITORY 
       https://github.com/abseil/abseil-cpp
     GIT_TAG        
-      20250814.1
+      20250127.1
     PREFIX
       ${ABSL_EXT_PREFIX}
     CMAKE_ARGS
@@ -292,21 +292,21 @@ target_link_libraries(absl_libs INTERFACE
 )
 
 
-file(GLOB ABSL_STATIC_LIBS "${ABSL_LIB_DIR}/libabsl_*.a")
-add_library(absl_glob INTERFACE)
+# file(GLOB ABSL_STATIC_LIBS "${ABSL_LIB_DIR}/libabsl_*.a")
+# add_library(absl_glob INTERFACE)
 
-target_include_directories(absl_glob SYSTEM INTERFACE ${ABSL_INCLUDE_DIR})
+# target_include_directories(absl_glob SYSTEM INTERFACE ${ABSL_INCLUDE_DIR})
 
-if(ABSL_STATIC_LIBS)
-    target_link_libraries(absl_glob INTERFACE
-        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-        ${ABSL_STATIC_LIBS}
-        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+# if(ABSL_STATIC_LIBS)
+#     target_link_libraries(absl_glob INTERFACE
+#         $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+#         ${ABSL_STATIC_LIBS}
+#         $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
         
-        $<$<BOOL:${UNIX}>:pthread>
-        $<$<PLATFORM_ID:Darwin>:-framework CoreFoundation>
-    )
-else()
-    message(STATUS "Abseil libs not yet present. They will be built.")
-endif()
-add_dependencies(absl_glob absl_external)
+#         $<$<BOOL:${UNIX}>:pthread>
+#         $<$<PLATFORM_ID:Darwin>:-framework CoreFoundation>
+#     )
+# else()
+#     message(STATUS "Abseil libs not yet present. They will be built.")
+# endif()
+# add_dependencies(absl_glob absl_external)

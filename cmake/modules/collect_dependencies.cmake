@@ -2,7 +2,7 @@ add_library(LITERTLM_DEPS INTERFACE)
 add_dependencies(LITERTLM_DEPS litert_external)
 target_link_libraries(LITERTLM_DEPS INTERFACE
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-    absl_glob
+    absl_libs
     antlr_lib
     libpng_lib
     kissfft_lib

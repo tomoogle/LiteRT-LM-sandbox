@@ -213,16 +213,16 @@ import_static_lib(imp_litert_core_model      "${LITERT_BUILD_DIR}/core/model/lib
 
 import_static_lib(imp_litert_runtime         "${LITERT_BUILD_DIR}/runtime/liblitert_runtime.a")
 
-# =========================================================
-#  5. The Interface
-# =========================================================
 add_library(litert_libs INTERFACE)
-target_include_directories(litert_libs SYSTEM INTERFACE ${LITERT_INCLUDE_PATHS})
+target_include_directories(litert_libs SYSTEM INTERFACE 
+  ${LITERT_INCLUDE_PATHS}
+)
 
 target_link_libraries(litert_libs INTERFACE
-  # [CRITICAL] The Nuclear Option: Start Group
-  # This forces the linker to cycle through libs to resolve circular deps 
-  # (especially between options, c_api, and logging)
+  absl_libs
+  flatbuffers_libs  # <--- You almost certainly need this too!
+  farmhash
+  tflite_libs
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
     imp_litert_c_api
     imp_litert_c_options

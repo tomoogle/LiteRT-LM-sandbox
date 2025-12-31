@@ -208,6 +208,8 @@ target_link_libraries(runtime_components_model_resources_litert_lm
     LiteRTLM::Runtime::Components::Tokenizer::HuggingFace
     LiteRTLM::Runtime::Components::Tokenizer::SentencePiece
     LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LiteRTLM::Schema::Core
+
   PRIVATE
     proto_lib
     LITERTLM_DEPS

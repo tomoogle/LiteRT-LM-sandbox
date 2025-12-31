@@ -26,7 +26,7 @@ target_link_libraries(schema_cc_litertlm_export_main
     LITERTLM_DEPS
     litert_libs
     proto_lib
-    flatbuffers_libs # [FIX] Added missing dependency
+    flatbuffers_libs
 )
 
 # ==============================================================================
