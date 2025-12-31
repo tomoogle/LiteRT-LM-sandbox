@@ -39,9 +39,23 @@ ExternalProject_Add(
 
     sed -i "s|FLATBUFFERS_VERSION_MAJOR == [0-9]*|FLATBUFFERS_VERSION_MAJOR >= 1|" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     # sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
-    COMMAND sed -i "/profiling\\/telemetry\\/telemetry_status.h/a \\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_info.cc\\n\\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_usage_monitor.cc" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+    # COMMAND sed -i "/profiling\\/telemetry\\/telemetry_status.h/a \\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_info.cc\\n\\ \\ \${TFLITE_SOURCE_DIR}/profiling/memory_usage_monitor.cc" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
     
-    COMMAND find <SOURCE_DIR>/tensorflow/lite -name CMakeLists.txt -exec sed -i "s/EXPORT tensorflow-liteTargets//g" {} +
+    # 1. Force linking to PRIVATE (Keep this, it's good hygiene)
+  COMMAND sed -i "/target_link_libraries(tensorflow-lite/,/)/ s/PUBLIC/PRIVATE/" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+
+  # 2. REMOVE the install(EXPORT ...) block
+  # This deletes the block that tries to export targets to the cmake/ folder
+  COMMAND sed -i "/install(.*EXPORT.*${PROJECT_NAME}Targets/,/)/d" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+
+  # 3. REMOVE the Config.cmake generation block (The part you asked to remove)
+  # We delete from 'include(CMakePackageConfigHelpers)' down to the end of the file
+  # (or effectively the end of that install logic)
+  COMMAND sed -i "/include(CMakePackageConfigHelpers)/,+20d" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+
+
+
+
     
     COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
 
@@ -55,7 +69,7 @@ ExternalProject_Add(
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     -DCMAKE_PREFIX_PATH="${ABSL_INSTALL_PREFIX};${libpng_lib_BINARY_DIR};${PROTO_INCLUDE_DIR}"
-
+    -DTFLITE_ENABLE_INSTALL=ON
 
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
     
@@ -66,7 +80,7 @@ ExternalProject_Add(
 
     # [FORCE SYSTEM DEPENDENCIES]
       # -DFETCHCONTENT_FULLY_DISCONNECTED=ON
-      -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=ALWAYS
+      # -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=ALWAYS
 
     # --- Dependency Injection ---
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
