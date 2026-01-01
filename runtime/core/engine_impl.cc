@@ -59,7 +59,7 @@ namespace {
 // with the provided settings. This ensure we maintain the same LiteRT
 // environment during the whole application lifetime. This is required for GPU
 // LiteRT environment. See b/454383477 for more details.
-absl::StatusOr<Environment&> GetEnvironment(
+absl::StatusOr<Environment*> GetEnvironment(
     const EngineSettings& engine_settings, ModelResources& model_resources) {
   // Helper must be available until LlmLiteRtCompiledModelExecutor::Create() is
   // called. Since env is used multiple times, it should also be static.
@@ -108,7 +108,7 @@ absl::StatusOr<Environment&> GetEnvironment(
   if (!kEnvironment->ok()) {
     return kEnvironment->status();
   }
-  return **kEnvironment;
+  return &(**kEnvironment);
 }
 
 }  // namespace
@@ -219,7 +219,7 @@ absl::StatusOr<std::unique_ptr<Engine>> Engine::CreateEngine(
           ModelType::kTfLiteAudioEncoderHw)));
 
   std::unique_ptr<LlmExecutor> executor;
-  ASSIGN_OR_RETURN(auto& env,
+  ASSIGN_OR_RETURN(auto env,
                    GetEnvironment(engine_settings, *model_resources));
   const auto& main_executor_settings =
       engine_settings.GetMainExecutorSettings();
@@ -228,7 +228,7 @@ absl::StatusOr<std::unique_ptr<Engine>> Engine::CreateEngine(
     default: {
       ASSIGN_OR_RETURN(executor,
                        CreateLlmLiteRtCompiledModelExecutor(
-                           main_executor_settings, env, *model_resources));
+                           main_executor_settings, *env, *model_resources));
     }
   };
 
@@ -239,7 +239,7 @@ absl::StatusOr<std::unique_ptr<Engine>> Engine::CreateEngine(
     ASSIGN_OR_RETURN(
         vision_executor,
         VisionLiteRtCompiledModelExecutor::Create(
-            engine_settings.GetMutableVisionExecutorSettings().value(), env));
+            engine_settings.GetMutableVisionExecutorSettings().value(), *env));
   }
 
   std::unique_ptr<AudioExecutor> audio_executor;
@@ -247,7 +247,7 @@ absl::StatusOr<std::unique_ptr<Engine>> Engine::CreateEngine(
     ASSIGN_OR_RETURN(
         audio_executor,
         AudioLiteRtCompiledModelExecutor::Create(
-            engine_settings.GetAudioExecutorSettings().value(), env));
+            engine_settings.GetAudioExecutorSettings().value(), *env));
   }
 
   if (benchmark_info.has_value()) {

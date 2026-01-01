@@ -152,11 +152,6 @@ target_include_directories(tflite_libs SYSTEM INTERFACE
   ${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy
 )
 target_link_libraries(tflite_libs INTERFACE
-    # 1. Foundation Deps (Keep outside the group)
-    absl_libs
-    flatbuffers_libs
-
-    # 2. The "Circular Dependency" Pit (TFLite + XNNPACK + RUY)
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
         imp_libtflite
         imp_xnnpack_delegate
@@ -198,4 +193,6 @@ target_link_libraries(tflite_libs INTERFACE
         imp_ruy_wait
         imp_xnnpack-microkernels-prod
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+    flatbuffers_libs    
+    absl_libs
 )

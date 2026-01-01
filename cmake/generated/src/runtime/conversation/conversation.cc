@@ -124,7 +124,7 @@ absl::StatusOr<std::string> Conversation::GetSingleTurnText(
   } else {
     return absl::UnimplementedError("Preface type is not supported yet");
   }
-  absl::MutexLock lock(history_mutex_);  // NOLINT
+  absl::MutexLock lock(&history_mutex_);  // NOLINT
   for (const auto& history_msg : history_) {
     if (std::holds_alternative<nlohmann::ordered_json>(history_msg)) {
       ASSIGN_OR_RETURN(nlohmann::ordered_json message_tmpl_input,
@@ -226,7 +226,7 @@ absl::StatusOr<Message> Conversation::SendMessage(
   auto json_message = std::get<nlohmann::ordered_json>(message);
   ASSIGN_OR_RETURN(const std::string& single_turn_text,
                    GetSingleTurnText(message));
-  absl::MutexLock lock(history_mutex_);  // NOLINT
+  absl::MutexLock lock(&history_mutex_);  // NOLINT
   if (json_message.is_array()) {
     for (const auto& message : json_message) {
       history_.push_back(message);
@@ -261,7 +261,7 @@ absl::Status Conversation::SendMessageAsync(
   ASSIGN_OR_RETURN(const std::string& single_turn_text,
                    GetSingleTurnText(message));
   {
-    absl::MutexLock lock(history_mutex_);  // NOLINT
+    absl::MutexLock lock(&history_mutex_);  // NOLINT
     if (json_message.is_array()) {
       for (const auto& message : json_message) {
         history_.push_back(message);
@@ -279,12 +279,12 @@ absl::Status Conversation::SendMessageAsync(
 
   absl::AnyInvocable<void(Message)> complete_message_callback =
       [this](const Message& complete_message) {
-        absl::MutexLock lock(this->history_mutex_);  // NOLINT
+        absl::MutexLock lock(&this->history_mutex_);  // NOLINT
         this->history_.push_back(complete_message);
       };
 
   absl::AnyInvocable<void()> cancel_callback = [this]() {
-    absl::MutexLock lock(this->history_mutex_);  // NOLINT
+    absl::MutexLock lock(&this->history_mutex_);  // NOLINT
     this->history_.pop_back();
   };
 

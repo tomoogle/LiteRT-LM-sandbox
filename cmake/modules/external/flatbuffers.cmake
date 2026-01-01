@@ -5,17 +5,12 @@ set(FLATBUFFERS_INSTALL_PREFIX ${FLATBUFFERS_EXT_PREFIX}/install)
 set(FLATBUFFERS_INCLUDE_DIR ${FLATBUFFERS_INSTALL_PREFIX}/include)
 set(FLATBUFFERS_SRC_DIR ${FLATBUFFERS_EXT_PREFIX}/src)
 set(FLATBUFFERS_BIN_DIR ${FLATBUFFERS_INSTALL_PREFIX}/bin)
+set(FLATBUFFERS_LIB_DIR ${FLATBUFFERS_INSTALL_PREFIX}/lib)
 
-# [FIX] 1. Auto-detect lib vs lib64
-if(EXISTS "${FLATBUFFERS_INSTALL_PREFIX}/lib64")
-  set(FLATBUFFERS_LIB_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib64")
-else()
-  set(FLATBUFFERS_LIB_DIR "${FLATBUFFERS_INSTALL_PREFIX}/lib")
-endif()
 
-set(FLATBUFFERS_DIR "${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers" CACHE INTERNAL "")
-set(FLATBUFFERS_CMAKE_CONFIG_FILE "${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers/flatbuffers-config.cmake")
-set(FLATC_EXECUTABLE "${FLATBUFFERS_BIN_DIR}/flatc" CACHE INTERNAL "")
+set(FLATBUFFERS_DIR ${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers CACHE INTERNAL "")
+set(FLATBUFFERS_CMAKE_CONFIG_FILE ${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers/flatbuffers-config.cmake)
+set(FLATC_EXECUTABLE ${FLATBUFFERS_BIN_DIR}/flatc CACHE INTERNAL "")
 
 if(NOT EXISTS "${FLATBUFFERS_CMAKE_CONFIG_FILE}")
   message(STATUS "Flatbuffers not found. Configuring external build...")
@@ -50,7 +45,6 @@ else()
     endif()
 endif()
 
-# [FIX] 2. Create the Import Target (Safety mechanism)
 import_static_lib(imp_flatbuffers "${FLATBUFFERS_LIB_DIR}/libflatbuffers.a")
 
 # [FIX] 3. Create the Interface Library

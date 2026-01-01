@@ -4,29 +4,18 @@ set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 # 1. Header Schema (Consuming the pre-generated FlatBuffer)
 #    Bazel: flatbuffer_cc_library(name = "litertlm_header_schema", ...)
 # ==============================================================================
-# Note: The generation of 'litertlm_header_schema_generated.h' is handled 
-# globally by 'flatbuffers.cmake' using 'compile_flatbuffer_files'.
-
 add_litertlm_library(schema_core_litertlm_header_schema INTERFACE)
 add_library(LiteRTLM::Schema::Core::HeaderSchema ALIAS schema_core_litertlm_header_schema)
 
-# We need to ensure the generation happens before this target is used.
-# Since 'flatbuffers.cmake' added the custom command but didn't create a target 
-# we can depend on directly, we rely on CMake finding the generated source 
-# if we add it to a target, OR we rely on the implicit file dependency.
-#
-# However, for an INTERFACE library, we can't list sources easily. 
-# We ensure the include directories point to where the generator put the file.
-
 target_include_directories(schema_core_litertlm_header_schema 
   INTERFACE
-    ${GENERATED_SRC_DIR} # This allows #include "schema/core/litertlm_header_schema_generated.h"
+    ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
 target_link_libraries(schema_core_litertlm_header_schema
   INTERFACE
-    flatbuffers_libs # [FIX] Required for the generated headers
+    flatbuffers_libs
 )
 
 # ==============================================================================
@@ -71,7 +60,7 @@ target_link_libraries(schema_core_litertlm_utils
   PRIVATE
     LITERTLM_DEPS
     litert_libs
-    flatbuffers_libs # [FIX] Explicit dep
+    flatbuffers_libs
 )
 
 # ==============================================================================
@@ -101,8 +90,8 @@ target_link_libraries(schema_core_litertlm_read
     LITERTLM_DEPS
     litert_libs
     proto_lib
-    sentencepiece_libs # [FIX] Explicit dep
-    zlib_lib           # [FIX] Explicit dep
+    sentencepiece_libs
+    zlib_lib
 )
 
 # ==============================================================================
@@ -122,8 +111,8 @@ target_link_libraries(schema_core_litertlm_section
   INTERFACE
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
-    flatbuffers_libs # [FIX] Explicit dep
-    zlib_lib         # [FIX] Explicit dep
+    flatbuffers_libs
+    zlib_lib
     LITERTLM_DEPS
 )
 
@@ -147,11 +136,11 @@ target_link_libraries(schema_core_litertlm_export
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
-    LiteRTLM::Schema::Core::Utils # [FIX] Added missing link
+    LiteRTLM::Schema::Core::Utils
     LITERTLM_DEPS
     litert_libs
     proto_lib
-    flatbuffers_libs # [FIX] Explicit dep
+    flatbuffers_libs
 )
 
 # ==============================================================================

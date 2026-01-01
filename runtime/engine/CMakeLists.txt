@@ -144,30 +144,36 @@ target_link_libraries(runtime_engine_shared_flags
 # 6. Advanced Main Executable
 #    Bazel: cc_binary(name = "litert_lm_advanced_main" ...)
 # ==============================================================================
+
+set(MEMORY_USAGE_MONITOR_SRC "${TFLITE_SRC_DIR}/profiling/memory_usage_monitor.cc")
+
+set_source_files_properties(${MEMORY_USAGE_MONITOR_SRC} PROPERTIES GENERATED TRUE)
+
 add_litertlm_executable(runtime_engine_litert_lm_advanced_main
   litert_lm_advanced_main.cc
+  ${MEMORY_USAGE_MONITOR_SRC}
 )
 
-# [CRITICAL] Linker flags for symbol export (Same as litert_lm_main)
 target_link_options(runtime_engine_litert_lm_advanced_main PRIVATE
   "LINKER:--export-dynamic-symbol=LiteRt*"
+)
+target_include_directories(runtime_engine_litert_lm_advanced_main PRIVATE
+  ${LITERTLM_INCLUDE_PATHS}
+  ${LITERT_INCLUDE_PATHS}
+  ${TENSORFLOW_SOURCE_DIR}
 )
 
 target_link_libraries(runtime_engine_litert_lm_advanced_main
   PRIVATE
-    # [CRITICAL] Start the Linker Group
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
       LiteRTLM::Runtime::Engine::IoTypes
       LiteRTLM::Runtime::Engine::Lib
       LiteRTLM::Runtime::Engine::SharedFlags
-      
-      # Core/Util Dependencies
+      LiteRTLM::Schema::Core
+
       runtime_util_litert_status_util
       
-      # External
       litert_libs
       LITERTLM_DEPS
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 )
 
 # ==============================================================================
@@ -190,10 +196,7 @@ target_include_directories(litert_lm_main PRIVATE
 )
 
 target_link_libraries(litert_lm_main
-  PRIVATE
-    # [CRITICAL] Start the Linker Group (Solves Circular Deps)
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-      
+  PRIVATE      
       # 1. Internal Components (Mapped from Bazel deps)
       LiteRTLM::Runtime::Engine::Interface
       LiteRTLM::Runtime::Engine::Settings
@@ -212,9 +215,6 @@ target_link_libraries(litert_lm_main
       LITERTLM_DEPS     
       proto_lib
       json_lib          
-      
-    # [CRITICAL] End the Linker Group
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 )
 
 # Android Specifics

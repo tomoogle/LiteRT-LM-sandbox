@@ -233,6 +233,7 @@ target_link_libraries(runtime_util_litert_lm_loader
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
+    LiteRTLM::Schema::Core
   PRIVATE
     LITERTLM_DEPS
     litert_libs

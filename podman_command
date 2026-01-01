@@ -1,0 +1,1 @@
+podman container create --interactive --tty --name litert_lm --replace litert_lm:latest && podman start --attach litert_lm
