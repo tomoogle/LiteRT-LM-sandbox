@@ -19,24 +19,19 @@ target_include_directories(c_engine
 
 target_link_libraries(c_engine
   PRIVATE
-    # [CRITICAL] Wrap dependencies to handle circular references in static build
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-      
-      # --- External Dependencies ---
-      litert_libs       # Covers @litert//litert/c/internal:litert_logging
-      LITERTLM_DEPS     # Covers absl (log, status, strings, etc.)
-      proto_lib         # Covers engine_cc_proto & sampler_params_cc_proto
+    # --- External Dependencies ---
+    litert_libs       # Covers @litert//litert/c/internal:litert_logging
+    LITERTLM_DEPS     # Covers absl (log, status, strings, etc.)
+    proto_lib         # Covers engine_cc_proto & sampler_params_cc_proto
 
-      # --- Internal Dependencies ---
-      LiteRTLM::Runtime::Conversation
-      LiteRTLM::Runtime::Conversation::IoTypes
-      LiteRTLM::Runtime::Core::EngineImpl
-      LiteRTLM::Runtime::Engine::Interface
-      LiteRTLM::Runtime::Engine::Settings
-      LiteRTLM::Runtime::Engine::IoTypes
-      LiteRTLM::Runtime::Executor::ExecutorSettingsBase
-      
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+    # --- Internal Dependencies ---
+    LiteRTLM::Runtime::Conversation
+    LiteRTLM::Runtime::Conversation::IoTypes
+    LiteRTLM::Runtime::Core::EngineImpl
+    LiteRTLM::Runtime::Engine::Interface
+    LiteRTLM::Runtime::Engine::Settings
+    LiteRTLM::Runtime::Engine::IoTypes
+    LiteRTLM::Runtime::Executor::ExecutorSettingsBase
 )
 
 # ==============================================================================

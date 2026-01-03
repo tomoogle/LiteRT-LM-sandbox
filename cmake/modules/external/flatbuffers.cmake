@@ -47,12 +47,10 @@ endif()
 
 import_static_lib(imp_flatbuffers "${FLATBUFFERS_LIB_DIR}/libflatbuffers.a")
 
-# [FIX] 3. Create the Interface Library
 add_library(flatbuffers_libs INTERFACE)
 target_link_libraries(flatbuffers_libs INTERFACE imp_flatbuffers)
 target_include_directories(flatbuffers_libs INTERFACE ${FLATBUFFERS_INCLUDE_DIR})
 
-# [FIX] 4. Compile Schema (Keep existing logic)
 set(schema_fbs
   "${PROJECT_ROOT}/schema/core/litertlm_header_schema.fbs"
 )

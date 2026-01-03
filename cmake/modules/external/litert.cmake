@@ -236,9 +236,16 @@ target_link_libraries(litert_libs INTERFACE
     imp_litert_core_model
     imp_litert_runtime
     imp_litert_logging
+
+    tflite_libs
+    farmhash
+    proto_lib
+    flatbuffers_libs
+    absl_libs  
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
   tflite_libs
-  absl_libs
-  flatbuffers_libs
   farmhash
+  proto_lib
+  flatbuffers_libs
+  absl_libs  
 )

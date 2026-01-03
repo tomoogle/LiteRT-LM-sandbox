@@ -18,10 +18,10 @@ set(SENTENCE_LIBRARY_TRAIN  "${SENTENCE_LIB_DIR}/libsentencepiece_train.a")
 set(ABSL_LINK_FLAGS "-L${ABSL_LIB_DIR} -Wl,--start-group -l:libabsl_*.a -Wl,--end-group -lpthread")
 
 
-file(GLOB_RECURSE ABSL_ALL_LIBS "${ABSL_INSTALL_PREFIX}/lib/libabsl_*.a")
+# file(GLOB_RECURSE ABSL_ALL_LIBS "${ABSL_INSTALL_PREFIX}/lib/libabsl_*.a")
 
-# CMake lists use semicolons (;). The linker needs spaces.
-string(REPLACE ";" " " ABSL_LIBS_STR "${ABSL_ALL_LIBS}")
+# # CMake lists use semicolons (;). The linker needs spaces.
+# string(REPLACE ";" " " ABSL_LIBS_STR "${ABSL_ALL_LIBS}")
 
 
 if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
@@ -68,30 +68,84 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
       "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
       "-DCMAKE_CXX_STANDARD_LIBRARIES= \
-          -lprotobuf -lutf8_range \
-          -Wl,--start-group \
-          -labsl_leak_check \
-          -labsl_log_internal_proto \
-          -labsl_log_internal_message \
-          -labsl_log_internal_check_op \
-          -labsl_log_severity \
-          -labsl_cord -labsl_cord_internal -labsl_cordz_handle \
-          -labsl_cordz_info -labsl_cordz_functions -labsl_cordz_sample_token \
-          -labsl_crc_cord_state -labsl_crc32c -labsl_crc_internal -labsl_crc_cpu_detect \
-          -labsl_exponential_biased \
-          -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_examine_stack \
-          -labsl_log_internal_globals -labsl_log_globals -labsl_log_sink \
-          -labsl_log_internal_log_sink_set -labsl_log_internal_format \
-          -labsl_log_internal_conditions -labsl_log_internal_nullguard \
-          -labsl_log_internal_fnmatch \
-          -labsl_status -labsl_statusor -labsl_raw_logging_internal \
-          -labsl_base -labsl_throw_delegate -labsl_int128 \
-          -labsl_strings -labsl_strings_internal -labsl_string_view \
-          -labsl_strerror \
-          -labsl_synchronization \
-          -labsl_time -labsl_time_zone -labsl_utf8_for_code_point \
-          -Wl,--end-group \
-          -lpthread"
+                -lprotobuf -lutf8_range \
+                -Wl,--start-group \
+                -labsl_leak_check \
+                -labsl_log_internal_proto \
+                -labsl_log_internal_message \
+                -labsl_log_internal_structured_proto \
+                -labsl_log_internal_check_op \
+                -labsl_log_severity \
+                -labsl_cord \
+                -labsl_cord_internal \
+                -labsl_cordz_handle \
+                -labsl_cordz_info \
+                -labsl_cordz_functions \
+                -labsl_cordz_sample_token \
+                -labsl_crc_cord_state \
+                -labsl_crc32c \
+                -labsl_crc_internal\
+                -labsl_crc_cpu_detect \
+                -labsl_exponential_biased \
+                -labsl_symbolize \
+                -labsl_stacktrace \
+                -labsl_tracing_internal \
+                -labsl_debugging_internal \
+                -labsl_examine_stack \
+                -labsl_demangle_internal \
+                -labsl_demangle_rust \
+                -labsl_decode_rust_punycode \
+                -labsl_log_internal_globals \
+                -labsl_log_globals \
+                -labsl_log_sink \
+                -labsl_log_internal_log_sink_set \
+                -labsl_log_internal_format \
+                -labsl_log_internal_conditions \
+                -labsl_log_internal_nullguard \
+                -labsl_log_internal_fnmatch \
+                -labsl_status \
+                -labsl_statusor \
+                -labsl_raw_logging_internal \
+                -labsl_base \
+                -labsl_spinlock_wait \
+                -labsl_malloc_internal \
+                -labsl_failure_signal_handler \
+                -labsl_throw_delegate \
+                -labsl_int128 \
+                -labsl_strings \
+                -labsl_strings_internal \
+                -labsl_string_view \
+                -labsl_strerror \
+                -labsl_poison \
+                -labsl_bad_any_cast_impl \
+                -labsl_bad_optional_access \
+                -labsl_bad_variant_access \
+                -labsl_synchronization \
+                -labsl_periodic_sampler \
+                -labsl_scoped_set_env \
+                -labsl_kernel_timeout_internal \
+                -labsl_time \
+                -labsl_time_zone \
+                -labsl_hash \
+                -labsl_city \
+                -labsl_low_level_hash \
+                -labsl_raw_hash_set \
+                -labsl_utf8_for_code_point \
+                -labsl_hashtablez_sampler \
+                -labsl_flags_parse \
+                -labsl_flags_usage \
+                -labsl_flags_usage_internal \
+                -labsl_flags_marshalling \
+                -labsl_flags_internal \
+                -labsl_flags_reflection \
+                -labsl_flags_config \
+                -labsl_flags_commandlineflag \
+                -labsl_flags_commandlineflag_internal \
+                -labsl_flags_private_handle_accessor \
+                -labsl_flags_program_name \
+                -labsl_die_if_null \
+                -Wl,--end-group \
+                -lpthread"
 
       # Provider Settings
       -DSPM_ABSL_PROVIDER=package
@@ -127,14 +181,15 @@ import_static_lib(imp_sentencepiece_train "${SENTENCE_LIBRARY_TRAIN}")
 add_library(sentencepiece_libs INTERFACE)
 add_dependencies(sentencepiece_libs 
   sentencepiece_external
-  absl_libs
   proto_lib
+  absl_libs
 )
 target_include_directories(sentencepiece_libs INTERFACE ${SENTENCE_INCLUDE_DIR})
 
 target_link_libraries(sentencepiece_libs INTERFACE 
-    imp_sentencepiece
     imp_sentencepiece_train
-    absl_libs 
+    imp_sentencepiece
+
     proto_lib
+    absl_libs
 )

@@ -12,8 +12,6 @@ target_include_directories(schema_cc_litertlm_export_main
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERT_INCLUDE_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-    ${THIRD_PARTY_DIR}
 )
 
 target_link_libraries(schema_cc_litertlm_export_main
@@ -23,10 +21,10 @@ target_link_libraries(schema_cc_litertlm_export_main
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
   PRIVATE
-    LITERTLM_DEPS
     litert_libs
     proto_lib
     flatbuffers_libs
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
@@ -54,8 +52,8 @@ target_link_libraries(schema_cc_litertlm_peek
     LiteRTLM::Schema::Core::Read
     LiteRTLM::Schema::Core::Section
   PRIVATE
-    LITERTLM_DEPS
     litert_libs
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
@@ -83,10 +81,10 @@ target_link_libraries(schema_cc_litertlm_writer
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
   PRIVATE
-    LITERTLM_DEPS
     litert_libs
     proto_lib
     flatbuffers_libs # [FIX] Added missing dependency
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
@@ -113,10 +111,10 @@ target_link_libraries(schema_cc_litertlm_writer_utils
     LiteRTLM::Schema::Core::Section
     LiteRTLM::Schema::Core::Utils
   PRIVATE
-    LITERTLM_DEPS
     proto_lib
     litert_libs
     flatbuffers_libs
+    LITERTLM_DEPS
 )
 
 # ==============================================================================

@@ -172,7 +172,6 @@ target_link_libraries(runtime_engine_litert_lm_advanced_main
 
       runtime_util_litert_status_util
       
-      litert_libs
       LITERTLM_DEPS
 )
 
@@ -184,7 +183,6 @@ add_litertlm_executable(litert_lm_main
   litert_lm_main.cc
 )
 
-# [CRITICAL] Export LiteRt symbols so the runtime can find them
 target_link_options(litert_lm_main PRIVATE
   "LINKER:--export-dynamic-symbol=LiteRt*"
 )

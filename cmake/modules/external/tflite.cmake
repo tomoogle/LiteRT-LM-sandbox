@@ -37,6 +37,14 @@ ExternalProject_Add(
     sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 1/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     # sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
+    COMMAND bash -c "echo 'target_sources(tensorflow-lite PRIVATE \
+            \${TF_SOURCE_DIR}/compiler/mlir/lite/allocation.cc \
+            \${TF_SOURCE_DIR}/compiler/mlir/lite/mmap_allocation.cc \
+            \${TF_SOURCE_DIR}/compiler/mlir/lite/core/model_builder_base.cc \
+            \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/error_reporter.cc \
+            \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/flatbuffer_conversions.cc \
+            )' >> <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt"
+
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
@@ -152,8 +160,9 @@ target_include_directories(tflite_libs SYSTEM INTERFACE
   ${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy
 )
 target_link_libraries(tflite_libs INTERFACE
+    imp_libtflite
+    imp_xnnpack_delegate
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-        imp_libtflite
         imp_xnnpack_delegate
         imp_XNNPACK
         imp_cpuinfo
@@ -192,7 +201,18 @@ target_link_libraries(tflite_libs INTERFACE
         imp_ruy_tune
         imp_ruy_wait
         imp_xnnpack-microkernels-prod
+        imp_libtflite
+        flatbuffers_libs    
+        absl_libs
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
     flatbuffers_libs    
     absl_libs
+)
+
+
+set(TENSORFLOW_MISSING_SRCS
+    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/allocation.cc"
+    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/mmap_allocation.cc"
+    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/core/api/error_reporter.cc"
+    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/core/model_builder_base.cc"
 )

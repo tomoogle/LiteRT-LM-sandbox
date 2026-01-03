@@ -104,7 +104,6 @@ target_link_libraries(proto_lib
     protobuf::libprotobuf
   PRIVATE
     imp_absl_base
-    # [FIX] Add these so the linker finds the UTF-8 symbols!
     imp_utf8_validity
     imp_utf8_range
 )

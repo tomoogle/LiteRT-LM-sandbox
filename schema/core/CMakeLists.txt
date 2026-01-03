@@ -16,6 +16,7 @@ target_include_directories(schema_core_litertlm_header_schema
 target_link_libraries(schema_core_litertlm_header_schema
   INTERFACE
     flatbuffers_libs
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
@@ -58,9 +59,9 @@ target_link_libraries(schema_core_litertlm_utils
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
   PRIVATE
-    LITERTLM_DEPS
     litert_libs
     flatbuffers_libs
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
@@ -69,12 +70,14 @@ target_link_libraries(schema_core_litertlm_utils
 # ==============================================================================
 add_litertlm_library(schema_core_litertlm_read STATIC
   litertlm_read.cc
+  ${TFLITE_MISSING_SRCS}
 )
 add_library(LiteRTLM::Schema::Core::Read ALIAS schema_core_litertlm_read)
 
 target_include_directories(schema_core_litertlm_read
   PRIVATE
     ${GENERATED_SRC_DIR}
+    ${TENSORFLOW_INCLUDE_SIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
@@ -87,11 +90,11 @@ target_link_libraries(schema_core_litertlm_read
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Utils
   PRIVATE 
-    LITERTLM_DEPS
     litert_libs
     proto_lib
     sentencepiece_libs
     zlib_lib
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
@@ -137,10 +140,10 @@ target_link_libraries(schema_core_litertlm_export
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
     LiteRTLM::Schema::Core::Utils
-    LITERTLM_DEPS
     litert_libs
     proto_lib
     flatbuffers_libs
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
@@ -163,9 +166,9 @@ target_link_libraries(schema_core_litertlm_print
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Read   
     LiteRTLM::Schema::Core::Utils  
-  PRIVATE 
-    LITERTLM_DEPS
+  PRIVATE
     litert_libs
+    LITERTLM_DEPS
 )
 
 # ==============================================================================
