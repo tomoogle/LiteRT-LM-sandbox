@@ -15,7 +15,7 @@ set(SENTENCE_LIBRARY_STATIC "${SENTENCE_LIB_DIR}/libsentencepiece.a")
 set(SENTENCE_LIBRARY_TRAIN  "${SENTENCE_LIB_DIR}/libsentencepiece_train.a")
 
 
-set(ABSL_LINK_FLAGS "-L${ABSL_LIB_DIR} -Wl,--start-group -l:libabsl_*.a -Wl,--end-group -lpthread")
+# set(ABSL_LINK_FLAGS "-L${ABSL_LIB_DIR} -Wl,--start-group -l:libabsl_*.a -Wl,--end-group -lpthread")
 
 
 # file(GLOB_RECURSE ABSL_ALL_LIBS "${ABSL_INSTALL_PREFIX}/lib/libabsl_*.a")
@@ -65,7 +65,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DCMAKE_PREFIX_PATH="${ABSL_INSTALL_PREFIX};${PROTO_INSTALL_PREFIX}"
 
       # "-DCMAKE_EXE_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
-      "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
+      # "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
       "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
       "-DCMAKE_CXX_STANDARD_LIBRARIES= \
                 -lprotobuf -lutf8_range \

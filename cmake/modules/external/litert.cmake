@@ -182,6 +182,87 @@ ExternalProject_Add(
     -DLITERT_DISABLE_KLEIDIAI=OFF
     -DLITERT_BUILD_C_API=ON
     -DLITERT_BUILD_TOOLS=OFF
+    # "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
+    "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
+    "-DCMAKE_CXX_STANDARD_LIBRARIES= \
+              -lprotobuf -lutf8_range \
+              -Wl,--start-group \
+              -labsl_leak_check \
+              -labsl_log_internal_proto \
+              -labsl_log_internal_message \
+              -labsl_log_internal_structured_proto \
+              -labsl_log_internal_check_op \
+              -labsl_log_severity \
+              -labsl_cord \
+              -labsl_cord_internal \
+              -labsl_cordz_handle \
+              -labsl_cordz_info \
+              -labsl_cordz_functions \
+              -labsl_cordz_sample_token \
+              -labsl_crc_cord_state \
+              -labsl_crc32c \
+              -labsl_crc_internal\
+              -labsl_crc_cpu_detect \
+              -labsl_exponential_biased \
+              -labsl_symbolize \
+              -labsl_stacktrace \
+              -labsl_tracing_internal \
+              -labsl_debugging_internal \
+              -labsl_examine_stack \
+              -labsl_demangle_internal \
+              -labsl_demangle_rust \
+              -labsl_decode_rust_punycode \
+              -labsl_log_internal_globals \
+              -labsl_log_globals \
+              -labsl_log_sink \
+              -labsl_log_internal_log_sink_set \
+              -labsl_log_internal_format \
+              -labsl_log_internal_conditions \
+              -labsl_log_internal_nullguard \
+              -labsl_log_internal_fnmatch \
+              -labsl_status \
+              -labsl_statusor \
+              -labsl_raw_logging_internal \
+              -labsl_base \
+              -labsl_spinlock_wait \
+              -labsl_malloc_internal \
+              -labsl_failure_signal_handler \
+              -labsl_throw_delegate \
+              -labsl_int128 \
+              -labsl_strings \
+              -labsl_strings_internal \
+              -labsl_string_view \
+              -labsl_strerror \
+              -labsl_poison \
+              -labsl_bad_any_cast_impl \
+              -labsl_bad_optional_access \
+              -labsl_bad_variant_access \
+              -labsl_synchronization \
+              -labsl_periodic_sampler \
+              -labsl_scoped_set_env \
+              -labsl_kernel_timeout_internal \
+              -labsl_time \
+              -labsl_time_zone \
+              -labsl_hash \
+              -labsl_city \
+              -labsl_low_level_hash \
+              -labsl_raw_hash_set \
+              -labsl_utf8_for_code_point \
+              -labsl_hashtablez_sampler \
+              -labsl_flags_parse \
+              -labsl_flags_usage \
+              -labsl_flags_usage_internal \
+              -labsl_flags_marshalling \
+              -labsl_flags_internal \
+              -labsl_flags_reflection \
+              -labsl_flags_config \
+              -labsl_flags_commandlineflag \
+              -labsl_flags_commandlineflag_internal \
+              -labsl_flags_private_handle_accessor \
+              -labsl_flags_program_name \
+              -labsl_die_if_null \
+              -Wl,--end-group \
+              -lpthread"
 
   INSTALL_COMMAND ""
 )
