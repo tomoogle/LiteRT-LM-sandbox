@@ -118,7 +118,8 @@ set(CMAKE_SHARED_LINKER_FLAGS
     -L${PROTO_INSTALL_PREFIX}/lib \
     -L${TFLITE_LIB_DIR} \
     -L${TFLITE_BUILD_DIR} \
-    -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy"
+    -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy \
+    -L${LITERT_INCLUDE_PATHS}"
 )
 set(CMAKE_CXX_STANDARD_LIBRARIES
                 "-lprotobuf -lutf8_range \
