@@ -23,6 +23,6 @@ target_link_libraries(LITERTLM_DEPS INTERFACE
     absl_libs
 )
 
-target_include_directories(LITERTLM_DEPS INTERFACE
+target_include_directories(LITERTLM_DEPS SYSTEM INTERFACE
     ${LITERTLM_INCLUDE_PATHS}
 )

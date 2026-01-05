@@ -11,7 +11,8 @@ add_litertlm_executable(schema_cc_litertlm_export_main
 target_include_directories(schema_cc_litertlm_export_main 
   PRIVATE
     ${GENERATED_SRC_DIR}
-    ${LITERT_INCLUDE_DIR}
+    # ${LITERT_INCLUDE_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
 )
 
 target_link_libraries(schema_cc_litertlm_export_main
@@ -37,20 +38,21 @@ add_litertlm_executable(schema_cc_litertlm_peek
 
 target_include_directories(schema_cc_litertlm_peek 
   PRIVATE
-    ${THIRD_PARTY_DIR}
     ${GENERATED_SRC_DIR}
     ${CMAKE_BINARY_DIR}
-    ${LITERT_INCLUDE_DIR}
+    # ${LITERT_INCLUDE_PATHS}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
 target_link_libraries(schema_cc_litertlm_peek
   PUBLIC
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+    LiteRTLM::Schema::Core::Read
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Print
-    LiteRTLM::Schema::Core::Read
     LiteRTLM::Schema::Core::Section
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
   PRIVATE
     litert_libs
     LITERTLM_DEPS
@@ -83,7 +85,7 @@ target_link_libraries(schema_cc_litertlm_writer
   PRIVATE
     litert_libs
     proto_lib
-    flatbuffers_libs # [FIX] Added missing dependency
+    flatbuffers_libs
     LITERTLM_DEPS
 )
 

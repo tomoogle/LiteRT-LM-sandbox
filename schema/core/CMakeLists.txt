@@ -69,15 +69,15 @@ target_link_libraries(schema_core_litertlm_utils
 #    Bazel: cc_library(name = "litertlm_read", ...)
 # ==============================================================================
 add_litertlm_library(schema_core_litertlm_read STATIC
+  # tf_proxy.cc
   litertlm_read.cc
-  ${TFLITE_MISSING_SRCS}
 )
 add_library(LiteRTLM::Schema::Core::Read ALIAS schema_core_litertlm_read)
 
 target_include_directories(schema_core_litertlm_read
   PRIVATE
     ${GENERATED_SRC_DIR}
-    ${TENSORFLOW_INCLUDE_SIR}
+    ${TENSORFLOW_SOURCE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
@@ -89,11 +89,9 @@ target_link_libraries(schema_core_litertlm_read
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Utils
+    tflite_libs
   PRIVATE 
     litert_libs
-    proto_lib
-    sentencepiece_libs
-    zlib_lib
     LITERTLM_DEPS
 )
 

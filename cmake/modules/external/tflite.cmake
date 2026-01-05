@@ -12,6 +12,9 @@ set(TENSORFLOW_SOURCE_DIR ${TFLITE_EXT_PREFIX}/src/tflite_external)
 
 set(TFLITE_STATIC_LIB "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
 
+set(RUY_INCLUDE_DIR ${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build)
+
+
 if(NOT EXISTS "${TFLITE_STATIC_LIB}")
   message(STATUS "TFLite not found. Configuring external build...")
 
@@ -37,13 +40,17 @@ ExternalProject_Add(
     sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 1/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     # sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
-    COMMAND bash -c "echo 'target_sources(tensorflow-lite PRIVATE \
-            \${TF_SOURCE_DIR}/compiler/mlir/lite/allocation.cc \
-            \${TF_SOURCE_DIR}/compiler/mlir/lite/mmap_allocation.cc \
-            \${TF_SOURCE_DIR}/compiler/mlir/lite/core/model_builder_base.cc \
-            \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/error_reporter.cc \
-            \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/flatbuffer_conversions.cc \
-            )' >> <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt"
+    # COMMAND bash -c "echo 'target_sources(tensorflow-lite PRIVATE \
+    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/allocation.cc \
+    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/mmap_allocation.cc \
+    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/core/model_builder_base.cc \
+    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/error_reporter.cc \
+    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/flatbuffer_conversions.cc \
+    #         )' >> <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt"
+
+    COMMAND sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h
+    COMMAND sed -i "s/FLATBUFFERS_VERSION_MINOR == 3/FLATBUFFERS_VERSION_MINOR >= 0/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h
+    COMMAND sed -i "s/FLATBUFFERS_VERSION_REVISION == 25/FLATBUFFERS_VERSION_REVISION >= 0/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h 
 
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
@@ -207,12 +214,4 @@ target_link_libraries(tflite_libs INTERFACE
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
     flatbuffers_libs    
     absl_libs
-)
-
-
-set(TENSORFLOW_MISSING_SRCS
-    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/allocation.cc"
-    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/mmap_allocation.cc"
-    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/core/api/error_reporter.cc"
-    "${TENSORFLOW_SOURCE_DIR}/compiler/mlir/lite/core/model_builder_base.cc"
 )
