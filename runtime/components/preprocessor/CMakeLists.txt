@@ -33,12 +33,12 @@ target_link_libraries(runtime_components_preprocessor_audio_preprocessor_miniaud
     LiteRTLM::Runtime::Components::Preprocessor::MelFilterBank
     runtime_engine_io_types
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    # litert_libs
     # [FIX] Added missing Bazel dependencies
-    miniaudio_lib
-    kissfft_lib
+    # miniaudio_lib
+    # kissfft_lib
 )
 
 # ==============================================================================
@@ -94,9 +94,9 @@ target_include_directories(runtime_components_preprocessor_mel_filterbank
 )
 
 target_link_libraries(runtime_components_preprocessor_mel_filterbank 
-  PRIVATE
+  PUBLIC
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # ==============================================================================
@@ -132,10 +132,8 @@ target_link_libraries(runtime_components_preprocessor_stb_image_preprocessor
     runtime_engine_io_types
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
-    # [FIX] Added missing Bazel dependency
     stb_lib
 )
 

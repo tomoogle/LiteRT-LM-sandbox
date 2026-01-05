@@ -58,9 +58,8 @@ target_include_directories(runtime_util_tensor_buffer_util
 )
 
 target_link_libraries(runtime_util_tensor_buffer_util
-  PRIVATE
+  PUBLIC
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -77,7 +76,6 @@ target_include_directories(runtime_util_litert_status_util
 
 target_link_libraries(runtime_util_litert_status_util 
   INTERFACE
-    litert_libs
     LITERTLM_DEPS 
 )
 
@@ -105,8 +103,6 @@ target_include_directories(runtime_util_scoped_file
 target_link_libraries(runtime_util_scoped_file
   PUBLIC
     LiteRTLM::Runtime::Util::LiteRtStatusUtil 
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -138,8 +134,6 @@ target_link_libraries(runtime_util_memory_mapped_file
   PUBLIC
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::ScopedFile
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -158,7 +152,7 @@ target_include_directories(runtime_util_file_util
 )
 
 target_link_libraries(runtime_util_file_util 
-  PRIVATE
+  PUBLIC
     litert_libs
     LITERTLM_DEPS
 )
@@ -184,8 +178,6 @@ target_link_libraries(runtime_util_file_format_util
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -209,9 +201,7 @@ target_link_libraries(runtime_util_executor_data_util
     LiteRTLM::Runtime::Util::ConvertTensorBuffer
     LiteRTLM::Runtime::Util::TensorBufferUtil
     runtime_executor_llm_executor_io_types # [Restored explicit link]
-  PRIVATE 
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -234,9 +224,7 @@ target_link_libraries(runtime_util_litert_lm_loader
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
     LiteRTLM::Schema::Core
-  PRIVATE
     LITERTLM_DEPS
-    litert_libs
     LiteRTLM::Runtime::Components::ModelResources::Interface # Components
     # Add Schema lib if available, usually handled via headers
 )
@@ -274,7 +262,7 @@ target_include_directories(runtime_util_logging_tensor_buffer
 )
 
 target_link_libraries(runtime_util_logging_tensor_buffer 
-  PRIVATE
+  PUBLIC
     litert_libs
     LITERTLM_DEPS
 )
@@ -299,10 +287,8 @@ target_link_libraries(runtime_util_lora_util
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
-    re2_libs # [FIX] Explicit dependency
+    # re2_libs # [FIX] Explicit dependency
 )
 
 # ==============================================================================
@@ -324,10 +310,8 @@ target_link_libraries(runtime_util_lora_data
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::LoRAUtil
     LiteRTLM::Runtime::Util::ScopedFile
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
-    flatbuffers_libs # [FIX] Explicit dependency
+    # flatbuffers_libs # [FIX] Explicit dependency
 )
 
 # ==============================================================================
@@ -345,9 +329,7 @@ target_include_directories(runtime_util_metadata_util
 )
 
 target_link_libraries(runtime_util_metadata_util
-  PRIVATE
-    proto_lib
-    litert_libs
+  PUBLIC
     LITERTLM_DEPS
 )
 
@@ -368,12 +350,8 @@ target_include_directories(runtime_util_zip_readonly_mem_file
 )
 
 target_link_libraries(runtime_util_zip_readonly_mem_file 
-  PRIVATE
+  PUBLIC
     LITERTLM_DEPS
-    litert_libs
-    proto_lib
-    minizip_lib # [FIX] Explicit dependency
-    zlib_lib    # [FIX] Explicit dependency
 )
 
 # ==============================================================================
@@ -397,12 +375,7 @@ target_link_libraries(runtime_util_zip_utils
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Util::ZipReadonlyMemFile
     runtime_util_external_file_cc_proto # [FIX] Link Local Proto
-  PRIVATE
     LITERTLM_DEPS
-    litert_libs
-    proto_lib
-    minizip_lib # [FIX] Explicit dependency
-    zlib_lib    # [FIX] Explicit dependency
 )
 
 # ==============================================================================
@@ -425,8 +398,6 @@ target_link_libraries(runtime_util_model_asset_bundle_resources
     LiteRTLM::Runtime::Util::MemoryMappedFile
     LiteRTLM::Runtime::Util::ScopedFile
     LiteRTLM::Runtime::Util::ZipUtils
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -448,9 +419,6 @@ target_link_libraries(runtime_util_model_type_utils
   PUBLIC
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
     LiteRTLM::Runtime::Components::Tokenizer::Interface # Components
-  PRIVATE
-    proto_lib
-    litert_libs
     LITERTLM_DEPS
 )
 

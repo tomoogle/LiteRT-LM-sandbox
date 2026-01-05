@@ -28,9 +28,9 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_end_o
   PUBLIC
     LiteRTLM::Runtime::Components::EmbeddingLookup::Interface
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    # litert_libs
 )
 
 # --- Manager ---
@@ -53,9 +53,9 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_manag
     LiteRTLM::Runtime::Components::EmbeddingLookup::MultiModal
     LiteRTLM::Runtime::Components::EmbeddingLookup::Text
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Multi Modal ---
@@ -76,9 +76,9 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_multi
     LiteRTLM::Runtime::Components::EmbeddingLookup::Interface
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Text ---
@@ -98,9 +98,9 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_text
   PUBLIC
     LiteRTLM::Runtime::Components::EmbeddingLookup::Interface
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Facade ---

@@ -19,9 +19,9 @@ target_link_libraries(runtime_components_tool_use_json_parser_utils
   PUBLIC
     LiteRTLM::Runtime::Components::ToolUse::ParserCommon # (Defined below)
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Json  # Inherits generated headers path automatically
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Parser Common ---
@@ -39,9 +39,9 @@ target_include_directories(runtime_components_tool_use_parser_common
 target_link_libraries(runtime_components_tool_use_parser_common
   PUBLIC
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Parser Utils ---
@@ -63,11 +63,11 @@ target_link_libraries(runtime_components_tool_use_parser_utils
     LiteRTLM::Runtime::Components::ToolUse::JsonUtils
     LiteRTLM::Runtime::Components::ToolUse::PythonUtils
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
     # [FIX] Added missing RE2 dependency
-    re2_libs
+    # re2_libs
 )
 
 # --- Python Parser Utils ---
@@ -86,9 +86,9 @@ target_link_libraries(runtime_components_tool_use_python_parser_utils
   PUBLIC
     LiteRTLM::Runtime::Components::ToolUse::ParserCommon
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Python
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Python Tool Format Utils ---
@@ -107,9 +107,9 @@ target_link_libraries(runtime_components_tool_use_python_tool_format_utils
   PUBLIC
     runtime_util_litert_status_util
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Folder Facade ---

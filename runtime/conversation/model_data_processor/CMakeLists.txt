@@ -29,10 +29,7 @@ target_include_directories(runtime_conversation_model_data_processor_data_utils
 target_link_libraries(runtime_conversation_model_data_processor_data_utils
   PUBLIC
     runtime_util_memory_mapped_file
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
-    json_lib
 )
 
 # ==============================================================================
@@ -125,7 +122,6 @@ target_link_libraries(runtime_conversation_model_data_processor_gemma3_data_proc
     runtime_util_memory_mapped_file
     LiteRTLM::Runtime::Conversation::Processor::DataUtils  
     LiteRTLM::Runtime::Conversation::Processor::Interface     
-  PRIVATE
     LITERTLM_DEPS
     litert_libs
     json_lib
@@ -154,7 +150,6 @@ target_link_libraries(runtime_conversation_model_data_processor_generic_data_pro
     runtime_engine_io_types
     runtime_util_litert_status_util
     LiteRTLM::Runtime::Conversation::Processor::Interface
-  PRIVATE
     LITERTLM_DEPS
     litert_libs
     json_lib
@@ -183,7 +178,6 @@ target_link_libraries(runtime_conversation_model_data_processor_qwen3_data_proce
     runtime_conversation_io_types
     runtime_engine_io_types
     runtime_util_litert_status_util
-  PRIVATE  
     litert_libs
     LITERTLM_DEPS
     json_lib
@@ -216,7 +210,6 @@ target_link_libraries(runtime_conversation_model_data_processor_factory
     LiteRTLM::Runtime::Components::Tokenizer::Interface
     LiteRTLM::Runtime::Conversation::IoTypes
     runtime_util_litert_status_util
-  PRIVATE
     proto_lib
     litert_libs
     LITERTLM_DEPS

@@ -32,7 +32,6 @@ target_link_libraries(runtime_conversation_conversation
     # runtime_engine_io_types (Likely defined in runtime/engine)
     runtime_util_litert_status_util
 
-  PRIVATE
     proto_lib
     LITERTLM_DEPS
     litert_libs
@@ -56,7 +55,6 @@ target_link_libraries(runtime_conversation_internal_callback_util
     LiteRTLM::Runtime::Conversation::Processor::ConfigRegistry
     LiteRTLM::Runtime::Conversation::Processor::Interface
     # runtime_engine_io_types (Likely defined in runtime/engine)
-  PRIVATE
     LITERTLM_DEPS
     litert_libs
 )
@@ -74,7 +72,7 @@ target_include_directories(runtime_conversation_io_types
 )
 
 target_link_libraries(runtime_conversation_io_types
-  PRIVATE 
+  PUBLIC 
     LITERTLM_DEPS
     litert_libs
 )

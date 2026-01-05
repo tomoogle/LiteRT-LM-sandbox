@@ -35,7 +35,7 @@ target_link_libraries(runtime_core_tasks
     runtime_framework_threadpool
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
-  PRIVATE
+  
     litert_libs
     proto_lib
     LITERTLM_DEPS
@@ -79,7 +79,7 @@ target_link_libraries(runtime_core_pipeline
     
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
     litert_libs
     proto_lib
@@ -107,7 +107,7 @@ target_link_libraries(runtime_core_session_utils
     runtime_engine_engine_settings
     runtime_engine_io_types
     runtime_util_litert_status_util
-  PRIVATE
+  
     litert_libs
     proto_lib
     LITERTLM_DEPS
@@ -158,7 +158,7 @@ target_link_libraries(runtime_core_session_basic
     runtime_util_litert_status_util
     runtime_util_model_type_utils
     runtime_util_tensor_buffer_util
-  PRIVATE
+  
     LITERTLM_DEPS
     litert_libs
     proto_lib
@@ -191,7 +191,7 @@ target_link_libraries(runtime_core_session_factory
     runtime_executor_vision_executor
     runtime_framework_threadpool
     runtime_util_litert_status_util
-  PRIVATE
+  
     LITERTLM_DEPS
     litert_libs
     proto_lib
@@ -247,7 +247,7 @@ target_link_libraries(runtime_core_engine_impl
     # runtime_executor_default_static_gpu_accelerator
     # LiteRTLM::Runtime::Components::Sampler::GPU
     
-  PRIVATE
+  
     proto_lib
     LITERTLM_DEPS
     litert_libs
@@ -291,7 +291,6 @@ target_link_libraries(runtime_core_engine_impl_cpu_only
     runtime_executor_llm_litert_compiled_model_executor_factory
     runtime_util_file_format_util
     runtime_util_litert_status_util
-  PRIVATE
     litert_libs
     LITERTLM_DEPS
     proto_lib

@@ -106,9 +106,20 @@ add_compile_definitions(
 # # set(CMAKE_EXE_LINKER_FLAGS "${ABSL_LINK_FLAGS}")
 # # set(CMAKE_SHARED_LINKER_FLAGS "${ABSL_LINK_FLAGS}")
 
-set(CMAKE_EXE_LINKER_FLAGS " -L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib")
-set(CMAKE_SHARED_LINKER_FLAGS  " -L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib")
-
+set(CMAKE_EXE_LINKER_FLAGS
+    " -L${ABSL_LIB_DIR} \
+    -L${PROTO_INSTALL_PREFIX}/lib \
+    -L${TFLITE_LIB_DIR} \
+    -L${TFLITE_BUILD_DIR} \
+    -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy"
+)
+set(CMAKE_SHARED_LINKER_FLAGS
+    " -L${ABSL_LIB_DIR} \
+    -L${PROTO_INSTALL_PREFIX}/lib \
+    -L${TFLITE_LIB_DIR} \
+    -L${TFLITE_BUILD_DIR} \
+    -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy"
+)
 set(CMAKE_CXX_STANDARD_LIBRARIES
                 "-lprotobuf -lutf8_range \
                 -Wl,--start-group \
@@ -186,6 +197,61 @@ set(CMAKE_CXX_STANDARD_LIBRARIES
                 -labsl_flags_private_handle_accessor \
                 -labsl_flags_program_name \
                 -labsl_die_if_null \
+                -ltensorflow-lite \
+
+                -lXNNPACK \
+                -lxnnpack-microkernels-prod \
+                -lxnnpack-delegate \
+                -lcpuinfo \
+                -lpthreadpool \
+
+                -leight_bit_int_gemm \
+                -lfft2d_fftsg \
+                -lfft2d_fftsg2d \
+                -lfarmhash \
+                -lflatbuffers \
+
+                -lruy_allocator \
+                -lruy_apply_multiplier \
+                -lruy_block_map \
+                -lruy_blocking_counter \
+                -lruy_context \
+                -lruy_context_get_ctx \
+                -lruy_cpuinfo \
+                -lruy_ctx \
+                -lruy_denormal \
+                -lruy_frontend \
+                -lruy_have_built_path_for_avx \
+                -lruy_have_built_path_for_avx2_fma \
+                -lruy_have_built_path_for_avx512 \
+                -lruy_kernel_arm \
+                -lruy_kernel_avx \
+                -lruy_kernel_avx2_fma \
+                -lruy_kernel_avx512 \
+                -lruy_pack_arm \
+                -lruy_pack_avx \
+                -lruy_pack_avx2_fma \
+                -lruy_pack_avx512 \
+                -lruy_prepacked_cache \
+                -lruy_prepare_packed_matrices \
+                -lruy_profiler_instrumentation \
+                -lruy_profiler_profiler \
+                -lruy_system_aligned_alloc \
+                -lruy_thread_pool \
+                -lruy_trmul \
+                -lruy_tune \
+                -lruy_wait \
+                -llitert_cc_api \
+                -llitert_cc_options \
+
+                -llitert_c_api \
+                -llitert_c_options \
+                -llitert_logging \
+
+                -llitert_core \
+                -llitert_core_model \
+                -llitert_compiler_plugin \
+                -llitert_runtime \
                 -Wl,--end-group \
                 -lpthread"
 )

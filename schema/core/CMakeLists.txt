@@ -58,9 +58,6 @@ target_link_libraries(schema_core_litertlm_utils
   PUBLIC
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
-  PRIVATE
-    litert_libs
-    flatbuffers_libs
     LITERTLM_DEPS
 )
 
@@ -69,7 +66,7 @@ target_link_libraries(schema_core_litertlm_utils
 #    Bazel: cc_library(name = "litertlm_read", ...)
 # ==============================================================================
 add_litertlm_library(schema_core_litertlm_read STATIC
-  # tf_proxy.cc
+  tf_proxy.cc
   litertlm_read.cc
 )
 add_library(LiteRTLM::Schema::Core::Read ALIAS schema_core_litertlm_read)
@@ -89,9 +86,6 @@ target_link_libraries(schema_core_litertlm_read
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Utils
-    tflite_libs
-  PRIVATE 
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -133,7 +127,7 @@ target_include_directories(schema_core_litertlm_export
 )
 
 target_link_libraries(schema_core_litertlm_export 
-  PRIVATE
+  PUBLIC
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
@@ -164,8 +158,6 @@ target_link_libraries(schema_core_litertlm_print
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Read   
     LiteRTLM::Schema::Core::Utils  
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
 )
 

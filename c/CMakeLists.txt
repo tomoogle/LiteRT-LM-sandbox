@@ -18,10 +18,10 @@ target_include_directories(c_engine
 )
 
 target_link_libraries(c_engine
-  PRIVATE
-    # --- External Dependencies ---
-    litert_libs       # Covers @litert//litert/c/internal:litert_logging
-    proto_lib         # Covers engine_cc_proto & sampler_params_cc_proto
+  PUBLIC
+    # # --- External Dependencies ---
+    # litert_libs       # Covers @litert//litert/c/internal:litert_logging
+    # proto_lib         # Covers engine_cc_proto & sampler_params_cc_proto
     LITERTLM_DEPS     # Covers absl (log, status, strings, etc.)
     
     # --- Internal Dependencies ---

@@ -46,8 +46,7 @@ target_link_libraries(runtime_engine_engine_settings
     runtime_util_litert_status_util
     runtime_util_model_type_utils
     proto_lib
-  PRIVATE
-    litert_libs
+  
     LITERTLM_DEPS 
 )
 
@@ -73,8 +72,7 @@ target_link_libraries(runtime_engine_io_types
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_util_litert_status_util
     proto_lib
-  PRIVATE
-    litert_libs
+  
     LITERTLM_DEPS 
 )
 
@@ -108,15 +106,13 @@ target_link_libraries(runtime_engine_litert_lm_lib
     runtime_executor_llm_executor_settings
     runtime_util_litert_status_util
 
-  PRIVATE
-    # External Dependencies (Bazel deps)
-    litert_libs # Includes MemoryInfo and MemoryUsageMonitor
+  
     LITERTLM_DEPS
     
     # Specific libs required by this file
-    json_lib        # @nlohmann_json//:json
-    re2_libs        # @com_googlesource_code_re2//:re2
-    stb_lib         # @stb//:stb_image
+    # json_lib        # @nlohmann_json//:json
+    # re2_libs        # @com_googlesource_code_re2//:re2
+    # stb_lib         # @stb//:stb_image
 )
 
 # ==============================================================================
@@ -135,8 +131,8 @@ target_include_directories(runtime_engine_shared_flags
 )
 
 target_link_libraries(runtime_engine_shared_flags
-  PRIVATE
-    litert_libs
+  PUBLIC
+    
     LITERTLM_DEPS 
 )
 
@@ -164,7 +160,7 @@ target_include_directories(runtime_engine_litert_lm_advanced_main PRIVATE
 )
 
 target_link_libraries(runtime_engine_litert_lm_advanced_main
-  PRIVATE
+  PUBLIC
       LiteRTLM::Runtime::Engine::IoTypes
       LiteRTLM::Runtime::Engine::Lib
       LiteRTLM::Runtime::Engine::SharedFlags
@@ -194,7 +190,7 @@ target_include_directories(litert_lm_main PRIVATE
 )
 
 target_link_libraries(litert_lm_main
-  PRIVATE      
+  PUBLIC      
       # 1. Internal Components (Mapped from Bazel deps)
       LiteRTLM::Runtime::Engine::Interface
       LiteRTLM::Runtime::Engine::Settings

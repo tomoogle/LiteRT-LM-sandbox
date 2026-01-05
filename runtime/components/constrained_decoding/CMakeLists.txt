@@ -62,8 +62,8 @@ target_link_libraries(runtime_components_constrained_decoding_constrained_decode
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     LiteRTLM::Runtime::Util::ConvertTensorBuffer
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
-  PRIVATE
-    litert_libs     # Covers layout, macros, model, tensor_buffer
+  
+    # litert_libs     # Covers layout, macros, model, tensor_buffer
     LITERTLM_DEPS   # Covers absl
 )
 
@@ -83,7 +83,7 @@ target_link_libraries(runtime_components_constrained_decoding_fake_constraint
   PUBLIC
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Bitmap
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
-  PRIVATE
+  
     LITERTLM_DEPS
 )
 

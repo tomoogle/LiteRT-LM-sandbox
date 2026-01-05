@@ -21,10 +21,6 @@ target_link_libraries(schema_cc_litertlm_export_main
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
-  PRIVATE
-    litert_libs
-    proto_lib
-    flatbuffers_libs
     LITERTLM_DEPS
 )
 
@@ -46,14 +42,11 @@ target_include_directories(schema_cc_litertlm_peek
 
 target_link_libraries(schema_cc_litertlm_peek
   PUBLIC
-  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
     LiteRTLM::Schema::Core::Read
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Print
     LiteRTLM::Schema::Core::Section
-  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
-  PRIVATE
     litert_libs
     LITERTLM_DEPS
 )
@@ -82,10 +75,6 @@ target_link_libraries(schema_cc_litertlm_writer
     LiteRTLM::Schema::Core::Header
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
-  PRIVATE
-    litert_libs
-    proto_lib
-    flatbuffers_libs
     LITERTLM_DEPS
 )
 
@@ -112,10 +101,6 @@ target_link_libraries(schema_cc_litertlm_writer_utils
     LiteRTLM::Schema::Core::Print
     LiteRTLM::Schema::Core::Section
     LiteRTLM::Schema::Core::Utils
-  PRIVATE
-    proto_lib
-    litert_libs
-    flatbuffers_libs
     LITERTLM_DEPS
 )
 

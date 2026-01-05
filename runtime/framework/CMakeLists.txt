@@ -44,8 +44,7 @@ target_include_directories(runtime_framework_threadpool
 
 target_link_libraries(runtime_framework_threadpool
   PUBLIC 
-    LiteRTLM::Framework::ThreadOptions
-  PRIVATE 
+    LiteRTLM::Framework::ThreadOptions 
     LITERTLM_DEPS
     litert_libs
 )

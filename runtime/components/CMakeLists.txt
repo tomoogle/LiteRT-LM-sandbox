@@ -54,8 +54,8 @@ target_link_libraries(runtime_components_huggingface_tokenizer
     LiteRTLM::Runtime::Components::Tokenizer::Interface
     runtime_util_litert_status_util
     runtime_util_memory_mapped_file
-  PRIVATE
-    litert_libs
+  
+    
     LITERTLM_DEPS
     tokenizers_lib # [FIX] Link the actual Tokenizers++ library
 )
@@ -85,7 +85,7 @@ target_link_libraries(runtime_components_sentencepiece_tokenizer
     LiteRTLM::Runtime::Components::Tokenizer::Interface
   PRIVATE
     LITERTLM_DEPS
-    litert_libs
+    
     sentencepiece_libs # [FIX] Link the actual SentencePiece library
 )
 
@@ -107,11 +107,11 @@ target_include_directories(runtime_components_prompt_template
 target_link_libraries(runtime_components_prompt_template
   PUBLIC
     runtime_util_litert_status_util
-  PRIVATE 
+   
     LITERTLM_DEPS
-    litert_libs
-    minja_lib     # [FIX] Link Minja
-    json_lib      # [FIX] Link JSON
+    
+    # minja_lib     # [FIX] Link Minja
+    # json_lib      # [FIX] Link JSON
 )
 
 # ==============================================================================
@@ -135,8 +135,8 @@ target_link_libraries(runtime_components_lora
     runtime_util_litert_status_util
     runtime_util_lora_data
     runtime_util_lora_util
-  PRIVATE
-    litert_libs
+  
+    
     LITERTLM_DEPS
 )
 
@@ -161,8 +161,7 @@ target_link_libraries(runtime_components_lora_manager
     runtime_util_litert_status_util
     runtime_util_lora_data
     runtime_executor_executor_settings_base
-  PRIVATE 
-    litert_libs
+   
     LITERTLM_DEPS
 )
 
@@ -210,10 +209,7 @@ target_link_libraries(runtime_components_model_resources_litert_lm
     LiteRTLM::Runtime::Components::Tokenizer::Interface
     LiteRTLM::Schema::Core
 
-  PRIVATE
-    proto_lib
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -239,10 +235,8 @@ target_link_libraries(runtime_components_model_resources_task
     runtime_util_metadata_util
     LiteRTLM::Runtime::Components::Tokenizer::SentencePiece
     LiteRTLM::Runtime::Components::Tokenizer::Interface
-  PRIVATE
-    proto_lib 
+  
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -286,9 +280,6 @@ target_link_libraries(runtime_components_sampler_factory
     runtime_util_litert_status_util
     LiteRTLM::Runtime::Components::Sampler::Interface
     LiteRTLM::Runtime::Components::Sampler::TopP
-  PRIVATE
-    proto_lib
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -308,9 +299,8 @@ target_include_directories(runtime_components_sampling_cpu_util
 )
 
 target_link_libraries(runtime_components_sampling_cpu_util
-  PRIVATE 
+   PUBLIC
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -332,7 +322,7 @@ target_link_libraries(runtime_components_scoring_cpu_util
   PUBLIC
     LiteRTLM::Runtime::Components::SamplingCpuUtil 
     runtime_util_litert_status_util
-  PRIVATE
+  
     litert_libs
     LITERTLM_DEPS
 )
@@ -352,7 +342,7 @@ target_include_directories(runtime_components_stop_token_detector
 )
 
 target_link_libraries(runtime_components_stop_token_detector
-  PRIVATE
+  PUBLIC
     LITERTLM_DEPS
     litert_libs
 )
@@ -372,7 +362,7 @@ target_include_directories(runtime_components_token_id_util
 )
 
 target_link_libraries(runtime_components_token_id_util
-  PRIVATE
+  PUBLIC
     LITERTLM_DEPS
     litert_libs
 )
@@ -397,9 +387,8 @@ target_link_libraries(runtime_components_top_p_cpu_sampler
     LiteRTLM::Runtime::Components::SamplingCpuUtil
     runtime_util_convert_tensor_buffer
     runtime_util_tensor_buffer_util
-  PRIVATE
+  
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
