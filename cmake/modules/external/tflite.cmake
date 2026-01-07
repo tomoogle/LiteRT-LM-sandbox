@@ -18,6 +18,12 @@ set(RUY_INCLUDE_DIR ${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build)
 if(NOT EXISTS "${TFLITE_STATIC_LIB}")
   message(STATUS "TFLite not found. Configuring external build...")
 
+
+
+set(SHIM_CODE 
+  "add_library(LiteRTLM::absl::absl INTERFACE IMPORTED GLOBAL)
+   set_target_properties(LiteRTLM::absl::absl PROPERTIES INTERFACE_LINK_LIBRARIES \"-Wl,--start-group ${ABSL_LIBS_FLAT} -Wl,--end-group\")")
+
 ExternalProject_Add(
   tflite_external
   DEPENDS 
@@ -38,7 +44,6 @@ ExternalProject_Add(
     tensorflow/lite
   PATCH_COMMAND
     sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 25/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
-    # sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
     COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
     # COMMAND bash -c "echo 'target_sources(tensorflow-lite PRIVATE \
     #         \${TF_SOURCE_DIR}/compiler/mlir/lite/allocation.cc \
@@ -53,7 +58,19 @@ ExternalProject_Add(
     COMMAND sed -i "s/FLATBUFFERS_VERSION_REVISION == 25/FLATBUFFERS_VERSION_REVISION >= 0/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h 
     COMMAND sed -i "s|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}//..//..//..|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}|g" <SOURCE_DIR>/tensorflow/lite/profiling/proto/CMakeLists.txt
 
-  CMAKE_ARGS
+# Kill the TF downloaders
+    COMMAND sed -i "1i return()" <SOURCE_DIR>/tensorflow/lite/tools/cmake/modules/abseil-cpp.cmake
+    COMMAND sed -i "1i return()" <SOURCE_DIR>/tensorflow/lite/tools/cmake/modules/protobuf.cmake
+
+    # Inject BOTH shims
+    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/patches/tflite_absl_shim.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/patches/tflite_proto_shim.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+
+    # RECURSIVE REDIRECTION (The Global Hammer)
+    COMMAND find <SOURCE_DIR>/tensorflow/lite -name "CMakeLists.txt" -exec sed -i "s|[[:space:]]absl::[a-zA-Z0-9_]*| LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/tensorflow/lite -name "CMakeLists.txt" -exec sed -i "s|[[:space:]]protobuf::[a-zA-Z0-9_-]*| LiteRTLM::protobuf::libprotobuf|g" {} +
+
+    CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -105,91 +122,20 @@ ExternalProject_Add(
     -DPNG_FOUND=ON
     -DPNG_LIBRARY=${libpng_lib_BINARY_DIR}/libpng.a
     -DPNG_PNG_INCLUDE_DIR=${libpng_lib_SOURCE_DIR}
-     # "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
-      "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
-      "-DCMAKE_CXX_STANDARD_LIBRARIES= \
-                -lprotobuf -lutf8_range \
-                -Wl,--start-group \
-                -labsl_leak_check \
-                -labsl_log_internal_proto \
-                -labsl_log_internal_message \
-                -labsl_log_internal_structured_proto \
-                -labsl_log_internal_check_op \
-                -labsl_log_severity \
-                -labsl_cord \
-                -labsl_cord_internal \
-                -labsl_cordz_handle \
-                -labsl_cordz_info \
-                -labsl_cordz_functions \
-                -labsl_cordz_sample_token \
-                -labsl_crc_cord_state \
-                -labsl_crc32c \
-                -labsl_crc_internal\
-                -labsl_crc_cpu_detect \
-                -labsl_exponential_biased \
-                -labsl_symbolize \
-                -labsl_stacktrace \
-                -labsl_tracing_internal \
-                -labsl_debugging_internal \
-                -labsl_examine_stack \
-                -labsl_demangle_internal \
-                -labsl_demangle_rust \
-                -labsl_decode_rust_punycode \
-                -labsl_log_internal_globals \
-                -labsl_log_globals \
-                -labsl_log_sink \
-                -labsl_log_internal_log_sink_set \
-                -labsl_log_internal_format \
-                -labsl_log_internal_conditions \
-                -labsl_log_internal_nullguard \
-                -labsl_log_internal_fnmatch \
-                -labsl_status \
-                -labsl_statusor \
-                -labsl_raw_logging_internal \
-                -labsl_base \
-                -labsl_spinlock_wait \
-                -labsl_malloc_internal \
-                -labsl_failure_signal_handler \
-                -labsl_throw_delegate \
-                -labsl_int128 \
-                -labsl_strings \
-                -labsl_strings_internal \
-                -labsl_string_view \
-                -labsl_strerror \
-                -labsl_poison \
-                -labsl_bad_any_cast_impl \
-                -labsl_bad_optional_access \
-                -labsl_bad_variant_access \
-                -labsl_synchronization \
-                -labsl_periodic_sampler \
-                -labsl_scoped_set_env \
-                -labsl_kernel_timeout_internal \
-                -labsl_time \
-                -labsl_time_zone \
-                -labsl_hash \
-                -labsl_city \
-                -labsl_low_level_hash \
-                -labsl_raw_hash_set \
-                -labsl_utf8_for_code_point \
-                -labsl_hashtablez_sampler \
-                -labsl_flags_parse \
-                -labsl_flags_usage \
-                -labsl_flags_usage_internal \
-                -labsl_flags_marshalling \
-                -labsl_flags_internal \
-                -labsl_flags_reflection \
-                -labsl_flags_config \
-                -labsl_flags_commandlineflag \
-                -labsl_flags_commandlineflag_internal \
-                -labsl_flags_private_handle_accessor \
-                -labsl_flags_program_name \
-                -labsl_die_if_null \
-                -Wl,--end-group \
-                -lpthread"
-
-
-
+    "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
+    "-DLITERTLM_ABSL_LIBRARIES=${ABSL_LIBS_FLAT}"
+    "-DCMAKE_CXX_STANDARD_LIBRARIES= -Wl,-z,multidefs\
+        -lpthread"
     
+    "-DLITERTLM_ABSL_LIBRARIES=${ABSL_LIBS_FLAT}"
+    "-DLITERTLM_ABSL_INCLUDE_DIRS=${ABSL_INCLUDE_DIR}"
+
+    "-DLITERTLM_PROTO_LIBRARIES=${PROTO_LIBS_FLAT}"
+    "-DLITERTLM_PROTO_INCLUDE_DIRS=${PROTO_INCLUDE_DIR}"
+    "-DLITERTLM_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}"
+
+
+
 )
   
   # Assuming you have a verify_install macro similar to your protobuf setup
@@ -300,4 +246,75 @@ target_link_libraries(tflite_libs INTERFACE
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
     flatbuffers_libs    
     absl_libs
+)
+
+
+# 1. Glob all TFLite and related dependency libraries
+# We look in both TFLITE_LIB_DIR (external deps) and TFLITE_BUILD_DIR (the core libs)
+file(GLOB ALL_TFLITE_LIBS 
+    "${TFLITE_LIB_DIR}/*.a"
+    "${TFLITE_BUILD_DIR}/*.a"
+)
+
+if(NOT ALL_TFLITE_LIBS)
+    message(WARNING "No TFLite libs found. Run build then re-run CMake.")
+endif()
+
+set(TFLITE_HAMMER_TARGETS "")   # Core libs that need --whole-archive
+set(TFLITE_SUPPORT_TARGETS "")  # Math/utility libs (standard link)
+
+# 2. Iterate and create imported targets
+foreach(LIB_PATH ${ALL_TFLITE_LIBS})
+    get_filename_component(LIB_FILENAME ${LIB_PATH} NAME)
+    string(REPLACE "." "_" SAFE_NAME "imp_${LIB_FILENAME}")
+    
+    if(NOT TARGET ${SAFE_NAME})
+        add_library(${SAFE_NAME} STATIC IMPORTED)
+        set_target_properties(${SAFE_NAME} PROPERTIES IMPORTED_LOCATION "${LIB_PATH}")
+    endif()
+
+    # Determine if this library needs the "Hammer"
+    # Core TFLite, LiteRT, and Delegates must be whole-archived for op registration.
+    if(LIB_FILENAME MATCHES "libtensorflow-lite.a" OR 
+       LIB_FILENAME MATCHES "libxnnpack-delegate.a" OR 
+       LIB_FILENAME MATCHES "liblitert")
+        list(APPEND TFLITE_HAMMER_TARGETS ${SAFE_NAME})
+    else()
+        list(APPEND TFLITE_SUPPORT_TARGETS ${SAFE_NAME})
+    endif()
+endforeach()
+
+# ==============================================================================
+# 3. THE KITCHEN SINK INTERFACE
+# ==============================================================================
+
+add_library(tflite_kitchen_sink INTERFACE)
+add_library(LiteRTLM::tflite::tflite ALIAS tflite_kitchen_sink)
+
+target_include_directories(tflite_kitchen_sink SYSTEM INTERFACE 
+    ${TFLITE_INCLUDE_DIR}
+    ${TFLITE_BUILD_DIR} # Often needed for generated ruy/cpuinfo headers
+)
+
+target_link_libraries(tflite_kitchen_sink INTERFACE
+    # --- PHASE 1: THE HAMMER ---
+    # Force load registration symbols from core libs
+    $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--whole-archive>
+    $<$<PLATFORM_ID:Darwin>:-Wl,-force_load>
+        ${TFLITE_HAMMER_TARGETS}
+    $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--no-whole-archive>
+
+    # --- PHASE 2: THE GROUP ---
+    # Standard resolution for math/util libs (XNNPACK, Ruy, cpuinfo, etc.)
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+        ${TFLITE_SUPPORT_TARGETS}
+        # Include your existing absl/flatbuffers kitchen sinks here
+        absl_kitchen_sink
+        flatbuffers_libs
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+
+    # System Dependencies
+    pthread
+    $<$<PLATFORM_ID:Linux>:dl>
+    $<$<PLATFORM_ID:Android>:log>
 )

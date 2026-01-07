@@ -64,11 +64,9 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       -DCMAKE_PREFIX_PATH="${ABSL_INSTALL_PREFIX};${PROTO_INSTALL_PREFIX}"
 
-      # "-DCMAKE_EXE_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
-      # "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
+      "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
       "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
       "-DCMAKE_CXX_STANDARD_LIBRARIES= \
-                -lprotobuf -lutf8_range \
                 -Wl,--start-group \
                 -labsl_leak_check \
                 -labsl_log_internal_proto \
@@ -114,12 +112,10 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
                 -labsl_int128 \
                 -labsl_strings \
                 -labsl_strings_internal \
+                -labsl_hashtable_profiler \
                 -labsl_string_view \
                 -labsl_strerror \
                 -labsl_poison \
-                -labsl_bad_any_cast_impl \
-                -labsl_bad_optional_access \
-                -labsl_bad_variant_access \
                 -labsl_synchronization \
                 -labsl_periodic_sampler \
                 -labsl_scoped_set_env \
@@ -128,7 +124,6 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
                 -labsl_time_zone \
                 -labsl_hash \
                 -labsl_city \
-                -labsl_low_level_hash \
                 -labsl_raw_hash_set \
                 -labsl_utf8_for_code_point \
                 -labsl_hashtablez_sampler \
@@ -144,6 +139,9 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
                 -labsl_flags_private_handle_accessor \
                 -labsl_flags_program_name \
                 -labsl_die_if_null \
+                -lprotobuf \
+                -lprotobuf-lite \
+                -lutf8_range \
                 -Wl,--end-group \
                 -lpthread"
 
@@ -166,7 +164,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DProtobuf_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
       -DProtobuf_PROTOC_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotoc.a
       -DProtobuf_PROTOC_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotoc.a
-
+    STEP_TARGETS install
   )
 else()
   if(NOT TARGET sentencepiece_external)

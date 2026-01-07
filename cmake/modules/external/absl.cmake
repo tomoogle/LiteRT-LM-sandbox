@@ -18,7 +18,7 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
     GIT_REPOSITORY 
       https://github.com/abseil/abseil-cpp
     GIT_TAG        
-      20250127.1
+      987c57f325f7fa8472fa84e1f885f7534d391b0d
     PREFIX
       ${ABSL_EXT_PREFIX}
     CMAKE_ARGS
@@ -33,6 +33,10 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
       -DABSL_USE_GOOGLETEST_HEAD=OFF
       -DABSL_ENABLE_INSTALL=ON
       -DABSL_PROPAGATE_CXX_STD=ON
+
+
+
+
     STEP_TARGETS
       verify_install_step
   )
@@ -110,6 +114,7 @@ import_static_lib(imp_absl_city                    "${ABSL_LIB_DIR}/libabsl_city
 import_static_lib(imp_absl_low_level_hash          "${ABSL_LIB_DIR}/libabsl_low_level_hash.a")
 import_static_lib(imp_absl_raw_hash_set            "${ABSL_LIB_DIR}/libabsl_raw_hash_set.a")
 import_static_lib(imp_absl_hashtablez_sampler      "${ABSL_LIB_DIR}/libabsl_hashtablez_sampler.a")
+import_static_lib(imp_absl_hashtable_profiler      "${ABSL_LIB_DIR}/libabsl_hashtable_profiler.a")
 
 # --- CRC (Explicitly listing these now based on your file list) ---
 import_static_lib(imp_absl_crc32c                  "${ABSL_LIB_DIR}/libabsl_crc32c.a")
@@ -344,6 +349,7 @@ target_link_libraries(absl_libs INTERFACE
     imp_absl_log_internal_structured_proto imp_absl_log_sink imp_absl_vlog_config_internal
     imp_absl_die_if_null
 
+    imp_absl_hashtable_profiler
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
   
   $<$<PLATFORM_ID:Linux>:pthread>
@@ -351,3 +357,52 @@ target_link_libraries(absl_libs INTERFACE
 )
 
 set(ABSL_LINK_FLAGS "-L${ABSL_LIB_DIR} -Wl,--start-group -l:libabsl_*.a -Wl,--end-group -lpthread")
+
+
+
+file(GLOB ALL_ABSL_LIBS "${ABSL_LIB_DIR}/libabsl_*.a")
+
+if(NOT ALL_ABSL_LIBS)
+    message(WARNING "No Abseil libs found in ${ABSL_LIB_DIR}. If this is a clean build, run Make (to build ExternalProject), then re-run CMake.")
+else()
+    message(STATUS "Found ${ALL_ABSL_LIBS} Abseil libraries. Importing...")
+endif()
+
+set(ABSL_IMPORTED_TARGETS "")
+
+# 2. Iterate and create a target for each file found
+foreach(LIB_PATH ${ALL_ABSL_LIBS})
+    # Extract filename: /path/to/libabsl_strings.a -> libabsl_strings.a
+    get_filename_component(LIB_FILENAME ${LIB_PATH} NAME)
+    
+    # Create a unique target name: imp_libabsl_strings_a
+    string(REPLACE "." "_" SAFE_NAME "imp_${LIB_FILENAME}")
+    
+    add_library(${SAFE_NAME} STATIC IMPORTED)
+    set_target_properties(${SAFE_NAME} PROPERTIES IMPORTED_LOCATION "${LIB_PATH}")
+    
+    # Add to our list
+    list(APPEND ABSL_IMPORTED_TARGETS ${SAFE_NAME})
+endforeach()
+
+# ==============================================================================
+# 3. KITCHEN SINK (Link Everything)
+# ==============================================================================
+
+add_library(absl_kitchen_sink INTERFACE)
+add_library(LiteRTLM::absl::absl ALIAS absl_kitchen_sink)
+target_compile_features(absl_kitchen_sink INTERFACE cxx_std_20)
+target_include_directories(absl_kitchen_sink SYSTEM INTERFACE ${ABSL_INCLUDE_DIR})
+
+# 3. Link them all inside a "Start Group" block
+# This tells the linker: "I don't care about order, just resolve the symbols."
+target_link_libraries(absl_kitchen_sink INTERFACE
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+    ${ABSL_IMPORTED_TARGETS}
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+    
+    # System deps often needed by Abseil
+    $<$<PLATFORM_ID:Linux>:pthread>
+    $<$<PLATFORM_ID:Darwin>:-framework CoreFoundation>
+)
+string(REPLACE ";" " " ABSL_LIBS_FLAT "${ALL_ABSL_LIBS}")

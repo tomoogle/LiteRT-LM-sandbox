@@ -122,8 +122,7 @@ set(CMAKE_SHARED_LINKER_FLAGS
     -L${LITERT_INCLUDE_PATHS}"
 )
 set(CMAKE_CXX_STANDARD_LIBRARIES
-                "-lprotobuf -lutf8_range \
-                -Wl,--start-group \
+                "-Wl,--start-group \
                 -labsl_log_internal_proto \
                 -labsl_log_internal_message \
                 -labsl_log_internal_structured_proto \
@@ -168,6 +167,7 @@ set(CMAKE_CXX_STANDARD_LIBRARIES
                 -labsl_strings \
                 -labsl_strings_internal \
                 -labsl_string_view \
+                -labsl_hashtable_profiler \
                 -labsl_strerror \
                 -labsl_poison \
                 -labsl_bad_any_cast_impl \
@@ -181,7 +181,6 @@ set(CMAKE_CXX_STANDARD_LIBRARIES
                 -labsl_time_zone \
                 -labsl_hash \
                 -labsl_city \
-                -labsl_low_level_hash \
                 -labsl_leak_check \
                 -labsl_raw_hash_set \
                 -labsl_utf8_for_code_point \
@@ -198,8 +197,9 @@ set(CMAKE_CXX_STANDARD_LIBRARIES
                 -labsl_flags_private_handle_accessor \
                 -labsl_flags_program_name \
                 -labsl_die_if_null \
+                -lprotobuf \
+                -lprotobuf-lite \
                 -ltensorflow-lite \
-
                 -lXNNPACK \
                 -lxnnpack-microkernels-prod \
                 -lxnnpack-delegate \
@@ -253,6 +253,7 @@ set(CMAKE_CXX_STANDARD_LIBRARIES
                 -llitert_core_model \
                 -llitert_compiler_plugin \
                 -llitert_runtime \
+
                 -Wl,--end-group \
                 -lpthread"
 )

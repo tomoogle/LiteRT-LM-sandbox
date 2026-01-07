@@ -16,7 +16,7 @@ if(NOT EXISTS "${GTEST_CONFIG_CMAKE_FILE}")
     DEPENDS
       absl_external
     GIT_REPOSITORY
-      https://github.com/google/googletest.git
+      https://github.com/google/googletest
     GIT_TAG
       v1.17.0
     PREFIX
