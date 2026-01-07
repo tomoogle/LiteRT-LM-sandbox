@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ==============================================================================
@@ -96,7 +110,6 @@ target_include_directories(runtime_components_preprocessor_mel_filterbank
 target_link_libraries(runtime_components_preprocessor_mel_filterbank 
   PUBLIC
     LITERTLM_DEPS
-    
 )
 
 # ==============================================================================
@@ -132,7 +145,6 @@ target_link_libraries(runtime_components_preprocessor_stb_image_preprocessor
     runtime_engine_io_types
     runtime_util_convert_tensor_buffer
     runtime_util_litert_status_util
-  
     LITERTLM_DEPS
     stb_lib
 )

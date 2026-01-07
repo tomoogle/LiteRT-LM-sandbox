@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ==============================================================================
@@ -86,7 +100,6 @@ target_link_libraries(runtime_conversation_model_data_processor
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_conversation_io_types
     runtime_engine_io_types
-    json_lib
     LITERTLM_DEPS
 )
 
@@ -123,9 +136,6 @@ target_link_libraries(runtime_conversation_model_data_processor_gemma3_data_proc
     LiteRTLM::Runtime::Conversation::Processor::DataUtils  
     LiteRTLM::Runtime::Conversation::Processor::Interface     
     LITERTLM_DEPS
-    litert_libs
-    json_lib
-    re2_libs # [FIX] Added missing RE2 dependency
 )
 
 # ==============================================================================
@@ -151,8 +161,6 @@ target_link_libraries(runtime_conversation_model_data_processor_generic_data_pro
     runtime_util_litert_status_util
     LiteRTLM::Runtime::Conversation::Processor::Interface
     LITERTLM_DEPS
-    litert_libs
-    json_lib
 )
 
 # ==============================================================================
@@ -178,9 +186,7 @@ target_link_libraries(runtime_conversation_model_data_processor_qwen3_data_proce
     runtime_conversation_io_types
     runtime_engine_io_types
     runtime_util_litert_status_util
-    litert_libs
     LITERTLM_DEPS
-    json_lib
 )
 
 # ==============================================================================
@@ -210,8 +216,6 @@ target_link_libraries(runtime_conversation_model_data_processor_factory
     LiteRTLM::Runtime::Components::Tokenizer::Interface
     LiteRTLM::Runtime::Conversation::IoTypes
     runtime_util_litert_status_util
-    proto_lib
-    litert_libs
     LITERTLM_DEPS
 )
 

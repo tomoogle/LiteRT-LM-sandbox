@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ==============================================================================
@@ -101,18 +115,10 @@ target_link_libraries(runtime_engine_litert_lm_lib
     LiteRTLM::Runtime::Engine::Interface
     LiteRTLM::Runtime::Engine::Settings
     LiteRTLM::Runtime::Engine::IoTypes
-    
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor_settings
     runtime_util_litert_status_util
-
-  
     LITERTLM_DEPS
-    
-    # Specific libs required by this file
-    # json_lib        # @nlohmann_json//:json
-    # re2_libs        # @com_googlesource_code_re2//:re2
-    # stb_lib         # @stb//:stb_image
 )
 
 # ==============================================================================
@@ -167,7 +173,6 @@ target_link_libraries(runtime_engine_litert_lm_advanced_main
       LiteRTLM::Schema::Core
 
       runtime_util_litert_status_util
-      
       LITERTLM_DEPS
 )
 
@@ -190,25 +195,17 @@ target_include_directories(litert_lm_main PRIVATE
 )
 
 target_link_libraries(litert_lm_main
-  PUBLIC      
-      # 1. Internal Components (Mapped from Bazel deps)
+  PUBLIC
       LiteRTLM::Runtime::Engine::Interface
       LiteRTLM::Runtime::Engine::Settings
       LiteRTLM::Runtime::Engine::IoTypes
-      
       LiteRTLM::Runtime::Conversation
       LiteRTLM::Runtime::Conversation::IoTypes
       LiteRTLM::Runtime::Core::EngineImpl
-      
       runtime_executor_executor_settings_base
       runtime_executor_llm_executor_settings
       runtime_util_litert_status_util
-
-      # 2. External Dependencies
-      litert_libs       
-      LITERTLM_DEPS     
-      proto_lib
-      json_lib          
+      LITERTLM_DEPS
 )
 
 # Android Specifics

@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(ANTLR_TOOL_JAR "${PROJECT_ROOT}/antlr-4.13.2-complete.jar")
 
@@ -14,7 +28,6 @@ add_custom_command(
         ${ANTLR_GENERATED_DIR}/AntlrJsonParser.cpp
         ${ANTLR_GENERATED_DIR}/AntlrJsonParserBaseListener.h
         ${ANTLR_GENERATED_DIR}/AntlrJsonParserListener.h
-        
     COMMAND java -jar ${ANTLR_TOOL_JAR}
             -Dlanguage=Cpp
             -listener -visitor
@@ -22,7 +35,6 @@ add_custom_command(
             -package antlr_json_tool_call_parser
             ${PKG_ROOT}/AntlrJsonLexer.g4 
             ${PKG_ROOT}/AntlrJsonParser.g4
-            
     DEPENDS ${PKG_ROOT}/AntlrJsonLexer.g4 ${PKG_ROOT}/AntlrJsonParser.g4
     COMMENT "Generating JSON Parser C++ code..."
 )

@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Important: Build the ANTLR dependency first
@@ -17,11 +31,9 @@ target_include_directories(runtime_components_tool_use_json_parser_utils
 
 target_link_libraries(runtime_components_tool_use_json_parser_utils
   PUBLIC
-    LiteRTLM::Runtime::Components::ToolUse::ParserCommon # (Defined below)
-    LiteRTLM::Runtime::Components::ToolUse::Antlr::Json  # Inherits generated headers path automatically
-  
+    LiteRTLM::Runtime::Components::ToolUse::ParserCommon
+    LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
     LITERTLM_DEPS
-    
 )
 
 # --- Parser Common ---
@@ -39,9 +51,7 @@ target_include_directories(runtime_components_tool_use_parser_common
 target_link_libraries(runtime_components_tool_use_parser_common
   PUBLIC
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
-  
     LITERTLM_DEPS
-    
 )
 
 # --- Parser Utils ---
@@ -63,11 +73,7 @@ target_link_libraries(runtime_components_tool_use_parser_utils
     LiteRTLM::Runtime::Components::ToolUse::JsonUtils
     LiteRTLM::Runtime::Components::ToolUse::PythonUtils
     runtime_util_litert_status_util
-  
     LITERTLM_DEPS
-    
-    # [FIX] Added missing RE2 dependency
-    # re2_libs
 )
 
 # --- Python Parser Utils ---
@@ -86,9 +92,7 @@ target_link_libraries(runtime_components_tool_use_python_parser_utils
   PUBLIC
     LiteRTLM::Runtime::Components::ToolUse::ParserCommon
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Python
-  
     LITERTLM_DEPS
-    
 )
 
 # --- Python Tool Format Utils ---
@@ -107,9 +111,7 @@ target_link_libraries(runtime_components_tool_use_python_tool_format_utils
   PUBLIC
     runtime_util_litert_status_util
     LiteRTLM::Runtime::Components::ToolUse::Antlr::Json
-  
     LITERTLM_DEPS
-    
 )
 
 # --- Folder Facade ---
