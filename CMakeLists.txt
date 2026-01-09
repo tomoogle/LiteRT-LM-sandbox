@@ -35,8 +35,7 @@ set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 ### [START] NEW GLOBAL PATHS ###
 set(LITERTLM_ROOT_DIR "${PROJECT_ROOT}" CACHE PATH "LiteRT-LM: Root of the LiteRT-LM workspace")
 
-set(LITERTLM_RECIPES_DIR "${LITERTLM_ROOT_DIR}/cmake/recipes" 
-    CACHE PATH "LiteRT-LM: Directory for build recipes")
+set(LITERTLM_RECIPES_DIR "${LITERTLM_ROOT_DIR}/cmake/recipes" CACHE PATH "LiteRT-LM: Directory for build recipes")
 
 
 set(LITERTLM_PATCHES_DIR "${LITERTLM_ROOT_DIR}/cmake/patches" 

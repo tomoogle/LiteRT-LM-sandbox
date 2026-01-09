@@ -1,12 +1,18 @@
-set(EXTERNAL_PROJECT_MODULES_DIR "${LITERTLM_MODULES_DIR}/external")
+# --- Dependency Orchestration ---
+# Note: Order is preserved to satisfy inter-dependency requirements
+set(LITERTLM_DEPENDENCY_ORDER
+    opencl
+    absl
+    gtest
+    protobuf
+    flatbuffers
+    sentencepiece
+    tokenizers
+    re2
+    tflite
+    litert
+)
 
-include(${LITERT_RECIPES_DIR}/opencl/opencl.cmake)
-include(${LITERT_RECIPES_DIR}/absl/absl.cmake)
-include(${LITERT_RECIPES_DIR}/protobuf/protobuf.cmake)
-include(${LITERT_RECIPES_DIR}/flatbuffers/flatbuffers.cmake)
-include(${LITERT_RECIPES_DIR}/gtest/gtest.cmake)
-include(${LITERT_RECIPES_DIR}/sentencepiece/sentencepiece.cmake)
-include(${LITERT_RECIPES_DIR}/tokenizers/tokenizers.cmake)
-include(${LITERT_RECIPES_DIR}/re2/re2.cmake)
-include(${LITERT_RECIPES_DIR}/tflite/tflite.cmake)
-include(${LITERT_RECIPES_DIR}/litert/litert.cmake)
+foreach(recipe ${LITERTLM_DEPENDENCY_ORDER})
+    load_recipe(${recipe})
+endforeach()

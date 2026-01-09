@@ -1,5 +1,0 @@
-if(NOT EXISTS "${FILE_TO_CHECK}")
-    message(FATAL_ERROR "Verification Failed: Expected file was not found: ${FILE_TO_CHECK}")
-else()
-    message(STATUS "Verification Success: Found ${FILE_TO_CHECK}")
-endif()

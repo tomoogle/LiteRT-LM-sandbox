@@ -58,3 +58,50 @@ macro(import_proto_lib target_name lib_path)
         add_dependencies(${target_name} protobuf_external)
     endif()
 endmacro()
+
+
+
+#[[.rst:
+load_recipe
+-----------
+
+Orchestrates the configuration of a project dependency.
+
+This macro follows the "Friendly Human" principle: it will skip its own 
+internal build logic if it detects the dependency is already satisfied.
+
+Users can pre-satisfy a dependency by:
+1. Providing an Imported Target:  <name>::<name>
+2. Setting a Found variable:     <UPPER_NAME>_FOUND
+3. Setting a lowercase variable: <name>_FOUND
+
+Example:
+  set(ABSL_FOUND TRUE)
+  load_recipe(absl) # This will now skip the internal Abseil build.
+
+Arguments:
+  name : The lowercase name of the recipe folder in cmake/recipes/
+  
+Requires:
+  - LITERTLM_RECIPES_DIR must be set to the absolute path of the recipes folder.
+  - LITERTLM_MODULES_DIR must be set to find supporting scripts.
+
+Note:
+  This macro is "sticky." Once a recipe is loaded, it sets a CACHE variable
+  to prevent redundant configuration cycles.
+#]]
+macro(load_recipe name)
+    string(TOUPPER "${name}" upper_name)
+    if(TARGET ${name}::${name} OR ${upper_name}_FOUND OR ${name}_FOUND)
+        message(STATUS "[LITERTLM] Recipe '${name}' satisfied. Skipping build.")
+    else()
+        set(recipe_file "${LITERTLM_RECIPES_DIR}/${name}/${name}.cmake")
+        if(EXISTS "${recipe_file}")
+            message(STATUS "[LITERTLM] Cooking Recipe: ${name}.cmake")
+            include("${recipe_file}")            
+            set(${upper_name}_FOUND TRUE CACHE INTERNAL "Recipe ${name} loaded")
+        else()
+            message(FATAL_ERROR "[LITERTLM] FATAL: Recipe '${name}.cmake' is missing!")
+        endif()
+    endif()
+endmacro()
