@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     gpg \
     ca-certificates \
     software-properties-common \
+    libpng-dev
     && rm -rf /var/lib/apt/lists/*
 
 # Install modern CMake from Kitware repository

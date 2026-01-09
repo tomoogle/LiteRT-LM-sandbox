@@ -26,9 +26,49 @@ project(LiteRT-LM LANGUAGES C CXX)
 # --- Global Paths
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(LITERTLM_SCRIPTS_DIR        "${PROJECT_ROOT}/cmake/scripts")
-set(LITERTLM_MODULES_DIR        "${PROJECT_ROOT}/cmake/modules")
+
+
+# [TODO] Refactor to namespaced CACHE vars
+#   1. Update all instances of OLD GLOBAL PATHS
+#   2. Delete OLD GLOBAL PATHS
+#
+### [START] NEW GLOBAL PATHS ###
+set(LITERTLM_ROOT_DIR "${PROJECT_ROOT}" CACHE PATH "LiteRT-LM: Root of the LiteRT-LM workspace")
+
+set(LITERTLM_RECIPES_DIR "${LITERTLM_ROOT_DIR}/cmake/recipes" 
+    CACHE PATH "LiteRT-LM: Directory for build recipes")
+
+
+set(LITERTLM_PATCHES_DIR "${LITERTLM_ROOT_DIR}/cmake/patches" 
+    CACHE PATH "LiteRT-LM: Directory for build patches")
+
+# set(LITERTLM_SHIMS_DIR "${LITERTLM_PATCHES_DIR}/shims" 
+    # CACHE PATH "LiteRT-LM: Directory for virtualization shims")
+
+set(LITERTLM_MODULES_DIR "${LITERTLM_ROOT_DIR}/cmake/modules" 
+    CACHE PATH "LiteRT-LM: Modules path, appended to CMAKE_MODULE_PATH")
+
+set(LITERTLM_SCRIPTS_DIR "${LITERTLM_ROOT_DIR}/cmake/scripts" 
+    CACHE PATH "LiteRT-LM: Directory for internal build and automation scripts")
+if(NOT EXISTS "${LITERTLM_MODULES_DIR}")
+    message(FATAL_ERROR "LITERTLM Safety Check: ${LITERTLM_MODULES_DIR} not found! Check your LITERTLM_ROOT_DIR.")
+endif()
+
+
+
+### [END] NEW GLOBAL PATHS###
+
+
+### [START] OLD GLOBAL PATHS ###
+set(SCRIPTS_DIR      "${LITERTLM_SCRIPTS_DIR}")
+set(PATCHES_DIR      "${LITERTLM_PATCHES_DIR}")
+
+set(MODULES_DIR        "${LITERTLM_MODULES_DIR}")
 list(APPEND CMAKE_MODULE_PATH   "${LITERTLM_MODULES_DIR}")
+### [END] OLD GLOBAL PATHS ###
+
+
+
 
 set(EXTERNAL_PROJECT_BINARY_DIR "${CMAKE_BINARY_DIR}/external")
 set(THIRD_PARTY_DIR             "${CMAKE_BINARY_DIR}/third_party")

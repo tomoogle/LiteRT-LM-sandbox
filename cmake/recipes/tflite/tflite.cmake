@@ -1,5 +1,9 @@
 include(ExternalProject)
 
+
+message(STATUS "[DEBUG] Starting tflite.cmake")
+
+
 set(TFLITE_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/tensorflow)
 set(TFLITE_INSTALL_PREFIX ${TFLITE_EXT_PREFIX}/install)
 
@@ -43,32 +47,41 @@ ExternalProject_Add(
   SOURCE_SUBDIR
     tensorflow/lite
   PATCH_COMMAND
-    sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 25/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
-    COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/converter.zip" -d "${TFLITE_SRC_DIR}"
-    # COMMAND bash -c "echo 'target_sources(tensorflow-lite PRIVATE \
-    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/allocation.cc \
-    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/mmap_allocation.cc \
-    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/core/model_builder_base.cc \
-    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/error_reporter.cc \
-    #         \${TF_SOURCE_DIR}/compiler/mlir/lite/core/api/flatbuffer_conversions.cc \
-    #         )' >> <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt"
+    git checkout -- . && git clean -df
+    COMMAND sed -i "s/FLATBUFFERS_VERSION_MAJOR == [0-9]*/FLATBUFFERS_VERSION_MAJOR >= 25/" <SOURCE_DIR>/tensorflow/lite/acceleration/configuration/configuration_generated.h
+    COMMAND unzip -o "${PROJECT_ROOT}/cmake/patches/litert_converter.zip" -d "${TFLITE_SRC_DIR}"
 
+    COMMAND sed -i "s|find_program(FLATC_BIN flatc HINTS \${FLATC_PATHS})|set(FLATC_BIN \"${FLATC_EXECUTABLE}\" CACHE FILEPATH \"Forced by LiteRT-LM\")|g" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+    
     COMMAND sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h
     COMMAND sed -i "s/FLATBUFFERS_VERSION_MINOR == 3/FLATBUFFERS_VERSION_MINOR >= 0/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h
     COMMAND sed -i "s/FLATBUFFERS_VERSION_REVISION == 25/FLATBUFFERS_VERSION_REVISION >= 0/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h 
     COMMAND sed -i "s|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}//..//..//..|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}|g" <SOURCE_DIR>/tensorflow/lite/profiling/proto/CMakeLists.txt
 
+
+
 # Kill the TF downloaders
     COMMAND sed -i "1i return()" <SOURCE_DIR>/tensorflow/lite/tools/cmake/modules/abseil-cpp.cmake
     COMMAND sed -i "1i return()" <SOURCE_DIR>/tensorflow/lite/tools/cmake/modules/protobuf.cmake
+    COMMAND sed -i "1i return()" <SOURCE_DIR>/tensorflow/lite/tools/cmake/modules/flatbuffers.cmake
 
-    # Inject BOTH shims
-    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/patches/tflite_absl_shim.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
-    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/patches/tflite_proto_shim.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
 
     # RECURSIVE REDIRECTION (The Global Hammer)
     COMMAND find <SOURCE_DIR>/tensorflow/lite -name "CMakeLists.txt" -exec sed -i "s|[[:space:]]absl::[a-zA-Z0-9_]*| LiteRTLM::absl::absl|g" {} +
     COMMAND find <SOURCE_DIR>/tensorflow/lite -name "CMakeLists.txt" -exec sed -i "s|[[:space:]]protobuf::[a-zA-Z0-9_-]*| LiteRTLM::protobuf::libprotobuf|g" {} +
+    COMMAND find <SOURCE_DIR>/tensorflow/lite -name "CMakeLists.txt" -exec sed -i "s|[[:space:]]flatbuffers::[a-zA-Z0-9_-]*| LiteRTLM::flatbuffers::flatbuffers|g" {} +
+
+
+
+    COMMAND sed -i -E "s|[\$][{]CMAKE_CURRENT_SOURCE_DIR[}]([\/][.][.])+ [^ ]+|${TFLITE_SRC_DIR} tools/benchmark/proto/benchmark_result.proto|g" <SOURCE_DIR>/tensorflow/lite/tools/benchmark/proto/CMakeLists.txt
+    COMMAND sed -i -E "s|[\$][{]CMAKE_CURRENT_SOURCE_DIR[}]([\/][.][.])+ tflite[\/]|${TFLITE_SRC_DIR} |g" <SOURCE_DIR>/tensorflow/lite/profiling/proto/CMakeLists.txt
+
+
+
+
+    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/patches/shims/tflite_shims.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+
+
 
     CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${TFLITE_INSTALL_PREFIX}
@@ -87,20 +100,18 @@ ExternalProject_Add(
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
 
     # --- Dependency Injection ---
-    # TFLite uses find_package(absl), so we just point it to the config dir
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
     -D_abseil-cpp_LICENSE_FILE:FILEPATH=${ABSL_SRC_DIR}/absl_external/LICENSE
-    # TFLite uses find_package(Flatbuffers), so we point it to the config dir
 
     -DFLATBUFFERS_BUILD_FLATC=OFF
     -DFLATBUFFERS_INSTALL=OFF
-    -DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}
-    -DFLATBUFFERS_PROJECT_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
-    -DFlatBuffers_SOURCE_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
-    -D_flatbuffers_LICENSE_FILE=${FLATBUFFERS_SRC_DIR}/flatbuffers_external/LICENSE
-    -DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}
-    -DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}
-    -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
+    "-DFlatBuffers_BINARY_DIR=${FLATBUFFERS_BIN_DIR}"
+    "-DFLATBUFFERS_PROJECT_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external"
+    "-DFlatBuffers_SOURCE_DIR=${FLATBUFFERS_SRC_DIR}/flatbuffers_external"
+    "-D_flatbuffers_LICENSE_FILE=${FLATBUFFERS_SRC_DIR}/flatbuffers_external/LICENSE"
+    "-DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}"
+    "-DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}"
+    "-Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers"
 
 
 
@@ -116,7 +127,7 @@ ExternalProject_Add(
     -DXNNPACK_SET_VERBOSITY=OFF
     -DTFLITE_ENABLE_GPU=OFF
     -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR}
-    -DTFLITE_HOST_TOOLS_DIR=${FLATBUFFERS_BIN_DIR}
+    "-DTFLITE_HOST_TOOLS_DIR=${FLATBUFFERS_BIN_DIR}"
 
     "-DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX};${libpng_lib_BINARY_DIR}"
     -DPNG_FOUND=ON
@@ -134,7 +145,7 @@ ExternalProject_Add(
     "-DLITERTLM_PROTO_INCLUDE_DIRS=${PROTO_INCLUDE_DIR}"
     "-DLITERTLM_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}"
 
-
+    "-DLITERTLM_SHIMS_DIR=${LITERTLM_SHIMS_DIR}"
 
 )
   

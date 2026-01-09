@@ -33,7 +33,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       absl_external
       protobuf_external
     GIT_REPOSITORY https://github.com/google/sentencepiece.git
-    GIT_TAG        v0.2.1
+    GIT_TAG        f2219b53e24ff5deee4cacdc2d0ca3074e529a07
     PREFIX         ${SENTENCE_EXT_PREFIX}
     
     PATCH_COMMAND

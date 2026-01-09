@@ -20,9 +20,14 @@ if(NOT EXISTS "${FLATBUFFERS_CMAKE_CONFIG_FILE}")
     DEPENDS
       absl_external
       googletest_external
-    GIT_REPOSITORY https://github.com/google/flatbuffers.git
-    GIT_TAG v25.9.23
-    PREFIX ${FLATBUFFERS_EXT_PREFIX}
+    GIT_REPOSITORY 
+      https://github.com/google/flatbuffers.git
+    GIT_TAG 
+      v25.9.23
+    PREFIX 
+      ${FLATBUFFERS_EXT_PREFIX}
+    PATCH_COMMAND
+      git checkout -- . && git clean -df
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${FLATBUFFERS_INSTALL_PREFIX}
         -DCMAKE_BUILD_TYPE=Release
