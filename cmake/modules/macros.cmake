@@ -2,11 +2,21 @@
 # LITERTLM MACROS
 # ==============================================================================
 
-# ------------------------------------------------------------------------------
-# Macro: import_static_lib
-# Purpose: Imports a built static library (.a) from an absolute path.
-# Usage: import_static_lib(my_target_name "/path/to/lib.a")
-# ------------------------------------------------------------------------------
+#[[.rst:
+import_static_lib
+-----------------
+Imports an existing static library (.a) as a CMake GLOBAL target.
+
+This bridges the ExternalProject build phase and internal build tree. Once imported, the target can be linked using
+target_link_libraries().
+
+Usage:
+  import_static_lib(my_target_name "/absolute/path/to/lib.a")
+
+Arguments:
+  name : The CMake target name.
+  path : The absolute filesystem path to the static library file.
+#]]
 macro(import_static_lib target_name lib_full_path)
     if("${lib_full_path}" STREQUAL "")
         message(FATAL_ERROR "Critical Error: Attempted to import '${target_name}' with an empty path.")
@@ -18,12 +28,20 @@ macro(import_static_lib target_name lib_full_path)
     )
 endmacro()
 
-# ------------------------------------------------------------------------------
-# Macro: add_litertlm_library
-# Purpose: Wrapper for add_library that automatically ensures build order.
-# Usage: add_litertlm_library(my_lib STATIC src/file.cc)
-#        add_litertlm_library(my_interface INTERFACE)
-# ------------------------------------------------------------------------------
+
+
+#[[.rst:
+add_litertlm_library
+--------------------
+Wrapper for add_library that automatically ensures the library is only 
+processed after the external dependency recipes are configured.
+
+Supports all standard library types (STATIC, SHARED, INTERFACE).
+
+Usage:
+  add_litertlm_library(my_lib STATIC src/file.cc)
+  add_litertlm_library(my_interface INTERFACE)
+#]]
 macro(add_litertlm_library target_name lib_type)
     add_library(${target_name} ${lib_type} ${ARGN})
     
@@ -32,11 +50,17 @@ macro(add_litertlm_library target_name lib_type)
     endif()
 endmacro()
 
-# ------------------------------------------------------------------------------
-# Macro: add_litertlm_executable
-# Purpose: Wrapper for add_executable that automatically ensures build order.
-# Usage: add_litertlm_executable(my_app src/main.cc)
-# ------------------------------------------------------------------------------
+
+
+#[[.rst:
+add_litertlm_executable
+-----------------------
+Wrapper for add_executable that automatically ensures build order
+by linking against the generated target list and dependency tree.
+
+Usage:
+  add_litertlm_executable(my_app src/main.cc)
+#]]
 macro(add_litertlm_executable target_name)
     add_executable(${target_name} ${ARGN})
 
@@ -81,7 +105,7 @@ Example:
 
 Arguments:
   name : The lowercase name of the recipe folder in cmake/recipes/
-  
+
 Requires:
   - LITERTLM_RECIPES_DIR must be set to the absolute path of the recipes folder.
   - LITERTLM_MODULES_DIR must be set to find supporting scripts.
