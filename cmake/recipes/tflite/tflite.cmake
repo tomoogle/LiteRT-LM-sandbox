@@ -79,7 +79,7 @@ ExternalProject_Add(
 
 
 
-    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/patches/shims/tflite_shims.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
+    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/recipes/tflite/tflite_shims.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
 
 
 
