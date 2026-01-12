@@ -24,6 +24,8 @@ if(NOT TARGET flatbuffers-flatc-NOTFOUND)
     )
 endif()
 
+set(FLATC_TARGET "${FLATC_EXECUTABLE}" CACHE INTERNAL "" FORCE)
+
 # 3. Final spoofing for TFLite's internal checks
 set(flatbuffers_FLATC_EXECUTABLE "${FLATC_EXECUTABLE}")
 set(FLATBUFFERS_FLATC_EXECUTABLE "${FLATC_EXECUTABLE}")

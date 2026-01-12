@@ -64,6 +64,13 @@ function(generate_protobuf TARGET_NAME)
     set(GENERATED_SRCS)
     set(GENERATED_HDRS)
 
+
+    add_custom_command(
+        OUTPUT ""
+        COMMAND $<TARGET_FILE:protobuf::protoc>
+        ARGS --version
+    )
+
     foreach(PROTO_FILE ${PROTO_FILES})
         # Calculate the path relative to PROJECT_ROOT
         # e.g., runtime/proto/engine.proto
