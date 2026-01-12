@@ -1,5 +1,7 @@
 # --- Dependency Orchestration ---
 # Note: Order is preserved to satisfy inter-dependency requirements
+message(STATUS "[DEBUG] LITERTLM_RECIPES_DIR: ${LITERTLM_RECIPES_DIR}")
+
 set(LITERTLM_DEPENDENCY_ORDER
     opencl
     absl
