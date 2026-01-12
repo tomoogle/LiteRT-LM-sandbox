@@ -87,8 +87,8 @@ function(generate_protobuf TARGET_NAME)
             
             # Run protoc with -I set to PROJECT_ROOT.
             # This is critical! It tells protoc that "runtime/proto/..." is the package root.
-            COMMAND protobuf::protoc
-            ARGS --cpp_out "${CMAKE_BINARY_DIR}" 
+            COMMAND $<TARGET_FILE:protobuf::protoc>
+            ARGS --cpp_out "${CMAKE_BINARY_DIR}"
                  -I "${PROJECT_ROOT}" 
                  "${PROTO_FILE}"
                  

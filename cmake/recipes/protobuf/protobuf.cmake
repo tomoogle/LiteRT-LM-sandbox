@@ -57,7 +57,7 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
       -DGTest_DIR=${GTEST_INSTALL_PREFIX}/lib/cmake/GTest
       -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/Protobuf
       "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
-      "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -Wl,-z,muldefs"
+      "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR}"
       "-DCMAKE_CXX_STANDARD_LIBRARIES= \
                 -Wl,--start-group \
                 -labsl_leak_check \
