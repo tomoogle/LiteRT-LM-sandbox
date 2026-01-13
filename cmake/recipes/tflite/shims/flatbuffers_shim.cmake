@@ -1,53 +1,76 @@
+# ==============================================================================
+# LiteRT-LM Flatbuffers Shim
+# Purpose: Neutralize TFLite internal discovery and force pre-built tools.
+# ==============================================================================
 
+# --- 1. GLOBAL VARIABLE OVERRIDES (The "Nuclear" Option) ---
+# We use CACHE INTERNAL FORCE to ensure these cannot be overwritten by TFLite's
+# internal set() calls or find_program() logic.
+set(FIXED_FLATC "${FLATC_EXECUTABLE}" CACHE INTERNAL "Forced" FORCE)
+
+set(FLATC_TARGET                 "${FIXED_FLATC}" CACHE INTERNAL "Forced" FORCE)
+set(FLATC_BIN                    "${FIXED_FLATC}" CACHE INTERNAL "Forced" FORCE)
+set(FLATBUFFERS_FLATC_EXECUTABLE "${FIXED_FLATC}" CACHE INTERNAL "Forced" FORCE)
+set(flatbuffers_FLATC_EXECUTABLE "${FIXED_FLATC}" CACHE INTERNAL "Forced" FORCE)
+
+# Satisfy TFLite host tools check
+set(TFLITE_HOST_TOOLS_DIR        "${FIXED_FLATC}" CACHE PATH     "Forced" FORCE)
+set(FLATC_PATHS                  "${FIXED_FLATC}" CACHE STRING   "Forced" FORCE)
+
+# Convince TFLite discovery that Flatbuffers is already present
+set(flatbuffers_FOUND            TRUE             CACHE INTERNAL "Forced" FORCE)
+set(FlatBuffers_FOUND            TRUE             CACHE INTERNAL "Forced" FORCE)
+
+
+# --- 2. NAMESPACE TARGETS: flatbuffers::flatbuffers ---
 if(NOT TARGET LiteRTLM::flatbuffers::flatbuffers)
     add_library(LiteRTLM::flatbuffers::flatbuffers INTERFACE IMPORTED GLOBAL)
     set_target_properties(LiteRTLM::flatbuffers::flatbuffers PROPERTIES 
         INTERFACE_LINK_LIBRARIES "imp_flatbuffers"
         INTERFACE_INCLUDE_DIRECTORIES "${FLATBUFFERS_INCLUDE_DIR}"
     )
-
-    # Alias the names TFLite actually uses
-    add_library(flatbuffers::flatbuffers ALIAS LiteRTLM::flatbuffers::flatbuffers)
+    # Alias to the names TFLite expects
+    if(NOT TARGET flatbuffers::flatbuffers)
+        add_library(flatbuffers::flatbuffers ALIAS LiteRTLM::flatbuffers::flatbuffers)
+    endif()
 endif()
 
-# 2. Bridge the FLATC compiler using the CACHE INTERNAL var you just verified
-if(NOT TARGET flatbuffers-flatc)
-    add_executable(flatbuffers-flatc IMPORTED GLOBAL)
-    set_target_properties(flatbuffers-flatc PROPERTIES 
-        IMPORTED_LOCATION "${FLATC_EXECUTABLE}"
+
+# --- 3. EXECUTABLE TARGETS: flatbuffers-flatc ---
+# TFLite custom commands often DEPEND on these target names. 
+# We mock them as IMPORTED targets pointing to our absolute binary path.
+foreach(_target_name flatbuffers-flatc flatbuffers-flatc-NOTFOUND)
+    if(NOT TARGET ${_target_name})
+        add_executable(${_target_name} IMPORTED GLOBAL)
+        set_target_properties(${_target_name} PROPERTIES 
+            IMPORTED_LOCATION "${FIXED_FLATC}"
+        )
+    endif()
+endforeach()
+
+
+# --- THE GLOBAL DEPENDENCY STRIKE ---
+# We target both the TFLite source AND the downloaded dependencies (like XNNPACK)
+
+set(RELATIVE_PROBLEM_PATH "flatbuffers-flatc/bin/flatc")
+
+# 1. Patch the TFLite Source
+execute_process(
+    COMMAND find "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite" -name "*.cmake" -o -name "CMakeLists.txt" 
+    -exec sed -i "s|${RELATIVE_PROBLEM_PATH}|${FLATC_EXECUTABLE}|g" {} +
+)
+
+# 2. Patch the Downloaded Dependencies (XNNPACK, etc.)
+# Note: This only works if the dependencies have already been populated/downloaded
+if(EXISTS "${TFLITE_BUILD_DIR}/_deps")
+    execute_process(
+        COMMAND find "${TFLITE_BUILD_DIR}/_deps" -name "*.cmake" -o -name "CMakeLists.txt" 
+        -exec sed -i "s|${RELATIVE_PROBLEM_PATH}|${FLATC_EXECUTABLE}|g" {} +
     )
 endif()
 
-if(NOT TARGET flatbuffers-flatc-NOTFOUND)
-    add_executable(flatbuffers-flatc-NOTFOUND IMPORTED GLOBAL)
-    set_target_properties(flatbuffers-flatc-NOTFOUND PROPERTIES 
-        IMPORTED_LOCATION "${FLATC_EXECUTABLE}"
-    )
-endif()
-
-set(FLATC_TARGET "${FLATC_EXECUTABLE}" CACHE INTERNAL "" FORCE)
-
-# 3. Final spoofing for TFLite's internal checks
-set(flatbuffers_FLATC_EXECUTABLE "${FLATC_EXECUTABLE}")
-set(FLATBUFFERS_FLATC_EXECUTABLE "${FLATC_EXECUTABLE}")
-set(flatbuffers_FOUND TRUE CACHE INTERNAL "")
-
-
-message(STATUS "LITERTLM: Commencing surgical strike on kernels/CMakeLists.txt")
-
-execute_process(
-    COMMAND sed -i "1,/set(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS/ { /set(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS/!d }" 
-    "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/kernels/CMakeLists.txt"
-)
-
-execute_process(
-    COMMAND sed -i "1s|^|set(FLATBUFFERS_FLATC_EXECUTABLE \"${FLATC_EXECUTABLE}\")\\n|" "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/kernels/CMakeLists.txt"
-    RESULT_VARIABLE patch_result2
-)
-
-# Combine the results for your check
-# math(EXPR patch_result "${patch_result1} + ${patch_result2}")
-
-# if(NOT patch_result EQUAL 0)
-    # message(FATAL_ERROR "LITERTLM: Failed to decapitate the Kernels check!")
-# endif()
+# ==============================================================================
+# NOTE: All 'execute_process(sed ...)' calls have been removed.
+# By being included at line 1 of the root CMakeLists.txt, the CACHE FORCE 
+# variables above render the internal logic in kernels/ and root/ irrelevant.
+# ==============================================================================

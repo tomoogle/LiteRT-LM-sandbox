@@ -1,9 +1,5 @@
 include(ExternalProject)
 
-
-message(STATUS "[DEBUG] Starting tflite.cmake")
-
-
 set(TFLITE_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/tensorflow)
 set(TFLITE_INSTALL_PREFIX ${TFLITE_EXT_PREFIX}/install)
 
@@ -79,8 +75,13 @@ ExternalProject_Add(
 
 
 
-    COMMAND sed -i "1i include(\"${PROJECT_ROOT}/cmake/recipes/tflite/tflite_shims.cmake\")" <SOURCE_DIR>/tensorflow/lite/CMakeLists.txt
-
+    COMMAND ${CMAKE_COMMAND} 
+    -DFLATC_EXECUTABLE=${FLATC_EXECUTABLE} 
+    -DTFLITE_SRC_DIR=${TFLITE_SRC_DIR} 
+    -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
+    -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR} 
+    -DLITERTLM_RECIPES_DIR=${LITERTLM_RECIPES_DIR}
+    -P "${PROJECT_ROOT}/cmake/recipes/tflite/tflite_patcher.cmake"
 
 
     CMAKE_ARGS
