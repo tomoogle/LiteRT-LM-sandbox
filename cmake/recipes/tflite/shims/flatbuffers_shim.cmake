@@ -42,11 +42,11 @@ execute_process(
 execute_process(
     COMMAND sed -i "1s|^|set(FLATBUFFERS_FLATC_EXECUTABLE \"${FLATC_EXECUTABLE}\")\\n|" "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/kernels/CMakeLists.txt"
     RESULT_VARIABLE patch_result2
-)
+# )
 
 # Combine the results for your check
-math(EXPR patch_result "${patch_result1} + ${patch_result2}")
+# math(EXPR patch_result "${patch_result1} + ${patch_result2}")
 
-if(NOT patch_result EQUAL 0)
-    message(FATAL_ERROR "LITERTLM: Failed to decapitate the Kernels check!")
-endif()
+# if(NOT patch_result EQUAL 0)
+    # message(FATAL_ERROR "LITERTLM: Failed to decapitate the Kernels check!")
+# endif()

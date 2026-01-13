@@ -99,6 +99,9 @@ ExternalProject_Add(
     # Consolidated C Flags
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -DTF_MAJOR_VERSION=2 -DTF_MINOR_VERSION=20 -DTF_PATCH_VERSION=0 -DTF_VERSION_SUFFIX=\"\""
 
+    -DTFLITE_HOST_TOOLS_DIR=${LITERTLM_INSTALL_DIR}/bin
+    -DCMAKE_CROSSCOMPILING=ON
+
     # --- Dependency Injection ---
     -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
     -D_abseil-cpp_LICENSE_FILE:FILEPATH=${ABSL_SRC_DIR}/absl_external/LICENSE
@@ -112,7 +115,8 @@ ExternalProject_Add(
     "-DFLATC_PATHS=${FLATBUFFERS_BIN_DIR}"
     "-DFLATBUFFERS_FLATC_EXECUTABLE=${FLATC_EXECUTABLE}"
     "-Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers"
-
+    "-DFLATC_TARGET=${FLATC_EXECUTABLE}"
+    "-DFLATC_EXECUTABLE=${FLATC_EXECUTABLE}"
 
 
     -Dprotobuf_BINARY_DIR=${PROTO_BIN_DIR}
