@@ -1,3 +1,4 @@
+
 if(NOT TARGET LiteRTLM::flatbuffers::flatbuffers)
     add_library(LiteRTLM::flatbuffers::flatbuffers INTERFACE IMPORTED GLOBAL)
     set_target_properties(LiteRTLM::flatbuffers::flatbuffers PROPERTIES 
@@ -42,7 +43,7 @@ execute_process(
 execute_process(
     COMMAND sed -i "1s|^|set(FLATBUFFERS_FLATC_EXECUTABLE \"${FLATC_EXECUTABLE}\")\\n|" "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/kernels/CMakeLists.txt"
     RESULT_VARIABLE patch_result2
-# )
+)
 
 # Combine the results for your check
 # math(EXPR patch_result "${patch_result1} + ${patch_result2}")
