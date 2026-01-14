@@ -132,22 +132,61 @@ file(COPY "${TFLITE_SRC_DIR}/weight_cache_schema_generated.h"
 
 
 # --- THE PROTO STUTTER LOBOTOMY ---
-set(PROTO_TARGETS 
-    "tensorflow/lite/profiling/proto/CMakeLists.txt"
-    "tensorflow/lite/tools/benchmark/proto/CMakeLists.txt"
+# set(PROTO_TARGETS 
+#     "tensorflow/lite/profiling/proto/CMakeLists.txt"
+#     "tensorflow/lite/tools/benchmark/proto/CMakeLists.txt"
+# )
+
+# foreach(PROTO_LIST ${PROTO_TARGETS})
+#     set(FULL_PATH "${TENSORFLOW_SOURCE_DIR}/${PROTO_LIST}")
+#     if(EXISTS "${FULL_PATH}")
+#         message(STATUS "[LITERTLM] Fixing relative proto paths in ${PROTO_LIST}")
+        
+#         # 1. Force the include path to the ROOT of the source tree
+#         # This fixes: "Could not make proto path relative"
+#         execute_process(COMMAND sed -i "s|--proto_path=\${CMAKE_CURRENT_SOURCE_DIR}/\\([./]\\)*|--proto_path=${TENSORFLOW_SOURCE_DIR}|g" "${FULL_PATH}")
+
+#         # 2. Point the input files to the actual 'tensorflow/lite' path on disk
+#         # This fixes: "No such file or directory"
+#         execute_process(COMMAND sed -i "s|tflite/|tensorflow/lite/|g" "${FULL_PATH}")
+#     endif()
+# endforeach()
+
+# set(PROTO_CMAKELIST_PATHS 
+#     "tensorflow/lite/profiling/proto/CMakeLists.txt"
+#     "tensorflow/lite/tools/benchmark/proto/CMakeLists.txt"
+# )
+# --- THE PROTO PATH RECONCILIATION ---
+# --- THE PROTO STUTTER LOBOTOMY (RE-ENABLED & IMPROVED) ---
+# --- THE SURGICAL PROTO FIX ---
+# --- THE UNIFIED SURGICAL PROTO FIX ---
+# --- THE UNIFIED SURGICAL PROTO FIX (CLEAN CMAKE) ---
+set(PROTO_RECORDS 
+    "tensorflow/lite/profiling/proto/CMakeLists.txt:profiling_info.proto"
+    "tensorflow/lite/tools/benchmark/proto/CMakeLists.txt:benchmark_result.proto"
 )
 
-foreach(PROTO_LIST ${PROTO_TARGETS})
-    set(FULL_PATH "${TENSORFLOW_SOURCE_DIR}/${PROTO_LIST}")
-    if(EXISTS "${FULL_PATH}")
-        message(STATUS "[LITERTLM] Fixing relative proto paths in ${PROTO_LIST}")
-        
-        # 1. Force the include path to the ROOT of the source tree
-        # This fixes: "Could not make proto path relative"
-        execute_process(COMMAND sed -i "s|--proto_path=\${CMAKE_CURRENT_SOURCE_DIR}/\\([./]\\)*|--proto_path=${TENSORFLOW_SOURCE_DIR}|g" "${FULL_PATH}")
+foreach(RECORD ${PROTO_RECORDS})
+    string(REPLACE ":" ";" FIELDS ${RECORD})
+    list(GET FIELDS 0 PLIST)
+    list(GET FIELDS 1 PFILE)
+    
+    set(TARGET_LIST "${TENSORFLOW_SOURCE_DIR}/${PLIST}")
+    
+    if(EXISTS "${TARGET_LIST}")
+        message(STATUS "[LITERTLM] Applying surgical fix to ${PLIST}...")
 
-        # 2. Point the input files to the actual 'tensorflow/lite' path on disk
-        # This fixes: "No such file or directory"
-        execute_process(COMMAND sed -i "s|tflite/|tensorflow/lite/|g" "${FULL_PATH}")
+        # Get the directory part of the PLIST (e.g., tensorflow/lite/profiling/proto)
+        get_filename_component(PDIR "${PLIST}" DIRECTORY)
+
+        # 1. Force the --proto_path to the repo root
+        execute_process(COMMAND sed -i "s|--proto_path=[^ ]*|--proto_path=${TENSORFLOW_SOURCE_DIR}|g" "${TARGET_LIST}")
+
+        # 2. Fix the input file path ONLY in COMMAND/DEPENDS arguments
+        # We use the absolute path we constructed: ${TENSORFLOW_SOURCE_DIR}/${PDIR}/${PFILE}
+        execute_process(COMMAND sed -i "s| [^ ]*${PFILE}| ${TENSORFLOW_SOURCE_DIR}/${PDIR}/${PFILE}|g" "${TARGET_LIST}")
+        
+        # 3. Final cleanup for any stray 'tflite/' prefixes
+        execute_process(COMMAND sed -i "s|tflite/|tensorflow/lite/|g" "${TARGET_LIST}")
     endif()
 endforeach()

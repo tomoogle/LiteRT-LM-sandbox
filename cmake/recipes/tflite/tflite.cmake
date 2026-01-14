@@ -52,7 +52,7 @@ ExternalProject_Add(
     COMMAND sed -i "s/FLATBUFFERS_VERSION_MAJOR == 24/FLATBUFFERS_VERSION_MAJOR >= 24/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h
     COMMAND sed -i "s/FLATBUFFERS_VERSION_MINOR == 3/FLATBUFFERS_VERSION_MINOR >= 0/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h
     COMMAND sed -i "s/FLATBUFFERS_VERSION_REVISION == 25/FLATBUFFERS_VERSION_REVISION >= 0/g" <SOURCE_DIR>/tensorflow/compiler/mlir/lite/schema/schema_generated.h 
-    COMMAND sed -i "s|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}//..//..//..|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}|g" <SOURCE_DIR>/tensorflow/lite/profiling/proto/CMakeLists.txt
+    # COMMAND sed -i "s|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}//..//..//..|--proto_path=${CMAKE_CURRENT_SOURCE_DIR}|g" <SOURCE_DIR>/tensorflow/lite/profiling/proto/CMakeLists.txt
 
 
 
@@ -69,8 +69,8 @@ ExternalProject_Add(
 
 
 
-    COMMAND sed -i -E "s|[\$][{]CMAKE_CURRENT_SOURCE_DIR[}]([\/][.][.])+ [^ ]+|${TFLITE_SRC_DIR} tools/benchmark/proto/benchmark_result.proto|g" <SOURCE_DIR>/tensorflow/lite/tools/benchmark/proto/CMakeLists.txt
-    COMMAND sed -i -E "s|[\$][{]CMAKE_CURRENT_SOURCE_DIR[}]([\/][.][.])+ tflite[\/]|${TFLITE_SRC_DIR} |g" <SOURCE_DIR>/tensorflow/lite/profiling/proto/CMakeLists.txt
+    # COMMAND sed -i -E "s|[\$][{]CMAKE_CURRENT_SOURCE_DIR[}]([\/][.][.])+ [^ ]+|${TENSORFLOW_SOURCE_DIR} tools/benchmark/proto/benchmark_result.proto|g" <SOURCE_DIR>/tensorflow/lite/tools/benchmark/proto/CMakeLists.txt
+    # COMMAND sed -i -E "s|[\$][{]CMAKE_CURRENT_SOURCE_DIR[}]([\/][.][.])+ tflite[\/]|${TENSORFLOW_SOURCE_DIR} |g" <SOURCE_DIR>/tensorflow/lite/profiling/proto/CMakeLists.txt
 
 
 

@@ -63,53 +63,43 @@ ExternalProject_Add(
   #  PATCHES
   # ---------------------------------------------------------
   PATCH_COMMAND 
-    # [A] Fix Compilation Errors (Return types & Missing dirs)
-    sed -i "s/ return litert_cpu_buffer_requirements/return litert::Expected<const LiteRtTensorBufferRequirementsT*>(litert_cpu_buffer_requirements)/" <SOURCE_DIR>/litert/runtime/compiled_model.cc
-    COMMAND sed -i "s|add_subdirectory(compiler_plugin)|add_subdirectory(compiler)|g" <SOURCE_DIR>/litert/CMakeLists.txt
+    git checkout -- . && git clean -df
 
-    # [B] Fix Google's CMake Structure (Comment out overrides)
+    # --- Section 1: Abseil Redirection & Shim Injection ---
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::status|LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::strings|LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::str_format|LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::log|LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::flat_hash_map|LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::any|LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::span|LiteRTLM::absl::absl|g" {} +
+    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::hash|LiteRTLM::absl::absl|g" {} +
+
+    COMMAND sed -i "1i add_library(LiteRTLM::absl::absl INTERFACE IMPORTED GLOBAL)" <SOURCE_DIR>/litert/CMakeLists.txt
+    COMMAND sed -i "2i set_target_properties(LiteRTLM::absl::absl PROPERTIES INTERFACE_LINK_LIBRARIES \"-Wl,--start-group ${ABSL_LIBS_FLAT} -Wl,--end-group\")" <SOURCE_DIR>/litert/CMakeLists.txt
+    
+    # --- Section 2: Source Code & Compilation Fixes ---
+    COMMAND sed -i "s/ return litert_cpu_buffer_requirements/return litert::Expected<const LiteRtTensorBufferRequirementsT*>(litert_cpu_buffer_requirements)/" <SOURCE_DIR>/litert/runtime/compiled_model.cc
+    COMMAND sed -i "s|add_subdirectory(compiler_plugin)|add_subdirectory(compiler)|g" <SOURCE_DIR>/litert/CMakeLists.txt
     COMMAND sed -i "s|set(TFLITE_BUILD_DIR|#set(TFLITE_BUILD_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt
     COMMAND sed -i "s|set(TFLITE_SOURCE_DIR|#set(TFLITE_SOURCE_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt
 
-    # [C] Fix Missing/Moved Source Files
+    # --- Section 3: File Path & Source Movement ---
     COMMAND sed -i "s|    litert_accelerator.cc|    internal/litert_accelerator.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt
     COMMAND sed -i "s|    litert_accelerator_registration.cc|    internal/litert_accelerator_registration.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt
     
-    # [D] Comment out broken files we don't need
+    # --- Section 4: Feature Disabling & Cleanup ---
     COMMAND sed -i "s|    model_graph.cc|#    model_graph.cc|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
     COMMAND sed -i "s|    tensor_buffer_conversion.cc|#    tensor_buffer_conversion.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
     COMMAND sed -i "s|    webgpu_buffer.cc|#    webgpu_buffer.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
-
-    # COMMAND sed -i "s|    message(FATAL_ERROR \"FlatBuffers|#    message(FATAL_ERROR \"FlatBuffers|" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
-    # COMMAND sed -i "s|    message(FATAL_ERROR \"FlatBuffers|#    message(FATAL_ERROR \"FlatBuffers|" <SOURCE_DIR>/litert/vender/CMakeLists.txt
-
-    # Stop MediaTek from clearing our FLATC_EXECUTABLE variable
     COMMAND sed -i "s/set(FLATC_EXECUTABLE \"\")/#set(FLATC_EXECUTABLE \"\")/g" <SOURCE_DIR>/litert/vendors/CMakeLists.txt
 
-    # [F] THE "EMPTY()" POLYFILL (Critical for v24 compatibility)
-    # The compiler is finding older headers first, so we replace .empty() with .size() != 0
-    # COMMAND sed -i "s/!buffers->empty()/buffers->size() != 0/g" <SOURCE_DIR>/tflite/converter/core/model_builder_base.h
-
-    # # [Fix Root Overlay Path]
-    # COMMAND sed -i "s|set(_overlay_root.*)|set(_overlay_root \"${TFLITE_SRC_DIR}/converter\")|g" <SOURCE_DIR>/litert/CMakeLists.txt
-
-    # # [Fix Model Schema Output Path]
-    # COMMAND sed -i "s|generated/include/tflite/schema/mutable|generated/include/converter/schema/mutable|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
-
-    # COMMAND sed -i "s|set(_overlay_root \"${CMAKE_CURRENT_SOURCE_DIR}/../tflite/converter\")|  set(_overlay_root \"${TFLITE_SOURCE_DIR}/tflite/converter\")|" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
-
-        # [E] THE NUCLEAR OPTION (Versioning)
-    # Recursively find ALL generated headers and force them to accept our FlatBuffers version.
+    # --- Section 5: Versioning & Layout Fixes ---
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MAJOR == 25/FLATBUFFERS_VERSION_MAJOR >= 24/g" {} +
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
     COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
-
-     # [Fix] Use double backslashes so CMake passes single backslashes to sed
     COMMAND sed -i "s/constexpr \\(.*\\)Layout(/ \\1Layout(/g" <SOURCE_DIR>/litert/cc/litert_layout.h
-
     COMMAND sed -i "s|\$<BUILD_INTERFACE:.*/opencl_headers>|        {OPENCL_INCLUDE_DIR}|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
-
-
 
   # ---------------------------------------------------------
   #  CMAKE ARGUMENTS
