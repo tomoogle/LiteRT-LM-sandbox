@@ -65,48 +65,17 @@ ExternalProject_Add(
   PATCH_COMMAND 
     git checkout -- . && git clean -df
 
-    # --- Section 1: Abseil Redirection & Shim Injection ---
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::status|LiteRTLM::absl::absl|g" {} +
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::strings|LiteRTLM::absl::absl|g" {} +
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::str_format|LiteRTLM::absl::absl|g" {} +
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::log|LiteRTLM::absl::absl|g" {} +
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::flat_hash_map|LiteRTLM::absl::absl|g" {} +
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::any|LiteRTLM::absl::absl|g" {} +
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::span|LiteRTLM::absl::absl|g" {} +
-    COMMAND find <SOURCE_DIR>/litert -name "CMakeLists.txt" -exec sed -i "s|absl::hash|LiteRTLM::absl::absl|g" {} +
-
-    COMMAND sed -i "1i add_library(LiteRTLM::absl::absl INTERFACE IMPORTED GLOBAL)" <SOURCE_DIR>/litert/CMakeLists.txt
-    COMMAND sed -i "2i set_target_properties(LiteRTLM::absl::absl PROPERTIES INTERFACE_LINK_LIBRARIES \"-Wl,--start-group ${ABSL_LIBS_FLAT} -Wl,--end-group\")" <SOURCE_DIR>/litert/CMakeLists.txt
-    
-    # --- Section 2: Source Code & Compilation Fixes ---
-    COMMAND sed -i "s/ return litert_cpu_buffer_requirements/return litert::Expected<const LiteRtTensorBufferRequirementsT*>(litert_cpu_buffer_requirements)/" <SOURCE_DIR>/litert/runtime/compiled_model.cc
-    COMMAND sed -i "s|add_subdirectory(compiler_plugin)|add_subdirectory(compiler)|g" <SOURCE_DIR>/litert/CMakeLists.txt
-    COMMAND sed -i "s|set(TFLITE_BUILD_DIR|#set(TFLITE_BUILD_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt
-    COMMAND sed -i "s|set(TFLITE_SOURCE_DIR|#set(TFLITE_SOURCE_DIR|" <SOURCE_DIR>/litert/CMakeLists.txt
-
-    # --- Section 3: File Path & Source Movement ---
-    COMMAND sed -i "s|    litert_accelerator.cc|    internal/litert_accelerator.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt
-    COMMAND sed -i "s|    litert_accelerator_registration.cc|    internal/litert_accelerator_registration.cc|g" <SOURCE_DIR>/litert/c/CMakeLists.txt
-    
-    # --- Section 4: Feature Disabling & Cleanup ---
-    COMMAND sed -i "s|    model_graph.cc|#    model_graph.cc|g" <SOURCE_DIR>/litert/core/model/CMakeLists.txt
-    COMMAND sed -i "s|    tensor_buffer_conversion.cc|#    tensor_buffer_conversion.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
-    COMMAND sed -i "s|    webgpu_buffer.cc|#    webgpu_buffer.cc|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
-    COMMAND sed -i "s/set(FLATC_EXECUTABLE \"\")/#set(FLATC_EXECUTABLE \"\")/g" <SOURCE_DIR>/litert/vendors/CMakeLists.txt
-
-    # --- Section 5: Versioning & Layout Fixes ---
-    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MAJOR == 25/FLATBUFFERS_VERSION_MAJOR >= 24/g" {} +
-    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_MINOR == [0-9]*/FLATBUFFERS_VERSION_MINOR >= 0/g" {} +
-    COMMAND find <SOURCE_DIR> -name "*generated.h" -exec sed -i "s/FLATBUFFERS_VERSION_REVISION == [0-9]*/FLATBUFFERS_VERSION_REVISION >= 0/g" {} +
-    COMMAND sed -i "s/constexpr \\(.*\\)Layout(/ \\1Layout(/g" <SOURCE_DIR>/litert/cc/litert_layout.h
-    COMMAND sed -i "s|\$<BUILD_INTERFACE:.*/opencl_headers>|        {OPENCL_INCLUDE_DIR}|g" <SOURCE_DIR>/litert/runtime/CMakeLists.txt
-
     COMMAND ${CMAKE_COMMAND} 
     -DFLATC_EXECUTABLE=${FLATC_EXECUTABLE} 
+    -DFLATBUFFERS_LIB_DIR=${FLATBUFFERS_LIB_DIR}
     -DTFLITE_SRC_DIR=${TFLITE_SRC_DIR} 
     -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
-    -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR} 
+    -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR}
     -DLITERTLM_RECIPES_DIR=${LITERTLM_RECIPES_DIR}
+    -DLITERT_SOURCE_DIR=${LITERT_SOURCE_DIR}
+    -DABSL_LIBS_FLAT=${ABSL_LIBS_FLAT}
+    -DABSL_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
+    -DOPENCL_INCLUDE_DIR=${OPENCL_INCLUDE_DIR}
     -P "${PROJECT_ROOT}/cmake/recipes/litert/litert_patcher.cmake"
 
 
@@ -130,9 +99,14 @@ ExternalProject_Add(
     -DCMAKE_CXX_EXTENSIONS=OFF
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     
-    # Inject our constructed flags (Includes OpenCL mocks)
-    "-DCMAKE_CXX_FLAGS=${LITERT_CXX_FLAGS_Construct}"
-    "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}" 
+
+    "-DCMAKE_PREFIX_PATH=${ABSL_INSTALL_PREFIX};${TFLITE_INSTALL_PREFIX};${PROTOBUF_INSTALL_PREFIX};${FLATBUFFERS_INSTALL_PREFIX}"
+
+    "-DCMAKE_CXX_FLAGS:STRING=${LITERT_CXX_FLAGS_Construct} -isystem ${TFLITE_INSTALL_PREFIX}/include -isystem ${ABSL_INSTALL_PREFIX}/include -isystem ${PROTOBUF_INSTALL_PREFIX}/include"
+    "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} -isystem ${TFLITE_INSTALL_PREFIX}/include"
+
+    "-DXNNPACK_INCLUDE_DIR=${TFLITE_INSTALL_PREFIX}/include"
+
 
     # OpenCL Versioning
     -DCL_TARGET_OPENCL_VERSION=220
@@ -160,7 +134,9 @@ ExternalProject_Add(
     -DFLATC_EXECUTABLE=${FLATC_EXECUTABLE}
     -Dflatbuffers_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib/cmake/flatbuffers
     -DFETCHCONTENT_SOURCE_DIR_FLATBUFFERS=${FLATBUFFERS_SRC_DIR}/flatbuffers_external
-    
+    "-DFLATBUFFERS_INSTALL_PREFIX=${FLATBUFFERS_INSTALL_PREFIX}"
+    "-DFLATBUFFERS_LIB_DIR=${FLATBUFFERS_INSTALL_PREFIX}/lib"
+
     # Dependency Injection: TFLite
     -DTFLite_DIR=${TFLITE_INSTALL_PREFIX}/lib
     -Dtensorflow-lite_DIR=${TFLITE_INSTALL_PREFIX}/lib
@@ -183,126 +159,8 @@ ExternalProject_Add(
     -DLITERT_BUILD_TOOLS=OFF
     "-DCMAKE_SHARED_LINKER_FLAGS=${ABSL_LINK_FLAGS}"
     "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_LIB_DIR} -L${FLATBUFFERS_LIB_DIR} -L${TFLITE_LIB_DIR}"
-    # "-DCMAKE_CXX_STANDARD_LIBRARIES= \
-    #   -Wl,--start-group \
-    #   -labsl_log_internal_proto \
-    #   -labsl_log_internal_message \
-    #   -labsl_log_internal_structured_proto \
-    #   -labsl_log_internal_check_op \
-    #   -labsl_log_severity \
-    #   -labsl_cord \
-    #   -labsl_cord_internal \
-    #   -labsl_cordz_handle \
-    #   -labsl_cordz_info \
-    #   -labsl_cordz_functions \
-    #   -labsl_cordz_sample_token \
-    #   -labsl_crc_cord_state \
-    #   -labsl_crc32c \
-    #   -labsl_crc_internal\
-    #   -labsl_crc_cpu_detect \
-    #   -labsl_exponential_biased \
-    #   -labsl_symbolize \
-    #   -labsl_stacktrace \
-    #   -labsl_tracing_internal \
-    #   -labsl_debugging_internal \
-    #   -labsl_examine_stack \
-    #   -labsl_demangle_internal \
-    #   -labsl_demangle_rust \
-    #   -labsl_decode_rust_punycode \
-    #   -labsl_log_internal_globals \
-    #   -labsl_log_globals \
-    #   -labsl_log_sink \
-    #   -labsl_log_internal_log_sink_set \
-    #   -labsl_log_internal_format \
-    #   -labsl_log_internal_conditions \
-    #   -labsl_log_internal_nullguard \
-    #   -labsl_log_internal_fnmatch \
-    #   -labsl_status \
-    #   -labsl_statusor \
-    #   -labsl_raw_logging_internal \
-    #   -labsl_base \
-    #   -labsl_spinlock_wait \
-    #   -labsl_malloc_internal \
-    #   -labsl_failure_signal_handler \
-    #   -labsl_throw_delegate \
-    #   -labsl_int128 \
-    #   -labsl_strings \
-    #   -labsl_strings_internal \
-    #   -labsl_string_view \
-    #   -labsl_strerror \
-    #   -labsl_poison \
-    #   -labsl_synchronization \
-    #   -labsl_periodic_sampler \
-    #   -labsl_scoped_set_env \
-    #   -labsl_kernel_timeout_internal \
-    #   -labsl_time \
-    #   -labsl_time_zone \
-    #   -labsl_hash \
-    #   -labsl_city \
-    #   -labsl_hashtable_profiler \
-    #   -labsl_log_initialize \
-    #   -labsl_leak_check \
-    #   -labsl_raw_hash_set \
-    #   -labsl_utf8_for_code_point \
-    #   -labsl_hashtablez_sampler \
-    #   -labsl_flags_parse \
-    #   -labsl_flags_usage \
-    #   -labsl_flags_usage_internal \
-    #   -labsl_flags_marshalling \
-    #   -labsl_flags_internal \
-    #   -labsl_flags_reflection \
-    #   -labsl_flags_config \
-    #   -labsl_flags_commandlineflag \
-    #   -labsl_flags_commandlineflag_internal \
-    #   -labsl_flags_private_handle_accessor \
-    #   -labsl_flags_program_name \
-    #   -labsl_die_if_null \
-    #   -lprotobuf \
-    #   -lprotobuf-lite \
-    #   -ltensorflow-lite \
-    #   -lXNNPACK \
-    #   -lxnnpack-microkernels-prod \
-    #   -lxnnpack-delegate \
-    #   -lcpuinfo \
-    #   -lpthreadpool \
-    #   -leight_bit_int_gemm \
-    #   -lfft2d_fftsg \
-    #   -lfft2d_fftsg2d \
-    #   -lfarmhash \
-    #   -lflatbuffers \
-    #   -lruy_allocator \
-    #   -lruy_apply_multiplier \
-    #   -lruy_block_map \
-    #   -lruy_blocking_counter \
-    #   -lruy_context \
-    #   -lruy_context_get_ctx \
-    #   -lruy_cpuinfo \
-    #   -lruy_ctx \
-    #   -lruy_denormal \
-    #   -lruy_frontend \
-    #   -lruy_have_built_path_for_avx \
-    #   -lruy_have_built_path_for_avx2_fma \
-    #   -lruy_have_built_path_for_avx512 \
-    #   -lruy_kernel_arm \
-    #   -lruy_kernel_avx \
-    #   -lruy_kernel_avx2_fma \
-    #   -lruy_kernel_avx512 \
-    #   -lruy_pack_arm \
-    #   -lruy_pack_avx \
-    #   -lruy_pack_avx2_fma \
-    #   -lruy_pack_avx512 \
-    #   -lruy_prepacked_cache \
-    #   -lruy_prepare_packed_matrices \
-    #   -lruy_profiler_instrumentation \
-    #   -lruy_profiler_profiler \
-    #   -lruy_system_aligned_alloc \
-    #   -lruy_thread_pool \
-    #   -lruy_trmul \
-    #   -lruy_tune \
-    #   -lruy_wait \
-    #   -Wl,--end-group \
-    #   "
-
+    "-DLITERTLM_RECIPES_DIR=${LITERTLM_RECIPES_DIR}"
+   
   INSTALL_COMMAND ""
 )
 
