@@ -112,8 +112,8 @@ include(utils)
 
 
 # --- Dependencies
-include(external_project)
 include(fetch_content)
+include(external_project)
 
 # LITERTLM_INCLUDE_PATHS must be updated before collect_dependencies is called
 list(APPEND LITERTLM_INCLUDE_PATHS
