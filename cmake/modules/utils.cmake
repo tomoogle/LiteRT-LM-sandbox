@@ -119,43 +119,174 @@ endfunction()
 
 
 
-# --- target_checkpoint ---
-# Logic: Ensure a target identity is registered in the global manifest.
-# Purpose: Prevents configuration-time "Target not found" errors in complex 
-#          Directed Acyclic Graphs (DAGs) without requiring specific source logic.
-function(target_checkpoint TARGET_NAME)
-    set(options QUIET)
+# # --- cmake_checkpoint_target ---
+# # 
+# # Synopsis:
+# #   cmake_checkpoint_target(<name> 
+# #       [TYPE <Interface|Object|Static|Shared|Module|Executable|Custom>]
+# #       [GLOBAL]
+# #       [QUIET]
+# #       [PROPERTIES <prop> <value>...]
+# #   )
+# #
+# # Description:
+# #   Ensures that a target with the given <name> exists in the current scope 
+# #   (or globally if GLOBAL is specified). If the target is missing, it creates 
+# #   a "Contract Target" of the specified TYPE.
+# #
+# #   This is primarily used in Dependency Injection and Super-Build orchestration
+# #   to separate the *Request* for a dependency from the *Fulfillment* of it.
+
+# function(cmake_checkpoint_target TARGET_NAME)
+#     set(options GLOBAL QUIET)
+#     set(oneValueArgs TYPE)
+#     set(multiValueArgs PROPERTIES)
+#     cmake_parse_arguments(CHK "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+#     # 1. Scope Check
+#     # We must check if the target exists globally OR in the current directory scope.
+#     if(TARGET ${TARGET_NAME})
+#         if(NOT CHK_QUIET)
+#              message(STATUS "Checkpoint: Target '${TARGET_NAME}' satisfied (Existing).")
+#         endif()
+#         return()
+#     endif()
+
+#     # 2. Type Normalization (Default to INTERFACE for safety)
+#     if(NOT CHK_TYPE)
+#         set(CHK_TYPE "INTERFACE") 
+#     endif()
+#     string(TOUPPER "${CHK_TYPE}" CHK_TYPE)
+
+#     # 3. Fulfillment Strategy
+#     # We use IMPORTED targets because Checkpoints are usually assumptions about 
+#     # external state, not instructions to build source in the current scope.
+#     set(SCOPE_FLAG "")
+#     if(CHK_GLOBAL)
+#         set(SCOPE_FLAG "GLOBAL")
+#     endif()
+
+#     if(CHK_TYPE STREQUAL "CUSTOM")
+#         # Custom targets cannot be IMPORTED in older CMake, but standard ones can.
+#         # usually just 'add_custom_target' is enough.
+#         add_custom_target(${TARGET_NAME})
+        
+#     elseif(CHK_TYPE STREQUAL "INTERFACE")
+#         add_library(${TARGET_NAME} INTERFACE IMPORTED ${SCOPE_FLAG})
+
+#     elseif(CHK_TYPE MATCHES "^(STATIC|SHARED|MODULE|UNKNOWN)$")
+#         add_library(${TARGET_NAME} ${CHK_TYPE} IMPORTED ${SCOPE_FLAG})
+
+#     elseif(CHK_TYPE STREQUAL "EXECUTABLE")
+#         add_executable(${TARGET_NAME} IMPORTED ${SCOPE_FLAG})
+
+#     else()
+#         message(FATAL_ERROR "cmake_checkpoint_target: Unsupported TYPE '${CHK_TYPE}'")
+#     endif()
+
+#     # 4. Property Application
+#     if(CHK_PROPERTIES)
+#         set_target_properties(${TARGET_NAME} PROPERTIES ${CHK_PROPERTIES})
+#     endif()
+
+#     # 5. Audit Trail
+#     # We use a distinct property to mark this as a checkpoint so logic can query:
+#     # get_target_property(is_chk ${tgt} CHECKPOINT_ORIGIN)
+#     set_target_properties(${TARGET_NAME} PROPERTIES 
+#         CHECKPOINT_CREATED TRUE
+#         CHECKPOINT_ORIGIN "${CMAKE_CURRENT_LIST_FILE}:${CMAKE_CURRENT_LIST_LINE}"
+#     )
+
+#     if(NOT CHK_QUIET)
+#         message(STATUS "Checkpoint: Target '${TARGET_NAME}' created as ${CHK_TYPE} (Stub).")
+#     endif()
+
+# endfunction()
+
+
+# --- cmake_checkpoint_target ---
+#
+# Synopsis:
+#   cmake_checkpoint_target(<name>
+#       [TYPE <Interface|Object|Static|Shared|Executable|Custom>]
+#       [GLOBAL]
+#       [QUIET]
+#       [PROPERTIES <prop> <value>...]
+#   )
+#
+# Description:
+#   Enforces the existence of a logical target in the current build graph.
+#   If the target does not exist, it creates a "Contract Shim" (Imported Target)
+#   to satisfy downstream dependencies without defining an implementation.
+#
+#   This separates the *Declaration* of a dependency from its *Definition*.
+#
+# Options:
+#   TYPE     : The CMake target type. Defaults to INTERFACE.
+#   GLOBAL   : Promotes the shim to Global Scope (visible to all directories).
+#              Default is Directory Scope (standard CMake visibility).
+#   QUIET    : Suppresses status messages.
+#   PROPERTIES: List of properties to apply to the shim.
+
+function(cmake_checkpoint_target TARGET_NAME)
+    set(options GLOBAL QUIET)
     set(oneValueArgs TYPE)
     set(multiValueArgs PROPERTIES)
-    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(CHK "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    if(NOT TARGET ${TARGET_NAME})
-        # Fulfillment Strategy
-        # Note: We use 'GLOBAL' where possible to ensure the checkpoint 
-        # spans the entire project tree, as a checkpoint is a promise of existence.
-        if(NOT ARG_TYPE OR ARG_TYPE STREQUAL "CUSTOM")
-            add_custom_target(${TARGET_NAME})
-        elseif(ARG_TYPE STREQUAL "INTERFACE")
-            add_library(${TARGET_NAME} INTERFACE IMPORTED GLOBAL)
-        elseif(ARG_TYPE STREQUAL "EXECUTABLE")
-            add_executable(${TARGET_NAME} IMPORTED GLOBAL)
-        elseif(ARG_TYPE STREQUAL "STATIC_LIBRARY")
-            add_library(${TARGET_NAME} STATIC IMPORTED GLOBAL)
+    # 1. State Check (Idempotency)
+    if(TARGET ${TARGET_NAME})
+        # Optional: verify scope visibility here if we wanted to be strict
+        if(NOT CHK_QUIET)
+             message(STATUS "[Checkpoint] Target '${TARGET_NAME}' satisfied (Existing).")
         endif()
-
-        # Apply standard target properties if provided
-        if(ARG_PROPERTIES)
-            set_target_properties(${TARGET_NAME} PROPERTIES ${ARG_PROPERTIES})
-        endif()
-
-        # Native Audit Trail (Using standard internal property naming conventions)
-        set_target_properties(${TARGET_NAME} PROPERTIES 
-            IMPORTED_GENERATED_BY_CHECKPOINT TRUE
-            CHECKPOINT_LOCATION "${CMAKE_CURRENT_LIST_FILE}:${CMAKE_CURRENT_LIST_LINE}"
-        )
-
-        if(NOT ARG_QUIET)
-            message(CONFIGURE_LOG "Target checkpoint fulfilled: ${TARGET_NAME}")
-        endif()
+        return()
     endif()
+
+    # 2. Type Normalization
+    if(NOT CHK_TYPE)
+        set(CHK_TYPE "INTERFACE")
+    endif()
+    string(TOUPPER "${CHK_TYPE}" CHK_TYPE)
+
+    # 3. Scope Handling
+    set(SCOPE_FLAG "")
+    if(CHK_GLOBAL)
+        set(SCOPE_FLAG "GLOBAL")
+    endif()
+
+    # 4. Fulfillment Strategy (The Shim)
+    if(CHK_TYPE STREQUAL "CUSTOM")
+        # Custom targets are always global in scope by nature in CMake,
+        # but we treat them consistently here.
+        add_custom_target(${TARGET_NAME})
+
+    elseif(CHK_TYPE STREQUAL "INTERFACE")
+        add_library(${TARGET_NAME} INTERFACE IMPORTED ${SCOPE_FLAG})
+
+    elseif(CHK_TYPE MATCHES "^(STATIC|SHARED|MODULE|UNKNOWN)$")
+        add_library(${TARGET_NAME} ${CHK_TYPE} IMPORTED ${SCOPE_FLAG})
+
+    elseif(CHK_TYPE STREQUAL "EXECUTABLE")
+        add_executable(${TARGET_NAME} IMPORTED ${SCOPE_FLAG})
+
+    else()
+        message(FATAL_ERROR "cmake_checkpoint_target: Unsupported TYPE '${CHK_TYPE}'")
+    endif()
+
+    # 5. Contract Signing (Properties)
+    if(CHK_PROPERTIES)
+        set_target_properties(${TARGET_NAME} PROPERTIES ${CHK_PROPERTIES})
+    endif()
+
+    # 6. Audit Trail (Metadata)
+    set_target_properties(${TARGET_NAME} PROPERTIES
+        CHECKPOINT_TYPE "SHIM"
+        CHECKPOINT_ORIGIN "${CMAKE_CURRENT_LIST_FILE}:${CMAKE_CURRENT_LIST_LINE}"
+    )
+
+    if(NOT CHK_QUIET)
+        message(STATUS "[Checkpoint] Created shim for '${TARGET_NAME}' (${CHK_TYPE} ${SCOPE_FLAG})")
+    endif()
+
 endfunction()
