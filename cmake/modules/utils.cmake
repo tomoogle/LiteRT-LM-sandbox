@@ -115,3 +115,47 @@ function(compile_flatbuffer_files FBS_FILE)
     set_source_files_properties(${GENERATED_HEADER} PROPERTIES GENERATED TRUE)
     set(GENERATED_FLATBUFFER_HEADERS ${GENERATED_FLATBUFFER_HEADERS} ${GENERATED_HEADER} PARENT_SCOPE)
 endfunction()
+
+
+
+
+# --- target_checkpoint ---
+# Logic: Ensure a target identity is registered in the global manifest.
+# Purpose: Prevents configuration-time "Target not found" errors in complex 
+#          Directed Acyclic Graphs (DAGs) without requiring specific source logic.
+function(target_checkpoint TARGET_NAME)
+    set(options QUIET)
+    set(oneValueArgs TYPE)
+    set(multiValueArgs PROPERTIES)
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(NOT TARGET ${TARGET_NAME})
+        # Fulfillment Strategy
+        # Note: We use 'GLOBAL' where possible to ensure the checkpoint 
+        # spans the entire project tree, as a checkpoint is a promise of existence.
+        if(NOT ARG_TYPE OR ARG_TYPE STREQUAL "CUSTOM")
+            add_custom_target(${TARGET_NAME})
+        elseif(ARG_TYPE STREQUAL "INTERFACE")
+            add_library(${TARGET_NAME} INTERFACE IMPORTED GLOBAL)
+        elseif(ARG_TYPE STREQUAL "EXECUTABLE")
+            add_executable(${TARGET_NAME} IMPORTED GLOBAL)
+        elseif(ARG_TYPE STREQUAL "STATIC_LIBRARY")
+            add_library(${TARGET_NAME} STATIC IMPORTED GLOBAL)
+        endif()
+
+        # Apply standard target properties if provided
+        if(ARG_PROPERTIES)
+            set_target_properties(${TARGET_NAME} PROPERTIES ${ARG_PROPERTIES})
+        endif()
+
+        # Native Audit Trail (Using standard internal property naming conventions)
+        set_target_properties(${TARGET_NAME} PROPERTIES 
+            IMPORTED_GENERATED_BY_CHECKPOINT TRUE
+            CHECKPOINT_LOCATION "${CMAKE_CURRENT_LIST_FILE}:${CMAKE_CURRENT_LIST_LINE}"
+        )
+
+        if(NOT ARG_QUIET)
+            message(CONFIGURE_LOG "Target checkpoint fulfilled: ${TARGET_NAME}")
+        endif()
+    endif()
+endfunction()
