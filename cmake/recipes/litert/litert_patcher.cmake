@@ -81,9 +81,20 @@ foreach(C_FILE ${ALL_CMAKELISTS})
     # Redirect modular internal calls to our global shims
     patch_file_content("${C_FILE}" "absl::[a-zA-Z0-9_]+" "LiteRTLM::absl::absl" TRUE)
     patch_file_content("${C_FILE}" "flatbuffers::flatbuffers" "LiteRTLM::flatbuffers::flatbuffers" FALSE)
-    
     # Kill hardcoded TFLite _deps paths specifically
-    patch_file_content("${C_FILE}" ".*/_deps/flatbuffers-build/libflatbuffers.a" "LiteRTLM::flatbuffers::flatbuffers" TRUE)
+    patch_file_content("${C_FILE}" "[^\" ]*/_deps/flatbuffers-build/libflatbuffers.a" "LiteRTLM::flatbuffers::flatbuffers" TRUE)
+    patch_file_content("${C_FILE}" "flatbuffers-build/libflatbuffers.a" "LiteRTLM::flatbuffers::flatbuffers" FALSE)
+
+    patch_file_content("${C_FILE}" "\\\${TFLITE_BUILD_DIR}/host_flatc/_deps/flatbuffers-build/flatc" "flatc" FALSE)
+    patch_file_content("${C_FILE}" "TFLITE_FLATBUFFERS_LIB" "LiteRTLM::flatbuffers::flatbuffers" FALSE)
+
+    patch_file_content("${C_FILE}" "FetchContent_Declare\\([^\\)]+\\)" "# FC_DECLARE_REMOVED" TRUE)
+    patch_file_content("${C_FILE}" "FetchContent_MakeAvailable\\([^\\)]+\\)" "# FC_MAKE_AVAILABLE_REMOVED" TRUE)
+
+    patch_file_content("${C_FILE}" "find_program\\(FLATC_EXECUTABLE[^\\)]+\\)" "# FIND_FLATC_REMOVED" TRUE)
+
+    patch_file_content("${C_FILE}" "set\\(FLATC_EXECUTABLE \\$<TARGET_FILE:flatc>\\)" "set(FLATC_EXECUTABLE flatc)" TRUE)
+    
 endforeach()
 
 # --- 4. SURGICAL COMPILATION FIXES (ORDER: LAST) ---
@@ -93,14 +104,39 @@ patch_file_content("${LITERT_INTERNAL_ROOT}/runtime/compiled_model.cc"
 
 patch_file_content("${ROOT_LIST}" "add_subdirectory(compiler_plugin)" "add_subdirectory(compiler)" FALSE)
 
-# Lobotomize Vendors
+
+# --- Section 4: Vendors Scavenger Hunt Lobotomy ---
 set(V_LIST "${LITERT_INTERNAL_ROOT}/vendors/CMakeLists.txt")
+
 if(EXISTS "${V_LIST}")
-patch_file_content("${V_LIST}" "message\\(FATAL_ERROR \"FlatBuffers 'flatc' target not available[^\"]*\"\\)" "message(STATUS \"Bypassing flatc\")" TRUE)
-file(READ "${V_LIST}" V_CONTENT)
-    if(NOT V_CONTENT MATCHES "LITERT_ENABLE_QUALCOMM")
-        file(WRITE "${V_LIST}" "if(NOT LITERT_ENABLE_QUALCOMM)\n  return()\nendif()\n\n${V_CONTENT}")
-    endif()
+    message(STATUS "[LITERTLM] Disabling Vendor-specific FlatBuffers fetching...")
+
+    # 1. Comment out the FetchContent and find_program logic for flatc
+    patch_file_content("${V_LIST}" "FetchContent_Declare\\(flatbuffers" "# FetchContent_Declare(flatbuffers" TRUE)
+    patch_file_content("${V_LIST}" "FetchContent_MakeAvailable\\(flatbuffers\\)" "# FetchContent_MakeAvailable(flatbuffers)" TRUE)
+    patch_file_content("${V_LIST}" "find_program\\(FLATC_EXECUTABLE" "# find_program(FLATC_EXECUTABLE" TRUE)
+
+    # 2. Force the FLATC_EXECUTABLE to use our shim target
+    # This replaces the entire 'if(NOT FLATC_EXECUTABLE)' block logic
+    patch_file_content("${V_LIST}" "set\\(FLATC_EXECUTABLE \\$<TARGET_FILE:flatc>\\)" "set(FLATC_EXECUTABLE flatc)" TRUE)
+
+    # 3. Fix the target_link_libraries in the _litert_add_dispatch_so function
+    # It links to litert_runtime_c_api_static, which might be pulling in the bad paths.
+    # We ensure our FlatBuffers shim is explicitly linked here.
+    patch_file_content("${V_LIST}" "litert_runtime_c_api_static" "litert_runtime_c_api_static\n      LiteRTLM::flatbuffers::flatbuffers" FALSE)
+
+    # 4. Kill the TFLITE_SOURCE_DIR and TFLITE_BUILD_DIR include directories
+    # These are where the 'ghost paths' often originate.
+    patch_file_content("${V_LIST}" "\\$<BUILD_INTERFACE:\\\${TFLITE_SOURCE_DIR}>" "#" TRUE)
+    patch_file_content("${V_LIST}" "\\$<BUILD_INTERFACE:\\\${TENSORFLOW_SOURCE_DIR}>" "#" TRUE)
+
+    # Lobotomize JSON fetching in Qualcomm
+    patch_file_content("${C_FILE}" "FetchContent_Declare\\(nlohmann_json" "#" TRUE)
+    patch_file_content("${C_FILE}" "FetchContent_MakeAvailable\\(nlohmann_json\\)" "#" TRUE)
+    
+    # If they use find_package(nlohmann_json), we want them to use our Shim instead
+    patch_file_content("${C_FILE}" "find_package\\(nlohmann_json" "#" TRUE)
+
 endif()
 
 message(STATUS "[LITERTLM] Patching Complete.")

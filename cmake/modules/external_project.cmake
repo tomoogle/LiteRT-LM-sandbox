@@ -16,5 +16,5 @@ set(LITERTLM_DEPENDENCY_ORDER
 )
 
 foreach(recipe ${LITERTLM_DEPENDENCY_ORDER})
-    load_recipe(${recipe})
+    load_recipe(${recipe}) # macros.cmake
 endforeach()

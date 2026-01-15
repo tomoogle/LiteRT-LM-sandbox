@@ -114,18 +114,75 @@ Note:
   This macro is "sticky." Once a recipe is loaded, it sets a CACHE variable
   to prevent redundant configuration cycles.
 #]]
+# macro(load_recipe name)
+#     string(TOUPPER "${name}" upper_name)
+#     if(TARGET ${name}::${name} OR ${upper_name}_FOUND OR ${name}_FOUND)
+#         message(STATUS "[LITERTLM] Recipe '${name}' satisfied. Skipping build.")
+#     else()
+#         set(recipe_file "${LITERTLM_RECIPES_DIR}/${name}/${name}.cmake")
+#         if(EXISTS "${recipe_file}")
+#             message(STATUS "[LITERTLM] Cooking Recipe: ${name}.cmake")
+#             include("${recipe_file}")            
+#             set(${upper_name}_FOUND TRUE CACHE INTERNAL "Recipe ${name} loaded")
+#         else()
+#             message(FATAL_ERROR "[LITERTLM] FATAL: Recipe '${name}.cmake' is missing!")
+#         endif()
+#     endif()
+# endmacro()
+
+# macro(load_recipe name)
+#     string(TOUPPER "${name}" upper_name)
+    
+#     # PRIORITY 1: Check if the target already exists (The only truth)
+#     # PRIORITY 2: Check if the recipe was explicitly loaded in THIS session
+#     if(TARGET ${name}::${name} OR TARGET ${name})
+#         message(STATUS "[LITERTLM] Target '${name}' already exists. Skipping.")
+#     else()
+#         set(recipe_file "${LITERTLM_RECIPES_DIR}/${name}/${name}.cmake")
+#         if(EXISTS "${recipe_file}")
+#             message(STATUS "[LITERTLM] Cooking Recipe: ${name}.cmake")
+            
+#             include("${recipe_file}")
+            
+#             # Post-Cook Verification: Did the recipe actually create the target?
+#             if(NOT TARGET ${name}::${name} AND NOT TARGET ${name})
+#                  message(WARNING "[LITERTLM] Recipe '${name}' finished but no target was found. It might have failed silently.")
+#             endif()
+#         else()
+#             message(FATAL_ERROR "[LITERTLM] FATAL: Recipe '${name}.cmake' missing!")
+#         endif()
+#     endif()
+# endmacro()
+
 macro(load_recipe name)
     string(TOUPPER "${name}" upper_name)
-    if(TARGET ${name}::${name} OR ${upper_name}_FOUND OR ${name}_FOUND)
-        message(STATUS "[LITERTLM] Recipe '${name}' satisfied. Skipping build.")
-    else()
-        set(recipe_file "${LITERTLM_RECIPES_DIR}/${name}/${name}.cmake")
-        if(EXISTS "${recipe_file}")
-            message(STATUS "[LITERTLM] Cooking Recipe: ${name}.cmake")
-            include("${recipe_file}")            
-            set(${upper_name}_FOUND TRUE CACHE INTERNAL "Recipe ${name} loaded")
+    set(USE_SYSTEM_VAR "LITERTLM_USE_SYSTEM_${upper_name}")
+    
+    # Define the option if it doesn't exist so it shows up in cmake-gui/ccmake
+    option(${USE_SYSTEM_VAR} "LiteRT-LM: Use system/pre-existing ${name} instead of internal recipe" OFF)
+
+    set(SHOULD_COOK TRUE)
+
+    # Logic 1: User explicitly commanded system usage
+    if(${${USE_SYSTEM_VAR}})
+        find_package(${name} QUIET)
+        if(TARGET ${name}::${name} OR TARGET ${name})
+            message(STATUS "[LITERTLM] Policy: Using SYSTEM ${name} (User Override)")
+            set(SHOULD_COOK FALSE)
         else()
-            message(FATAL_ERROR "[LITERTLM] FATAL: Recipe '${name}.cmake' is missing!")
+            message(FATAL_ERROR "[LITERTLM] User set ${USE_SYSTEM_VAR}=ON but ${name} was not found on system!")
         endif()
+
+    # Logic 2: Target already exists (Implicit satisfaction)
+    elseif(TARGET ${name}::${name} OR TARGET ${name})
+        message(STATUS "[LITERTLM] Policy: Using PRE-EXISTING ${name} (Detected in Namespace)")
+        set(SHOULD_COOK FALSE)
+    endif()
+
+    # Logic 3: Cook the recipe
+    if(SHOULD_COOK)
+        message(STATUS "[LITERTLM] Policy: Using INTERNAL Recipe for ${name}")
+        include("${LITERTLM_RECIPES_DIR}/${name}/${name}.cmake")        
+        cmake_checkpoint_target("${name}_external" TYPE CUSTOM QUIET)
     endif()
 endmacro()

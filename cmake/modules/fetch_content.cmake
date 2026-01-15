@@ -1,7 +1,7 @@
 include(FetchContent)
 
 # --- ANTLR ---
-set(ANTLR_SRC_DIR ${CMAKE_BINARY_DIR}/_deps/antlr_lib-src/runtime/Cpp/runtime/src)
+set(ANTLR_SRC_DIR ${CMAKE_BINARY_DIR}/_deps/antlr_lib-src/runtime/Cpp/runtime/src CACHE PATH "Path to antlr source directory")
 FetchContent_Declare(
   antlr_lib
   GIT_REPOSITORY https://github.com/antlr/antlr4.git
@@ -14,14 +14,13 @@ block()
   set(ANTLR_BUILD_STATIC ON) # Ensure static build is ON
   FetchContent_MakeAvailable(antlr_lib)
 endblock()
-# [FIX] Alias the real target 'antlr4_static' to your name 'antlr_lib'
 if(TARGET antlr4_static)
   add_library(antlr_lib ALIAS antlr4_static)
 endif()
 
 
 # --- LibPNG ---
-set(LIBPNG_SRC_DIR ${THIRD_PARTY_DIR}/libpng)
+set(LIBPNG_SRC_DIR ${THIRD_PARTY_DIR}/libpng CACHE PATH "Path to libpng source directory")
 FetchContent_Declare(
   libpng_lib
   GIT_REPOSITORY https://github.com/glennrp/libpng.git
@@ -46,15 +45,13 @@ block()
 
   FetchContent_MakeAvailable(libpng_lib)
 endblock()
-
-# [FIX] Alias the real target 'png_static' to your name 'libpng_lib'
 if(TARGET png_static)
   add_library(libpng_lib ALIAS png_static)
 endif()
 
 
 # --- KissFFT ---
-set(KISSFFT_SRC_DIR ${THIRD_PARTY_DIR}/kissfft)
+set(KISSFFT_SRC_DIR ${THIRD_PARTY_DIR}/kissfft CACHE PATH "Path to kissfft source directory")
 FetchContent_Declare(
   kissfft_lib
   GIT_REPOSITORY https://github.com/mborgerding/kissfft
@@ -68,14 +65,13 @@ block()
   set(KISSFFT_TOOLS OFF)
   FetchContent_MakeAvailable(kissfft_lib)
 endblock()
-# [FIX] Alias real target 'kissfft'
 if(TARGET kissfft)
   add_library(kissfft_lib ALIAS kissfft)
 endif()
 
 
 # --- MiniAudio ---
-set(MINIAUDIO_SRC_DIR ${THIRD_PARTY_DIR}/miniaudio)
+set(MINIAUDIO_SRC_DIR ${THIRD_PARTY_DIR}/miniaudio CACHE PATH "Path to miniaudio source directory")
 FetchContent_Declare(
   miniaudio_lib
   GIT_REPOSITORY https://github.com/mackron/miniaudio
@@ -84,14 +80,13 @@ FetchContent_Declare(
   SOURCE_DIR ${MINIAUDIO_SRC_DIR}
 )
 FetchContent_MakeAvailable(miniaudio_lib)
-# [FIX] MiniAudio often creates 'miniaudio'
 if(TARGET miniaudio)
   add_library(miniaudio_lib ALIAS miniaudio)
 endif()
 
 
 # --- MiniZip ---
-set(MINIZIP_SRC_DIR ${THIRD_PARTY_DIR}/minizip)
+set(MINIZIP_SRC_DIR ${THIRD_PARTY_DIR}/minizip CACHE PATH "Path to minizip source directory")
 FetchContent_Declare(
   minizip_lib
   GIT_REPOSITORY https://github.com/domoticz/minizip
@@ -100,14 +95,13 @@ FetchContent_Declare(
   SOURCE_DIR ${MINIZIP_SRC_DIR}
 )
 FetchContent_MakeAvailable(minizip_lib)
-# [FIX] Alias real target 'minizip'
 if(TARGET minizip)
   add_library(minizip_lib ALIAS minizip)
 endif()
 
 
 # --- Minja ---
-set(MINJA_SRC_DIR ${THIRD_PARTY_DIR}/minja)
+set(MINJA_SRC_DIR ${THIRD_PARTY_DIR}/minja CACHE PATH "Path to minja source directory")
 FetchContent_Declare(
   minja_lib
   GIT_REPOSITORY https://github.com/google/minja
@@ -117,14 +111,13 @@ FetchContent_Declare(
 )
 set(MINJA_TEST_ENABLED OFF)
 FetchContent_MakeAvailable(minja_lib)
-# [FIX] Alias real target 'minja'
 if(TARGET minja)
   add_library(minja_lib ALIAS minja)
 endif()
 
 
 # --- JSON (Header Only - Populated) ---
-set(JSON_SRC_DIR ${THIRD_PARTY_DIR}/json)
+set(JSON_SRC_DIR ${THIRD_PARTY_DIR}/json CACHE PATH "Path to json headers")
 FetchContent_Declare(
   json_lib
   GIT_REPOSITORY https://github.com/nlohmann/json
@@ -133,16 +126,18 @@ FetchContent_Declare(
   SOURCE_DIR ${JSON_SRC_DIR}
 )
 FetchContent_Populate(json_lib)
-
-# [FIX] Manually create the target because Populate() doesn't do it
 if(NOT TARGET json_lib)
   add_library(json_lib INTERFACE)
   target_include_directories(json_lib INTERFACE ${JSON_SRC_DIR}/include)
 endif()
 
+if(NOT TARGET nlohmann_json::nlohmann_json)
+  add_library(nlohmann_json::nlohmann_json ALIAS json_lib)
+endif()
+
 
 # --- STB (Header Only - Populated) ---
-set(STB_SRC_DIR ${THIRD_PARTY_DIR}/stb_lib)
+set(STB_SRC_DIR ${THIRD_PARTY_DIR}/stb_lib CACHE PATH "Path to libstb headers")
 FetchContent_Declare(
   stb_lib
   GIT_REPOSITORY https://github.com/nothings/stb.git
@@ -151,8 +146,6 @@ FetchContent_Declare(
   SOURCE_DIR ${STB_SRC_DIR}
 )
 FetchContent_Populate(stb_lib)
-
-# [FIX] Manually create the target because Populate() doesn't do it
 if(NOT TARGET stb_lib)
   add_library(stb_lib INTERFACE)
   target_include_directories(stb_lib INTERFACE ${STB_SRC_DIR})
@@ -160,7 +153,7 @@ endif()
 
 
 # --- ZLIB ---
-set(ZLIB_SRC_DIR ${THIRD_PARTY_DIR}/zlib)
+set(ZLIB_SRC_DIR ${THIRD_PARTY_DIR}/zlib CACHE PATH "Path to zlib source directory")
 FetchContent_Declare(
   zlib_lib
   GIT_REPOSITORY https://github.com/madler/zlib
@@ -172,7 +165,6 @@ block()
   set(BUILD_SHARED_LIBS OFF)
   FetchContent_MakeAvailable(zlib_lib)
 endblock()
-# [FIX] Alias real target 'zlibstatic' (standard ZLIB name)
 if(TARGET zlibstatic)
   add_library(zlib_lib ALIAS zlibstatic)
 elseif(TARGET zlib)
