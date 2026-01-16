@@ -11,7 +11,7 @@ set(LITERT_INTERNAL_ROOT "${LITERT_SOURCE_DIR}/litert")
 set(ROOT_LIST "${LITERT_INTERNAL_ROOT}/CMakeLists.txt")
 
 # Path to the Shim Hub we just created
-set(SHIM_PATH "${LITERTLM_RECIPES_DIR}/litert/shims/litert_shims.cmake")
+set(SHIM_PATH "${LITERTLM_RECIPES_DIR}/litert/litert_shims.cmake")
 
 # --- 1. INTEGRITY CHECKS ---
 if(NOT EXISTS "${ROOT_LIST}")
@@ -63,7 +63,8 @@ foreach(C_FILE ${ALL_CMAKELISTS})
     if("${C_FILE}" STREQUAL "${ROOT_LIST}")
         continue()
     endif()
-
+    patch_file_content("${C_FILE}" "absl::[a-zA-Z0-9_]+" "LiteRTLM::absl::absl" TRUE)
+   
     # A. Neutralize Hardcoded Flatbuffer Paths (Crucial)
     # TFLite/LiteRT loves to look for ".../flatbuffers-build/libflatbuffers.a" directly.
     patch_file_content("${C_FILE}" "[^\" ]*/_deps/flatbuffers-build/libflatbuffers.a" "LiteRTLM::flatbuffers::flatbuffers" TRUE)
@@ -94,32 +95,35 @@ patch_file_content("${ROOT_LIST}" "add_subdirectory(compiler_plugin)" "add_subdi
 
 # --- 6. VENDOR SUBSYSTEM DECOUPLING ---
 set(V_LIST "${LITERT_INTERNAL_ROOT}/vendors/CMakeLists.txt")
-set(VENDOR_SHIM_PATH "${LITERTLM_RECIPES_DIR}/litert/shims/vendor_shim.cmake")
-
 if(EXISTS "${V_LIST}")
     file(READ "${V_LIST}" V_CONTENT)
     
-    if(V_CONTENT MATCHES "if\\(VENDOR STREQUAL \"MediaTek\"\\)")
-        message(STATUS "[LITERTLM] Decoupling Vendor Dependencies in ${V_LIST}...")
+    # 1. Find the start of the MediaTek block
+    string(FIND "${V_CONTENT}" "if(VENDOR STREQUAL \"MediaTek\")" START_POS)
+    
+    if(NOT START_POS EQUAL -1)
+        # 2. Find the FIRST 'endif()' that occurs AFTER the start pos
+        # We look for the anchor first to make sure we're in the right place
+        string(FIND "${V_CONTENT}" "add_custom_target(mediatek_schema_gen" ANCHOR_POS)
+        
+        if(NOT ANCHOR_POS EQUAL -1)
+            message(STATUS "[LITERTLM] Decoupling Vendor Dependencies (Surgical Slice)...")
+            
+            # Find the endif() relative to the anchor
+            string(SUBSTRING "${V_CONTENT}" ${ANCHOR_POS} -1 POST_ANCHOR)
+            string(FIND "${POST_ANCHOR}" "endif()" ENDIF_REL_POS)
+            
+            # Calculate total end position (Anchor + Relative End + 'endif()' length)
+            math(EXPR END_POS "${ANCHOR_POS} + ${ENDIF_REL_POS} + 7")
 
-        set(MTK_REPLACEMENT "
-            # [LITERTLM] MediaTek Logic Virtualized
-            include(\"${VENDOR_SHIM_PATH}\")
-        ")
+            # 3. Slice it out
+            string(SUBSTRING "${V_CONTENT}" 0 ${START_POS} PRE_BLOCK)
+            string(SUBSTRING "${V_CONTENT}" ${END_POS} -1 POST_BLOCK)
 
-        # 1. Start at if(VENDOR...)
-        # 2. Match (.|\n)* ==> "Anything including newlines"
-        # 3. Anchor on 'add_custom_command' to ensure we have the right block
-        # 4. Stop at the closing endif()
-        string(REGEX REPLACE 
-            "if\\(VENDOR STREQUAL \"MediaTek\"\\)(.|\n)*add_custom_command(.|\n)*endif\\(\\)" 
-            "${MTK_REPLACEMENT}" 
-            V_CONTENT 
-            "${V_CONTENT}"
-        )
-
-        file(WRITE "${V_LIST}" "${V_CONTENT}")
-        message(STATUS "[LITERTLM] Successfully replaced MediaTek logic with Vendor Shim.")
+            # 4. Stitch in the include
+            set(INJECTION "\n# [LITERTLM] MediaTek Logic Virtualized\ninclude(\"${VENDOR_SHIM_PATH}\")\n")
+            file(WRITE "${V_LIST}" "${PRE_BLOCK}${INJECTION}${POST_BLOCK}")
+        endif()
     endif()
 endif()
 

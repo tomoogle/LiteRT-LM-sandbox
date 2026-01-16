@@ -359,7 +359,7 @@ target_link_libraries(absl_libs INTERFACE
   $<$<PLATFORM_ID:Darwin>:-framework CoreFoundation>
 )
 
-set(ABSL_LINK_FLAGS "-L${ABSL_LIB_DIR} -Wl,--start-group -l:libabsl_*.a -Wl,--end-group -lpthread")
+# set(ABSL_LINK_FLAGS "-L${ABSL_LIB_DIR} -Wl,--start-group -l:libabsl_*.a -Wl,--end-group -lpthread")
 
 
 

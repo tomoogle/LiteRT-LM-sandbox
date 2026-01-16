@@ -2,11 +2,13 @@
 # LITERTLM SHIMS HUB
 # Purpose: Virtualize dependencies and neutralize internal discovery logic.
 # ==============================================================================
-cmake_minimum_required(VERSION 3.16)
 
 # --- 1. UTILITIES & MACROS ---
-# Load the TFLite Linker Macro (Ensure this file is in your CMAKE_MODULE_PATH)
-include("${LITERTLM_RECIPES_DIR}/tflite/LiteRTLM_TFLiteLinker") 
+include("${LITERTLM_RECIPES_DIR}/tflite/LiteRTLM_TFLiteLinker.cmake")
+
+set(VENDOR_SHIM_PATH "${LITERTLM_RECIPES_DIR}/litert/shims/vendor_shim.cmake")
+
+
 
 message(STATUS "[LITERTLM-SHIM] Initializing Dependency Virtualization...")
 
