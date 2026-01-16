@@ -33,7 +33,7 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
     protobuf_external
     DEPENDS 
       absl_external
-      googletest_external
+      gtest_external
     GIT_REPOSITORY
       https://github.com/protocolbuffers/protobuf
     GIT_TAG

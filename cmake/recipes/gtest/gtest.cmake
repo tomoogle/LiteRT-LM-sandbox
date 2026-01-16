@@ -12,7 +12,7 @@ if(NOT EXISTS "${GTEST_CONFIG_CMAKE_FILE}")
   message(STATUS "GoogleTest not found. Configuring external build...")
 
   ExternalProject_Add(
-    googletest_external
+    gtest_external
     DEPENDS
       absl_external
     GIT_REPOSITORY
@@ -36,12 +36,12 @@ if(NOT EXISTS "${GTEST_CONFIG_CMAKE_FILE}")
     STEP_TARGETS
       step_verify_install
   )
-  verify_install(googletest_external ${GTEST_CONFIG_CMAKE_FILE})
+  verify_install(gtest_external ${GTEST_CONFIG_CMAKE_FILE})
 
 else()
     message(STATUS "GoogleTest already installed at: ${GTEST_INSTALL_PREFIX}")
-    if(NOT TARGET googletest_external)
-        add_custom_target(googletest_external)
+    if(NOT TARGET gtest_external)
+        add_custom_target(gtest_external)
     endif()
 endif()
 
@@ -50,6 +50,7 @@ import_static_lib(imp_gmock                      "${GTEST_LIB_DIR}/libgmock.a")
 import_static_lib(imp_gmock_main                 "${GTEST_LIB_DIR}/libgmock_main.a")
 import_static_lib(imp_gtest                      "${GTEST_LIB_DIR}/libgtest.a")
 import_static_lib(imp_gtest_main                 "${GTEST_LIB_DIR}/libgtest_main.a")
+
 
 add_library(gtest_libs INTERFACE)
 target_link_libraries(gtest_libs INTERFACE

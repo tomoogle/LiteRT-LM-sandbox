@@ -19,7 +19,7 @@ if(NOT EXISTS "${FLATBUFFERS_CMAKE_CONFIG_FILE}")
     flatbuffers_external
     DEPENDS
       absl_external
-      googletest_external
+      gtest_external
     GIT_REPOSITORY 
       https://github.com/google/flatbuffers.git
     GIT_TAG 

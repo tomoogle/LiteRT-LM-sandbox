@@ -364,6 +364,7 @@ set(ABSL_LINK_FLAGS "-L${ABSL_LIB_DIR} -Wl,--start-group -l:libabsl_*.a -Wl,--en
 
 
 file(GLOB ALL_ABSL_LIBS "${ABSL_LIB_DIR}/libabsl_*.a")
+list(JOIN ALL_ABSL_LIBS " " ABSL_LIBS_FLAT)
 
 if(NOT ALL_ABSL_LIBS)
     message(WARNING "No Abseil libs found in ${ABSL_LIB_DIR}. If this is a clean build, run Make (to build ExternalProject), then re-run CMake.")
@@ -408,4 +409,3 @@ target_link_libraries(absl_kitchen_sink INTERFACE
     $<$<PLATFORM_ID:Linux>:pthread>
     $<$<PLATFORM_ID:Darwin>:-framework CoreFoundation>
 )
-string(REPLACE ";" " " ABSL_LIBS_FLAT "${ALL_ABSL_LIBS}")

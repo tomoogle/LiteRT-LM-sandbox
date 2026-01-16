@@ -22,7 +22,7 @@ if(NOT EXISTS "${TOKENIZER_LIB_CHECK}")
     DEPENDS 
       absl_external
       protobuf_external
-      googletest_external
+      gtest_external
       sentencepiece_external
     GIT_REPOSITORY
         https://github.com/mlc-ai/tokenizers-cpp

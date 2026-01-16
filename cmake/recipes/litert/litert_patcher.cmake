@@ -1,142 +1,154 @@
-# litert_patcher.cmake
-message(STATUS "[LITERTLM] Initializing Surgical Patching...")
+# ==============================================================================
+# LITERT-LM SURGICAL PATCHER
+# Purpose: Inject the Hermetic Shim and neutralize internal dependency fetching.
+# ==============================================================================
+include("${LITERTLM_MODULES_DIR}/utils.cmake")
 
-# --- 1. CONFIGURATION & HELPERS ---
+message(STATUS "[LITERTLM] Initializing Surgical Build-System Remediation for LiteRT...")
+
+# --- 0. ENVIRONMENT SETUP ---
 set(LITERT_INTERNAL_ROOT "${LITERT_SOURCE_DIR}/litert")
 set(ROOT_LIST "${LITERT_INTERNAL_ROOT}/CMakeLists.txt")
 
-function(patch_file_content FILE_PATH MATCH_STR REPLACE_STR IS_REGEX)
-    if(EXISTS "${FILE_PATH}")
-        file(READ "${FILE_PATH}" CONTENT)
-        if(IS_REGEX)
-            string(REGEX REPLACE "${MATCH_STR}" "${REPLACE_STR}" CONTENT "${CONTENT}")
-        else()
-            string(REPLACE "${MATCH_STR}" "${REPLACE_STR}" CONTENT "${CONTENT}")
-        endif()
-        file(WRITE "${FILE_PATH}" "${CONTENT}")
-    endif()
-endfunction()
+# Path to the Shim Hub we just created
+set(SHIM_PATH "${LITERTLM_RECIPES_DIR}/litert/shims/litert_shims.cmake")
 
-# litert_patcher.cmake -> Section 2 Refactor
+# --- 1. INTEGRITY CHECKS ---
+if(NOT EXISTS "${ROOT_LIST}")
+    message(FATAL_ERROR "[LITERTLM] Integrity Failure: Root manifest not found at ${ROOT_LIST}.")
+endif()
 
-if(EXISTS "${ROOT_LIST}")
-    file(READ "${ROOT_LIST}" ROOT_CONTENT)
+# --- 2. ROOT MANIFEST INJECTION (The Single-Line Piercing) ---
+file(READ "${ROOT_LIST}" ROOT_CONTENT)
+
+# Check for idempotency so we don't inject twice
+if(NOT ROOT_CONTENT MATCHES "litert_shims.cmake")
+    message(STATUS "[LITERTLM] Injecting Global Dependency Shims into Root Manifest...")
     
-    # Check for our guard to prevent double-patching
-    if(NOT ROOT_CONTENT MATCHES "LITERTLM_ROOT_SHIM")
-        message(STATUS "[LITERTLM] Applying Root-Level Global Shims...")
-
-        # We use a pure-prepended block. No regex replacement of original text.
-        set(ROOT_SHIM "
-# --- LITERTLM_ROOT_SHIM ---
-# This block MUST be at the top to ensure global visibility
-cmake_minimum_required(VERSION 3.16) # Ensure a base version is set if we are at line 1
-
-if(NOT TARGET LiteRTLM::absl::absl)
-    add_library(LiteRTLM::absl::absl INTERFACE IMPORTED GLOBAL)
-    set_target_properties(LiteRTLM::absl::absl PROPERTIES 
-        INTERFACE_LINK_LIBRARIES \"-Wl,--start-group;${ABSL_LIBS_FLAT};-Wl,--end-group\"
-        INTERFACE_INCLUDE_DIRECTORIES \"${ABSL_INCLUDE_DIR}\")
+    # We simply include the Hub. All aliases and targets are defined there.
+    set(INJECTION "include(\"${SHIM_PATH}\")\n")
+    
+    file(WRITE "${ROOT_LIST}" "${INJECTION}${ROOT_CONTENT}")
+else()
+    message(STATUS "[LITERTLM] Root manifest already shimmed. Skipping injection.")
 endif()
 
-if(NOT TARGET LiteRTLM::flatbuffers::flatbuffers)
-    add_library(LiteRTLM::flatbuffers::flatbuffers STATIC IMPORTED GLOBAL)
-    set_target_properties(LiteRTLM::flatbuffers::flatbuffers PROPERTIES
-        IMPORTED_LOCATION \"${FLATBUFFERS_LIB_DIR}/libflatbuffers.a\"
-        INTERFACE_INCLUDE_DIRECTORIES \"${FLATBUFFERS_INCLUDE_DIR}\")
-endif()
 
-if(NOT TARGET flatc)
-    add_executable(flatc IMPORTED GLOBAL)
-    set_target_properties(flatc PROPERTIES IMPORTED_LOCATION \"${FLATC_EXECUTABLE}\")
-endif()
+# --- 3. THE SUBMODULE GUILLOTINE ---
+# Prevent LiteRT from entering these directories and triggering downloads/errors.
 
-# Global Hammer for headers and linking
-link_libraries(\"-Wl,--start-group;${ABSL_LIBS_FLAT};-Wl,--end-group\")
-include_directories(SYSTEM \"${ABSL_INCLUDE_DIR}\")
+set(GUILLOTINE_PATHS
+    "${LITERT_INTERNAL_ROOT}/third_party/tensorflow/CMakeLists.txt"       # The 2GB Download
+    "${LITERT_INTERNAL_ROOT}/tflite/CMakeLists.txt"                       # Legacy Internal TFLite
+    "${LITERT_INTERNAL_ROOT}/tflite/tools/cmake/CMakeLists.txt"           # Conflicting Toolchains
+)
 
-# Define target-level redirection targets for sub-projects
-if(NOT TARGET flatbuffers::flatbuffers)
-    add_library(flatbuffers::flatbuffers INTERFACE IMPORTED GLOBAL)
-    target_link_libraries(flatbuffers::flatbuffers INTERFACE LiteRTLM::flatbuffers::flatbuffers)
-endif()
-# --------------------------\n\n")
-
-        # Prepending is safer than regex replacing the project line
-        file(WRITE "${ROOT_LIST}" "${ROOT_SHIM}${ROOT_CONTENT}")
+foreach(TARGET_HEAD ${GUILLOTINE_PATHS})
+    # Ensure directory exists so we can plant the dummy file
+    get_filename_component(TARGET_DIR "${TARGET_HEAD}" DIRECTORY)
+    if(NOT EXISTS "${TARGET_DIR}")
+        file(MAKE_DIRECTORY "${TARGET_DIR}")
     endif()
-endif()
+
+    message(STATUS "[LITERTLM] Decapitating legacy build path: ${TARGET_HEAD}")
+    file(WRITE "${TARGET_HEAD}" "message(STATUS \"[LITERTLM] Path Guillotined: ${TARGET_HEAD}\")\n")
+endforeach()
 
 
-# --- 3. TARGET REDIRECTION (THE SURGICAL FIX) ---
-file(GLOB_RECURSE ALL_CMAKELISTS "${LITERT_INTERNAL_ROOT}/*.cmake" "${LITERT_INTERNAL_ROOT}/CMakeLists.txt")
+# --- 4. TRANSITIVE TARGET REDIRECTION (Recursive Sweep) ---
+# We scan for hardcoded paths and FetchContent calls that aliases can't fix.
+file(GLOB_RECURSE ALL_CMAKELISTS "${LITERT_INTERNAL_ROOT}/*.cmake" "${LITERT_INTERNAL_ROOT}/**/CMakeLists.txt")
 
 foreach(C_FILE ${ALL_CMAKELISTS})
-    # SAFETY: Do not patch the root CMakeLists.txt! 
-    # It contains our definitions. Patching it will mangle the shim.
     if("${C_FILE}" STREQUAL "${ROOT_LIST}")
         continue()
     endif()
 
-    # Redirect modular internal calls to our global shims
-    patch_file_content("${C_FILE}" "absl::[a-zA-Z0-9_]+" "LiteRTLM::absl::absl" TRUE)
-    patch_file_content("${C_FILE}" "flatbuffers::flatbuffers" "LiteRTLM::flatbuffers::flatbuffers" FALSE)
-    # Kill hardcoded TFLite _deps paths specifically
+    # A. Neutralize Hardcoded Flatbuffer Paths (Crucial)
+    # TFLite/LiteRT loves to look for ".../flatbuffers-build/libflatbuffers.a" directly.
     patch_file_content("${C_FILE}" "[^\" ]*/_deps/flatbuffers-build/libflatbuffers.a" "LiteRTLM::flatbuffers::flatbuffers" TRUE)
     patch_file_content("${C_FILE}" "flatbuffers-build/libflatbuffers.a" "LiteRTLM::flatbuffers::flatbuffers" FALSE)
-
-    patch_file_content("${C_FILE}" "\\\${TFLITE_BUILD_DIR}/host_flatc/_deps/flatbuffers-build/flatc" "flatc" FALSE)
     patch_file_content("${C_FILE}" "TFLITE_FLATBUFFERS_LIB" "LiteRTLM::flatbuffers::flatbuffers" FALSE)
 
-    patch_file_content("${C_FILE}" "FetchContent_Declare\\([^\\)]+\\)" "# FC_DECLARE_REMOVED" TRUE)
-    patch_file_content("${C_FILE}" "FetchContent_MakeAvailable\\([^\\)]+\\)" "# FC_MAKE_AVAILABLE_REMOVED" TRUE)
-
-    patch_file_content("${C_FILE}" "find_program\\(FLATC_EXECUTABLE[^\\)]+\\)" "# FIND_FLATC_REMOVED" TRUE)
-
+    # B. Kill Internal Discovery Logic
+    # We want it to use the "flatc" target we defined in the Shim, not look for one.
+    patch_file_content("${C_FILE}" "find_program\\(FLATC_EXECUTABLE[^\\)]+\\)" "# [LITERTLM] Suppressed: Using Global Shim" TRUE)
+    # Ensure variables point to the target name "flatc", not a file path
     patch_file_content("${C_FILE}" "set\\(FLATC_EXECUTABLE \\$<TARGET_FILE:flatc>\\)" "set(FLATC_EXECUTABLE flatc)" TRUE)
-    
+
+    # C. Neutralize FetchContent (The "Anti-Download" Shield)
+    patch_file_content("${C_FILE}" "FetchContent_Declare\\([^\\)]+\\)" "# [LITERTLM] Suppressed: External fetch prohibited" TRUE)
+    patch_file_content("${C_FILE}" "FetchContent_MakeAvailable\\([^\\)]+\\)" "# [LITERTLM] Suppressed: Using Global Manifest" TRUE)
 endforeach()
 
-# --- 4. SURGICAL COMPILATION FIXES (ORDER: LAST) ---
+
+# --- 5. SOURCE-LEVEL REMEDIATION ---
+# Correcting C++ API signature drifts.
 patch_file_content("${LITERT_INTERNAL_ROOT}/runtime/compiled_model.cc" 
     " return litert_cpu_buffer_requirements" 
     "return litert::Expected<const LiteRtTensorBufferRequirementsT*>(litert_cpu_buffer_requirements)" FALSE)
 
+# Fix directory structure mismatch
 patch_file_content("${ROOT_LIST}" "add_subdirectory(compiler_plugin)" "add_subdirectory(compiler)" FALSE)
 
 
-# --- Section 4: Vendors Scavenger Hunt Lobotomy ---
+# --- 6. VENDOR SUBSYSTEM DECOUPLING ---
 set(V_LIST "${LITERT_INTERNAL_ROOT}/vendors/CMakeLists.txt")
+set(VENDOR_SHIM_PATH "${LITERTLM_RECIPES_DIR}/litert/shims/vendor_shim.cmake")
 
 if(EXISTS "${V_LIST}")
-    message(STATUS "[LITERTLM] Disabling Vendor-specific FlatBuffers fetching...")
-
-    # 1. Comment out the FetchContent and find_program logic for flatc
-    patch_file_content("${V_LIST}" "FetchContent_Declare\\(flatbuffers" "# FetchContent_Declare(flatbuffers" TRUE)
-    patch_file_content("${V_LIST}" "FetchContent_MakeAvailable\\(flatbuffers\\)" "# FetchContent_MakeAvailable(flatbuffers)" TRUE)
-    patch_file_content("${V_LIST}" "find_program\\(FLATC_EXECUTABLE" "# find_program(FLATC_EXECUTABLE" TRUE)
-
-    # 2. Force the FLATC_EXECUTABLE to use our shim target
-    # This replaces the entire 'if(NOT FLATC_EXECUTABLE)' block logic
-    patch_file_content("${V_LIST}" "set\\(FLATC_EXECUTABLE \\$<TARGET_FILE:flatc>\\)" "set(FLATC_EXECUTABLE flatc)" TRUE)
-
-    # 3. Fix the target_link_libraries in the _litert_add_dispatch_so function
-    # It links to litert_runtime_c_api_static, which might be pulling in the bad paths.
-    # We ensure our FlatBuffers shim is explicitly linked here.
-    patch_file_content("${V_LIST}" "litert_runtime_c_api_static" "litert_runtime_c_api_static\n      LiteRTLM::flatbuffers::flatbuffers" FALSE)
-
-    # 4. Kill the TFLITE_SOURCE_DIR and TFLITE_BUILD_DIR include directories
-    # These are where the 'ghost paths' often originate.
-    patch_file_content("${V_LIST}" "\\$<BUILD_INTERFACE:\\\${TFLITE_SOURCE_DIR}>" "#" TRUE)
-    patch_file_content("${V_LIST}" "\\$<BUILD_INTERFACE:\\\${TENSORFLOW_SOURCE_DIR}>" "#" TRUE)
-
-    # Lobotomize JSON fetching in Qualcomm
-    patch_file_content("${C_FILE}" "FetchContent_Declare\\(nlohmann_json" "#" TRUE)
-    patch_file_content("${C_FILE}" "FetchContent_MakeAvailable\\(nlohmann_json\\)" "#" TRUE)
+    file(READ "${V_LIST}" V_CONTENT)
     
-    # If they use find_package(nlohmann_json), we want them to use our Shim instead
-    patch_file_content("${C_FILE}" "find_package\\(nlohmann_json" "#" TRUE)
+    if(V_CONTENT MATCHES "if\\(VENDOR STREQUAL \"MediaTek\"\\)")
+        message(STATUS "[LITERTLM] Decoupling Vendor Dependencies in ${V_LIST}...")
 
+        set(MTK_REPLACEMENT "
+            # [LITERTLM] MediaTek Logic Virtualized
+            include(\"${VENDOR_SHIM_PATH}\")
+        ")
+
+        # 1. Start at if(VENDOR...)
+        # 2. Match (.|\n)* ==> "Anything including newlines"
+        # 3. Anchor on 'add_custom_command' to ensure we have the right block
+        # 4. Stop at the closing endif()
+        string(REGEX REPLACE 
+            "if\\(VENDOR STREQUAL \"MediaTek\"\\)(.|\n)*add_custom_command(.|\n)*endif\\(\\)" 
+            "${MTK_REPLACEMENT}" 
+            V_CONTENT 
+            "${V_CONTENT}"
+        )
+
+        file(WRITE "${V_LIST}" "${V_CONTENT}")
+        message(STATUS "[LITERTLM] Successfully replaced MediaTek logic with Vendor Shim.")
+    endif()
 endif()
 
-message(STATUS "[LITERTLM] Patching Complete.")
+
+# --- 7. MANDATORY BUILD CONFIGURATION ---
+# Enforce deterministic GPU/NPU flags via a generated header.
+message(STATUS "[LITERTLM] Enforcing deterministic build_config.h...")
+set(LITERT_GEN_DIR "${LITERT_INTERNAL_ROOT}/build_common") 
+
+if(NOT EXISTS "${LITERT_GEN_DIR}")
+    file(MAKE_DIRECTORY "${LITERT_GEN_DIR}")
+endif()
+
+if(NOT DEFINED LITERT_BUILD_CONFIG_DISABLE_GPU_VAL)
+    set(LITERT_BUILD_CONFIG_DISABLE_GPU_VAL 1)
+endif()
+if(NOT DEFINED LITERT_BUILD_CONFIG_DISABLE_NPU_VAL)
+    set(LITERT_BUILD_CONFIG_DISABLE_NPU_VAL 1)
+endif()
+
+set(BUILD_CONFIG_CONTENT "/* Generated by LiteRTLM Patcher - Deterministic Configuration */
+#ifndef LITE_RT_BUILD_COMMON_BUILD_CONFIG_H_
+#define LITE_RT_BUILD_COMMON_BUILD_CONFIG_H_
+
+#define LITERT_BUILD_CONFIG_DISABLE_GPU ${LITERT_BUILD_CONFIG_DISABLE_GPU_VAL}
+#define LITERT_BUILD_CONFIG_DISABLE_NPU ${LITERT_BUILD_CONFIG_DISABLE_NPU_VAL}
+
+#endif  /* LITE_RT_BUILD_COMMON_BUILD_CONFIG_H_ */\n")
+
+file(WRITE "${LITERT_GEN_DIR}/build_config.h" "${BUILD_CONFIG_CONTENT}")
+
+message(STATUS "[LITERTLM] Surgical Patching Phase Complete.")

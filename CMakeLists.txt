@@ -107,13 +107,14 @@ endif()
 
 
 # --- Utilities
-include(macros)
 include(utils)
+include(macros)
 
 
 # --- Dependencies
 include(fetch_content)
 include(external_project)
+
 
 # LITERTLM_INCLUDE_PATHS must be updated before collect_dependencies is called
 list(APPEND LITERTLM_INCLUDE_PATHS
@@ -134,7 +135,6 @@ list(APPEND LITERTLM_INCLUDE_PATHS
   ${FETCHCONTENT_MODULE_INCLUDE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}/antlr_generated
 )
-
 include(collect_dependencies)
 
 

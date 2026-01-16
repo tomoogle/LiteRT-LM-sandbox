@@ -1,3 +1,7 @@
+# WARNING: DO NOT USE ANYTHING FROM macros.cmake IN THIS FILE!!
+
+include_guard(GLOBAL)
+
 function(verify_install target_name config_path)
     ExternalProject_Add_Step(${target_name} step_verify_install
         COMMAND ${CMAKE_COMMAND} -E echo "Verifying installation..."
@@ -114,6 +118,21 @@ function(compile_flatbuffer_files FBS_FILE)
 
     set_source_files_properties(${GENERATED_HEADER} PROPERTIES GENERATED TRUE)
     set(GENERATED_FLATBUFFER_HEADERS ${GENERATED_FLATBUFFER_HEADERS} ${GENERATED_HEADER} PARENT_SCOPE)
+endfunction()
+
+
+
+
+function(patch_file_content FILE_PATH MATCH_STR REPLACE_STR IS_REGEX)
+    if(EXISTS "${FILE_PATH}")
+        file(READ "${FILE_PATH}" CONTENT)
+        if(IS_REGEX)
+            string(REGEX REPLACE "${MATCH_STR}" "${REPLACE_STR}" CONTENT "${CONTENT}")
+        else()
+            string(REPLACE "${MATCH_STR}" "${REPLACE_STR}" CONTENT "${CONTENT}")
+        endif()
+        file(WRITE "${FILE_PATH}" "${CONTENT}")
+    endif()
 endfunction()
 
 
