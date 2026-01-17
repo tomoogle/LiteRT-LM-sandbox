@@ -7,27 +7,26 @@
 # ==============================================================================
 
 macro(literlm_configure_tflite_interface force_load_targets standard_targets include_dirs build_dir)
-
-    # 1. Define the Interface Target
-    if(NOT TARGET tflite_kitchen_sink)
-        add_library(tflite_kitchen_sink INTERFACE IMPORTED GLOBAL)
+    # 1. Define the Interface Target (The Engine)
+    if(NOT TARGET tflite_libs)
+        add_library(tflite_libs INTERFACE IMPORTED GLOBAL)
     endif()
 
-    # 2. Establish the Alias
+    # 2. Establish the Alias (The Sovereign API)
     # This ensures consistent naming across the build ecosystem
     if(NOT TARGET LiteRTLM::tflite::tflite)
-        add_library(LiteRTLM::tflite::tflite ALIAS tflite_kitchen_sink)
+        add_library(LiteRTLM::tflite::tflite ALIAS tflite_libs)
     endif()
 
     # 3. Configure Include Directories
     # We use SYSTEM to suppress warnings from TFLite headers
-    target_include_directories(tflite_kitchen_sink SYSTEM INTERFACE 
+    target_include_directories(tflite_libs SYSTEM INTERFACE 
         ${include_dirs}
         ${build_dir} # Required for generated headers (ruy/cpuinfo)
     )
 
     # 4. Configure Linker Logic
-    target_link_libraries(tflite_kitchen_sink INTERFACE
+    target_link_libraries(tflite_libs INTERFACE
         # --- PHASE 1: FORCE LOAD (The Hammer) ---
         # Ensures registration of static kernels and operators.
         # Critical for TFLite's self-registering OpResolver.
@@ -52,5 +51,4 @@ macro(literlm_configure_tflite_interface force_load_targets standard_targets inc
         $<$<PLATFORM_ID:Linux>:dl>
         $<$<PLATFORM_ID:Android>:log>
     )
-
 endmacro()

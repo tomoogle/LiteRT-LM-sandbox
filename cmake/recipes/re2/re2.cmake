@@ -49,3 +49,8 @@ add_library(re2_libs INTERFACE)
 target_link_libraries(re2_libs INTERFACE
     imp_re2
 )
+
+if(NOT TARGET LiteRTLM::re2::re2)
+    add_library(LiteRTLM::re2::re2 INTERFACE IMPORTED GLOBAL)
+    target_link_libraries(LiteRTLM::re2::re2 INTERFACE re2_libs)
+endif()

@@ -82,7 +82,7 @@ literlm_configure_tflite_interface(
 
 # Redirect the canonical target to our Kitchen Sink
 if(NOT TARGET tensorflow-lite)
-    add_library(tensorflow-lite ALIAS tflite_kitchen_sink)
+    add_library(tensorflow-lite ALIAS tflite_libs)
 endif()
 
 # --- 6. GLOBAL LINKAGE ENFORCEMENT ---

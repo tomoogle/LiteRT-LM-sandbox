@@ -135,6 +135,11 @@ if(NOT TARGET nlohmann_json::nlohmann_json)
   add_library(nlohmann_json::nlohmann_json ALIAS json_lib)
 endif()
 
+if(NOT TARGET LiteRTLM::nlohmann_json::nlohmann_json)
+  add_library(LiteRTLM::nlohmann_json::nlohmann_json INTERFACE IMPORTED GLOBAL)
+  target_link_libraries(LiteRTLM::nlohmann_json::nlohmann_json INTERFACE nlohmann_json::nlohmann_json)
+endif()
+
 
 # --- STB (Header Only - Populated) ---
 set(STB_SRC_DIR ${THIRD_PARTY_DIR}/stb_lib CACHE PATH "Path to libstb headers")

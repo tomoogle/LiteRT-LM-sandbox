@@ -2,12 +2,12 @@ add_library(LITERTLM_DEPS INTERFACE)
 add_dependencies(LITERTLM_DEPS litert_external)
 
 target_link_libraries(LITERTLM_DEPS INTERFACE
-    litert_libs           # Depends on TFLite, Abseil, FlatBuffers
-    tflite_libs           # Depends on Abseil, FlatBuffers, Ruy
+    LiteRTLM::litert::litert           # Depends on TFLite, Abseil, FlatBuffers
+    LiteRTLM::tflite::tflite           # Depends on Abseil, FlatBuffers, Ruy
     
-    sentencepiece_libs    # Depends on Abseil, Protobuf
-    tokenizers_lib        # Depends on SentencePiece
-    re2_libs              # Depends on Abseil
+    LiteRTLM::tokenizers::tokenizers    # Depends on Abseil, Protobuf
+    LiteRTLM::sentencepiece::sentencepiece        # Depends on SentencePiece
+    LiteRTLM::re2::re2              # Depends on Abseil
 
     opencl_headers_lib
     libpng_lib
@@ -17,10 +17,10 @@ target_link_libraries(LITERTLM_DEPS INTERFACE
     minja_lib
     zlib_lib
 
-    json_lib
-    proto_lib
-    flatbuffers_libs
-    absl_libs
+    LiteRTLM::nlohmann_json::nlohmann_json
+    LiteRTLM::protobuf::libprotobuf
+    LiteRTLM::flatbuffers::flatbuffers
+    LiteRTLM::absl::absl
 )
 
 target_include_directories(LITERTLM_DEPS SYSTEM INTERFACE

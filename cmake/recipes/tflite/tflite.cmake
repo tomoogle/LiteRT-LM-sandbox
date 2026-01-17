@@ -77,7 +77,7 @@ if(NOT EXISTS "${TFLITE_STATIC_LIB}")
                 -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
                 -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR} 
                 -DLITERTLM_RECIPES_DIR=${LITERTLM_RECIPES_DIR}
-                -P "${PROJECT_ROOT}/cmake/recipes/tflite/tflite_patcher.cmake"
+                -P "${LITERTLM_RECIPES_DIR}/tflite/tflite_patcher.cmake"
 
         # --- CMake Configuration ---
         CMAKE_ARGS

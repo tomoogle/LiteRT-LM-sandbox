@@ -233,3 +233,9 @@ target_link_libraries(litert_libs INTERFACE
   flatbuffers_libs
   absl_libs  
 )
+
+
+if(NOT TARGET LiteRTLM::litert::litert)
+    add_library(LiteRTLM::litert::litert INTERFACE IMPORTED GLOBAL)
+    target_link_libraries(LiteRTLM::litert::litert INTERFACE litert_libs)
+endif()

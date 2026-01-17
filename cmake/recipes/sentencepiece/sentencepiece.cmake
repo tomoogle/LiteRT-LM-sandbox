@@ -191,3 +191,8 @@ target_link_libraries(sentencepiece_libs INTERFACE
     proto_lib
     absl_libs
 )
+
+if(NOT TARGET LiteRTLM::sentencepiece::sentencepiece)
+    add_library(LiteRTLM::sentencepiece::sentencepiece INTERFACE IMPORTED GLOBAL)
+    target_link_libraries(LiteRTLM::sentencepiece::sentencepiece INTERFACE sentencepiece_libs)
+endif()

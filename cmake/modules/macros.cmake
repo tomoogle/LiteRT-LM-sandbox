@@ -30,6 +30,29 @@ endmacro()
 
 
 
+
+macro(import_absl_lib target_name lib_full_path)
+    if("${lib_full_path}" STREQUAL "")
+        message(FATAL_ERROR "Critical Error: Attempted to import '${target_name}' with an empty path.")
+    endif()
+
+    # 1. Create the base IMPORTED target
+    add_library(${target_name} STATIC IMPORTED GLOBAL)
+    set_target_properties(${target_name} PROPERTIES
+        IMPORTED_LOCATION "${lib_full_path}"
+    )
+
+    string(REPLACE "imp_" "" clean_name "${target_name}")
+    string(REPLACE "absl_" "absl::" ns_path "${clean_name}")
+    
+    if(NOT TARGET LiteRTLM::${ns_path})
+        add_library(LiteRTLM::${ns_path} ALIAS ${target_name})
+    endif()
+endmacro()
+
+
+
+
 #[[.rst:
 add_litertlm_library
 --------------------

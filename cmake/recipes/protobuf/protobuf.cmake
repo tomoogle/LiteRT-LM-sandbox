@@ -5,7 +5,7 @@ set(PROTO_INSTALL_PREFIX ${PROTO_EXT_PREFIX}/install)
 set(PROTO_CONFIG_CMAKE_FILE "${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf/protobuf-config.cmake")
 
 
-set(PROTO_SRC_DIR ${PROTO_INSTALL_PREFIX}/src/protobuf_external/src)
+set(PROTO_SRC_DIR ${PROTO_EXT_PREFIX}/src/protobuf_external)
 set(PROTO_INCLUDE_DIR ${PROTO_INSTALL_PREFIX}/include)
 set(PROTO_LIB_DIR ${PROTO_INSTALL_PREFIX}/lib)
 set(PROTO_LITE_LIBRARY ${PROTO_INSTALL_PREFIX}/lib/libprotobuf-lite.a)
@@ -40,6 +40,10 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
       v6.31.1
     PREFIX
       ${PROTO_EXT_PREFIX}
+    PATCH_COMMAND
+      ${CMAKE_COMMAND} 
+      -DPROTO_SRC_DIR=${PROTO_SRC_DIR}
+      -P "${LITERTLM_RECIPES_DIR}/protobuf/protobuf_patcher.cmake"
     CMAKE_ARGS
       -DCMAKE_PREFIX_PATH=${GTEST_INSTALL_PREFIX};${ABSL_INSTALL_PREFIX}
       -DCMAKE_INSTALL_PREFIX=${PROTO_INSTALL_PREFIX}
@@ -182,12 +186,7 @@ target_include_directories(proto_lib
 target_link_libraries(proto_lib
   PUBLIC
     protobuf::libprotobuf
-    imp_protobuf_lite
-    imp_protoc
-    imp_upb
-    imp_absl_base
-    imp_utf8_validity
-    imp_utf8_range
+    absl_libs
 )
 
 generate_protobuf(proto_lib)
@@ -214,16 +213,16 @@ foreach(LIB_PATH ${PROTO_INTERNAL_LIBS})
     list(APPEND PROTO_IMPORTED_TARGETS ${SAFE_NAME})
 endforeach()
 
-add_library(proto_kitchen_sink INTERFACE)
-add_library(LiteRTLM::protobuf::libprotobuf ALIAS proto_kitchen_sink)
+add_library(proto_libs INTERFACE)
+add_library(LiteRTLM::protobuf::libprotobuf ALIAS proto_libs)
 
-target_include_directories(proto_kitchen_sink SYSTEM INTERFACE 
+target_include_directories(proto_libs SYSTEM INTERFACE 
   ${PROTO_INCLUDE_DIR}
   ${ABSL_INCLUDE_DIR}
 )
 
 # 3. Link them all inside a "Start Group" block
-target_link_libraries(proto_kitchen_sink INTERFACE
+target_link_libraries(proto_libs INTERFACE
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
     ${PROTO_IMPORTED_TARGETS}
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>

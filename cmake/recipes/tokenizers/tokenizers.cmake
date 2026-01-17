@@ -57,12 +57,19 @@ import_static_lib(imp_tokenizers_c              "${TOKENIZER_BUILD_DIR}/libtoken
 import_static_lib(imp_tokenizers_cpp              "${TOKENIZER_BUILD_DIR}/libtokenizers_cpp.a")
 
 
-add_library(tokenizers_lib INTERFACE)
-target_include_directories(tokenizers_lib INTERFACE ${TOKENIZER_INCLUDE_DIR})
+add_library(tokenizers_libs INTERFACE)
+target_include_directories(tokenizers_libs INTERFACE ${TOKENIZER_INCLUDE_DIR})
 
-target_link_libraries(tokenizers_lib INTERFACE
+
+target_link_libraries(tokenizers_libs INTERFACE
   imp_tokenizers_c
   imp_tokenizers_cpp
   sentencepiece_libs 
   absl_libs
 )
+
+
+if(NOT TARGET LiteRTLM::tokenizers::tokenizers)
+    add_library(LiteRTLM::tokenizers::tokenizers INTERFACE IMPORTED GLOBAL)
+    target_link_libraries(LiteRTLM::tokenizers::tokenizers INTERFACE tokenizers_libs)
+endif()

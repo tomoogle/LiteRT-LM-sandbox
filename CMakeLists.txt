@@ -89,7 +89,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.20 CACHE STRING "Required CMake policy version." FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive" CACHE STRING "Required CXX flags" FORCE)
-add_link_options("-Wl,-z,muldefs")
+# add_link_options("-Wl,-z,muldefs")
 
 
 # --- Optimization
@@ -174,142 +174,142 @@ set(CMAKE_SHARED_LINKER_FLAGS
     -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy \
     -L${LITERT_INCLUDE_PATHS}"
 )
-set(CMAKE_CXX_STANDARD_LIBRARIES
-                "-Wl,--start-group \
-                -labsl_log_internal_proto \
-                -labsl_log_internal_message \
-                -labsl_log_internal_structured_proto \
-                -labsl_log_internal_check_op \
-                -labsl_log_severity \
-                -labsl_cord \
-                -labsl_cord_internal \
-                -labsl_cordz_handle \
-                -labsl_cordz_info \
-                -labsl_cordz_functions \
-                -labsl_cordz_sample_token \
-                -labsl_crc_cord_state \
-                -labsl_crc32c \
-                -labsl_crc_internal\
-                -labsl_crc_cpu_detect \
-                -labsl_exponential_biased \
-                -labsl_symbolize \
-                -labsl_stacktrace \
-                -labsl_tracing_internal \
-                -labsl_debugging_internal \
-                -labsl_examine_stack \
-                -labsl_demangle_internal \
-                -labsl_demangle_rust \
-                -labsl_decode_rust_punycode \
-                -labsl_log_internal_globals \
-                -labsl_log_globals \
-                -labsl_log_sink \
-                -labsl_log_internal_log_sink_set \
-                -labsl_log_internal_format \
-                -labsl_log_internal_conditions \
-                -labsl_log_internal_nullguard \
-                -labsl_log_internal_fnmatch \
-                -labsl_status \
-                -labsl_statusor \
-                -labsl_raw_logging_internal \
-                -labsl_base \
-                -labsl_spinlock_wait \
-                -labsl_malloc_internal \
-                -labsl_failure_signal_handler \
-                -labsl_throw_delegate \
-                -labsl_int128 \
-                -labsl_strings \
-                -labsl_strings_internal \
-                -labsl_string_view \
-                -labsl_hashtable_profiler \
-                -labsl_strerror \
-                -labsl_poison \
-                -labsl_bad_any_cast_impl \
-                -labsl_bad_optional_access \
-                -labsl_bad_variant_access \
-                -labsl_synchronization \
-                -labsl_periodic_sampler \
-                -labsl_scoped_set_env \
-                -labsl_kernel_timeout_internal \
-                -labsl_time \
-                -labsl_time_zone \
-                -labsl_hash \
-                -labsl_city \
-                -labsl_leak_check \
-                -labsl_raw_hash_set \
-                -labsl_utf8_for_code_point \
-                -labsl_hashtablez_sampler \
-                -labsl_flags_parse \
-                -labsl_flags_usage \
-                -labsl_flags_usage_internal \
-                -labsl_flags_marshalling \
-                -labsl_flags_internal \
-                -labsl_flags_reflection \
-                -labsl_flags_config \
-                -labsl_flags_commandlineflag \
-                -labsl_flags_commandlineflag_internal \
-                -labsl_flags_private_handle_accessor \
-                -labsl_flags_program_name \
-                -labsl_die_if_null \
-                -lprotobuf \
-                -lprotobuf-lite \
-                -ltensorflow-lite \
-                -lXNNPACK \
-                -lxnnpack-microkernels-prod \
-                -lxnnpack-delegate \
-                -lcpuinfo \
-                -lpthreadpool \
+# set(CMAKE_CXX_STANDARD_LIBRARIES
+#                 "-Wl,--start-group \
+#                 -labsl_log_internal_proto \
+#                 -labsl_log_internal_message \
+#                 -labsl_log_internal_structured_proto \
+#                 -labsl_log_internal_check_op \
+#                 -labsl_log_severity \
+#                 -labsl_cord \
+#                 -labsl_cord_internal \
+#                 -labsl_cordz_handle \
+#                 -labsl_cordz_info \
+#                 -labsl_cordz_functions \
+#                 -labsl_cordz_sample_token \
+#                 -labsl_crc_cord_state \
+#                 -labsl_crc32c \
+#                 -labsl_crc_internal\
+#                 -labsl_crc_cpu_detect \
+#                 -labsl_exponential_biased \
+#                 -labsl_symbolize \
+#                 -labsl_stacktrace \
+#                 -labsl_tracing_internal \
+#                 -labsl_debugging_internal \
+#                 -labsl_examine_stack \
+#                 -labsl_demangle_internal \
+#                 -labsl_demangle_rust \
+#                 -labsl_decode_rust_punycode \
+#                 -labsl_log_internal_globals \
+#                 -labsl_log_globals \
+#                 -labsl_log_sink \
+#                 -labsl_log_internal_log_sink_set \
+#                 -labsl_log_internal_format \
+#                 -labsl_log_internal_conditions \
+#                 -labsl_log_internal_nullguard \
+#                 -labsl_log_internal_fnmatch \
+#                 -labsl_status \
+#                 -labsl_statusor \
+#                 -labsl_raw_logging_internal \
+#                 -labsl_base \
+#                 -labsl_spinlock_wait \
+#                 -labsl_malloc_internal \
+#                 -labsl_failure_signal_handler \
+#                 -labsl_throw_delegate \
+#                 -labsl_int128 \
+#                 -labsl_strings \
+#                 -labsl_strings_internal \
+#                 -labsl_string_view \
+#                 -labsl_hashtable_profiler \
+#                 -labsl_strerror \
+#                 -labsl_poison \
+#                 -labsl_bad_any_cast_impl \
+#                 -labsl_bad_optional_access \
+#                 -labsl_bad_variant_access \
+#                 -labsl_synchronization \
+#                 -labsl_periodic_sampler \
+#                 -labsl_scoped_set_env \
+#                 -labsl_kernel_timeout_internal \
+#                 -labsl_time \
+#                 -labsl_time_zone \
+#                 -labsl_hash \
+#                 -labsl_city \
+#                 -labsl_leak_check \
+#                 -labsl_raw_hash_set \
+#                 -labsl_utf8_for_code_point \
+#                 -labsl_hashtablez_sampler \
+#                 -labsl_flags_parse \
+#                 -labsl_flags_usage \
+#                 -labsl_flags_usage_internal \
+#                 -labsl_flags_marshalling \
+#                 -labsl_flags_internal \
+#                 -labsl_flags_reflection \
+#                 -labsl_flags_config \
+#                 -labsl_flags_commandlineflag \
+#                 -labsl_flags_commandlineflag_internal \
+#                 -labsl_flags_private_handle_accessor \
+#                 -labsl_flags_program_name \
+#                 -labsl_die_if_null \
+#                 -lprotobuf \
+#                 -lprotobuf-lite \
+#                 -ltensorflow-lite \
+#                 -lXNNPACK \
+#                 -lxnnpack-microkernels-prod \
+#                 -lxnnpack-delegate \
+#                 -lcpuinfo \
+#                 -lpthreadpool \
 
-                -leight_bit_int_gemm \
-                -lfft2d_fftsg \
-                -lfft2d_fftsg2d \
-                -lfarmhash \
-                -lflatbuffers \
+#                 -leight_bit_int_gemm \
+#                 -lfft2d_fftsg \
+#                 -lfft2d_fftsg2d \
+#                 -lfarmhash \
+#                 -lflatbuffers \
 
-                -lruy_allocator \
-                -lruy_apply_multiplier \
-                -lruy_block_map \
-                -lruy_blocking_counter \
-                -lruy_context \
-                -lruy_context_get_ctx \
-                -lruy_cpuinfo \
-                -lruy_ctx \
-                -lruy_denormal \
-                -lruy_frontend \
-                -lruy_have_built_path_for_avx \
-                -lruy_have_built_path_for_avx2_fma \
-                -lruy_have_built_path_for_avx512 \
-                -lruy_kernel_arm \
-                -lruy_kernel_avx \
-                -lruy_kernel_avx2_fma \
-                -lruy_kernel_avx512 \
-                -lruy_pack_arm \
-                -lruy_pack_avx \
-                -lruy_pack_avx2_fma \
-                -lruy_pack_avx512 \
-                -lruy_prepacked_cache \
-                -lruy_prepare_packed_matrices \
-                -lruy_profiler_instrumentation \
-                -lruy_profiler_profiler \
-                -lruy_system_aligned_alloc \
-                -lruy_thread_pool \
-                -lruy_trmul \
-                -lruy_tune \
-                -lruy_wait \
-                -llitert_cc_api \
-                -llitert_cc_options \
+#                 -lruy_allocator \
+#                 -lruy_apply_multiplier \
+#                 -lruy_block_map \
+#                 -lruy_blocking_counter \
+#                 -lruy_context \
+#                 -lruy_context_get_ctx \
+#                 -lruy_cpuinfo \
+#                 -lruy_ctx \
+#                 -lruy_denormal \
+#                 -lruy_frontend \
+#                 -lruy_have_built_path_for_avx \
+#                 -lruy_have_built_path_for_avx2_fma \
+#                 -lruy_have_built_path_for_avx512 \
+#                 -lruy_kernel_arm \
+#                 -lruy_kernel_avx \
+#                 -lruy_kernel_avx2_fma \
+#                 -lruy_kernel_avx512 \
+#                 -lruy_pack_arm \
+#                 -lruy_pack_avx \
+#                 -lruy_pack_avx2_fma \
+#                 -lruy_pack_avx512 \
+#                 -lruy_prepacked_cache \
+#                 -lruy_prepare_packed_matrices \
+#                 -lruy_profiler_instrumentation \
+#                 -lruy_profiler_profiler \
+#                 -lruy_system_aligned_alloc \
+#                 -lruy_thread_pool \
+#                 -lruy_trmul \
+#                 -lruy_tune \
+#                 -lruy_wait \
+#                 -llitert_cc_api \
+#                 -llitert_cc_options \
 
-                -llitert_c_api \
-                -llitert_c_options \
-                -llitert_logging \
+#                 -llitert_c_api \
+#                 -llitert_c_options \
+#                 -llitert_logging \
 
-                -llitert_core \
-                -llitert_core_model \
-                -llitert_compiler_plugin \
-                -llitert_runtime \
+#                 -llitert_core \
+#                 -llitert_core_model \
+#                 -llitert_compiler_plugin \
+#                 -llitert_runtime \
 
-                -Wl,--end-group \
-                -lpthread"
-)
+#                 -Wl,--end-group \
+#                 -lpthread"
+# )
 
 set(TENSORFLOW_MISSING_SRCS
     "${TENSORFLOW_SOURCE_DIR}/tensorflow/compiler/mlir/lite/allocation.cc"
