@@ -36,6 +36,7 @@ set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(LITERTLM_ROOT_DIR "${PROJECT_ROOT}" CACHE PATH "LiteRT-LM: Root of the LiteRT-LM workspace")
 
 set(LITERTLM_RECIPES_DIR "${LITERTLM_ROOT_DIR}/cmake/recipes" CACHE PATH "LiteRT-LM: Directory for build recipes")
+include("${LITERTLM_RECIPES_DIR}/recipes.cmake")
 
 
 set(LITERTLM_PATCHES_DIR "${LITERTLM_ROOT_DIR}/cmake/patches" 

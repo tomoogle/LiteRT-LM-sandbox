@@ -7,7 +7,12 @@ set(ROOT_LIST "${PROTO_SRC_DIR}/CMakeLists.txt")
 if(EXISTS "${ROOT_LIST}")
     file(READ "${ROOT_LIST}" CONTENT)
     
-    set(INJECTION "include(\"${LITERTLM_PROTO_SHIM_PATH}\")\n")
+    # set(INJECTION "include(${LITERTLM_PROTO_SHIM_PATH})\n")
+
+    string(REPLACE "project(protobuf C CXX)" 
+               "project(protobuf C CXX)\ninclude(${LITERTLM_PROTO_SHIM_PATH})" 
+               CONTENT "${CONTENT}")
+
     
     file(WRITE "${ROOT_LIST}" "${INJECTION}${CONTENT}")
     message(STATUS "[LITERTLM PATCHER] Injection successful.")

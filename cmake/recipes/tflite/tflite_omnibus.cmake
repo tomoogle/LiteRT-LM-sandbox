@@ -6,7 +6,7 @@
 # to ensure zero drift in linker flags or dependency ordering.
 # ==============================================================================
 
-macro(literlm_configure_tflite_interface force_load_targets standard_targets include_dirs build_dir)
+macro(generate_tflite_omnibus force_load_targets standard_targets include_dirs build_dir)
     # 1. Define the Interface Target (The Engine)
     if(NOT TARGET tflite_libs)
         add_library(tflite_libs INTERFACE IMPORTED GLOBAL)
@@ -43,6 +43,7 @@ macro(literlm_configure_tflite_interface force_load_targets standard_targets inc
             
             # Hermetic Shim Dependencies (Must be defined in calling scope)
             LiteRTLM::absl::absl
+            LiteRTLM::protobuf::libprotobuf
             LiteRTLM::flatbuffers::flatbuffers
         $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
 

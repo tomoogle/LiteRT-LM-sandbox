@@ -1,7 +1,7 @@
 # ==============================================================================
 # LiteRT-LM Abseil Target-to-Path Mapping
 # ==============================================================================
-set(ABSL_NS_MAP
+set(ABSL_TARGET_MAP
     "absl::base|${ABSL_LIB_DIR}/libabsl_base.a"
     "absl::spinlock_wait|${ABSL_LIB_DIR}/libabsl_spinlock_wait.a"
     "absl::throw_delegate|${ABSL_LIB_DIR}/libabsl_throw_delegate.a"
@@ -91,3 +91,7 @@ set(ABSL_NS_MAP
     "absl::vlog_config_internal|${ABSL_LIB_DIR}/libabsl_vlog_config_internal.a"
     "absl::die_if_null|${ABSL_LIB_DIR}/libabsl_die_if_null.a"
 )
+
+macro()
+
+endmacro

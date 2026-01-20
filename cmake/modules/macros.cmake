@@ -175,3 +175,38 @@ macro(load_recipe name)
     endif()
     cmake_checkpoint_target("${name}_external" TYPE CUSTOM QUIET)
 endmacro()
+
+
+
+
+# ==============================================================================
+# LiteRTLM Component Orchestrator
+# ==============================================================================
+# Usage: literlm_configure_component_interface(sentencepiece "lib1;lib2" "dep1;dep2" "/inc")
+# ==============================================================================
+
+macro(literlm_configure_component_interface prefix main_targets dependency_targets include_dirs)
+    set(_target "${prefix}_libs")
+    set(_ns_target "LiteRTLM::${prefix}::${prefix}")
+
+    if(NOT TARGET ${_target})
+        add_library(${_target} INTERFACE IMPORTED GLOBAL)
+    endif()
+
+    if(NOT TARGET ${_ns_target})
+        add_library(${_ns_target} ALIAS ${_target})
+    endif()
+
+    target_include_directories(${_target} SYSTEM INTERFACE ${include_dirs})
+
+    target_link_libraries(${_target} INTERFACE
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+            ${main_targets}
+            ${dependency_targets}
+            LiteRTLM::absl::absl
+            LiteRTLM::protobuf::libprotobuf
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+        
+        pthread
+    )
+endmacro()

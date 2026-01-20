@@ -16,6 +16,7 @@ set(LITERT_INCLUDE_PATHS
   ${LITERT_BUILD_DIR}/core/include
   ${LITERT_BUILD_DIR}/runtime/include
 )
+set(LITERT_RECIPE_DIR "${LITERTLM_RECIPES_DIR}/litert")
 
 # =========================================================
 #  2. Construct Compiler Flags (The "dirty work")
@@ -72,6 +73,7 @@ ExternalProject_Add(
     -DFLATBUFFERS_LIB_DIR=${FLATBUFFERS_LIB_DIR}
     -DTFLITE_SRC_DIR=${TFLITE_SRC_DIR}
     -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
+    -DTFLITE_RECIPE_DIR=${TFLITE_RECIPE_DIR}
     -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR}
     -DLITERTLM_RECIPES_DIR=${LITERTLM_RECIPES_DIR}
     -DLITERTLM_MODULES_DIR=${LITERTLM_MODULES_DIR}
@@ -81,7 +83,7 @@ ExternalProject_Add(
     -DOPENCL_INCLUDE_DIR=${OPENCL_INCLUDE_DIR}
     -DJSON_INCLUDE_DIR=${JSON_SRC_DIR}
 
-    -P "${PROJECT_ROOT}/cmake/recipes/litert/litert_patcher.cmake"
+    -P "${LITERTLM_RECIPES_DIR}/litert/litert_patcher.cmake"
 
 
 

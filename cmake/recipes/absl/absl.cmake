@@ -17,7 +17,7 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
     absl_external
     GIT_REPOSITORY 
       https://github.com/abseil/abseil-cpp
-    GIT_TAG        
+    GIT_TAG
       987c57f325f7fa8472fa84e1f885f7534d391b0d
     PREFIX
       ${ABSL_EXT_PREFIX}
@@ -36,9 +36,7 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
       -DABSL_USE_GOOGLETEST_HEAD=OFF
       -DABSL_ENABLE_INSTALL=ON
       -DABSL_PROPAGATE_CXX_STD=ON
-
-
-
+      -DBUILD_SHARED_LIBS=OFF
 
     STEP_TARGETS
       verify_install_step

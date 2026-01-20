@@ -1,12 +1,6 @@
 # tflite_patcher.cmake
-# This script is executed by PATCH_COMMAND to clean and prepare the TFLite tree.
 
 message(STATUS "[LITERTLM PATCHER] Starting surgical orchestration...")
-
-# --- 1. The Nuclear Reset ---
-# We do this first to ensure the script is idempotent (can run multiple times safely)
-# execute_process(COMMAND git checkout -- . WORKING_DIRECTORY "${TENSORFLOW_SOURCE_DIR}")
-# execute_process(COMMAND git clean -df WORKING_DIRECTORY "${TENSORFLOW_SOURCE_DIR}")
 
 # --- 2. Version Compatibility Patches ---
 # Fixes the strict version checks that break modern Flatbuffers usage
@@ -89,12 +83,10 @@ endif()
 # Inject our shim at the very top of the TFLite root
 set(ROOT_LIST "${TFLITE_SRC_DIR}/CMakeLists.txt")
 file(READ "${ROOT_LIST}" CONTENT)
-set(INJECTION "include(\"${LITERTLM_RECIPES_DIR}/tflite/tflite_shims.cmake\")\n")
+set(INJECTION "include(${LITERTLM_RECIPES_DIR}/tflite/tflite_shims.cmake)\n")
 file(WRITE "${ROOT_LIST}" "${INJECTION}${CONTENT}")
 
 message(STATUS "[LITERTLM PATCHER] Orchestration complete.")
-
-
 
 
 
@@ -131,36 +123,6 @@ file(COPY "${TFLITE_SRC_DIR}/weight_cache_schema_generated.h"
      DESTINATION "${TFLITE_BUILD_DIR}/tensorflow/lite/delegates/xnnpack")
 
 
-# --- THE PROTO STUTTER LOBOTOMY ---
-# set(PROTO_TARGETS 
-#     "tensorflow/lite/profiling/proto/CMakeLists.txt"
-#     "tensorflow/lite/tools/benchmark/proto/CMakeLists.txt"
-# )
-
-# foreach(PROTO_LIST ${PROTO_TARGETS})
-#     set(FULL_PATH "${TENSORFLOW_SOURCE_DIR}/${PROTO_LIST}")
-#     if(EXISTS "${FULL_PATH}")
-#         message(STATUS "[LITERTLM] Fixing relative proto paths in ${PROTO_LIST}")
-        
-#         # 1. Force the include path to the ROOT of the source tree
-#         # This fixes: "Could not make proto path relative"
-#         execute_process(COMMAND sed -i "s|--proto_path=\${CMAKE_CURRENT_SOURCE_DIR}/\\([./]\\)*|--proto_path=${TENSORFLOW_SOURCE_DIR}|g" "${FULL_PATH}")
-
-#         # 2. Point the input files to the actual 'tensorflow/lite' path on disk
-#         # This fixes: "No such file or directory"
-#         execute_process(COMMAND sed -i "s|tflite/|tensorflow/lite/|g" "${FULL_PATH}")
-#     endif()
-# endforeach()
-
-# set(PROTO_CMAKELIST_PATHS 
-#     "tensorflow/lite/profiling/proto/CMakeLists.txt"
-#     "tensorflow/lite/tools/benchmark/proto/CMakeLists.txt"
-# )
-# --- THE PROTO PATH RECONCILIATION ---
-# --- THE PROTO STUTTER LOBOTOMY (RE-ENABLED & IMPROVED) ---
-# --- THE SURGICAL PROTO FIX ---
-# --- THE UNIFIED SURGICAL PROTO FIX ---
-# --- THE UNIFIED SURGICAL PROTO FIX (CLEAN CMAKE) ---
 set(PROTO_RECORDS 
     "tensorflow/lite/profiling/proto/CMakeLists.txt:profiling_info.proto"
     "tensorflow/lite/tools/benchmark/proto/CMakeLists.txt:benchmark_result.proto"

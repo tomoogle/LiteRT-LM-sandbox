@@ -1,0 +1,81 @@
+
+# --- litert_shims.cmake
+# --- 5. TFLITE "KITCHEN SINK" CONFIGURATION ---
+
+# Re-hydrate the flattened path strings passed from the Super-Build
+set(_TFLITE_FORCE_LOAD_PATHS "${TFLITE_FORCE_LOAD_PATHS_FLAT}")
+set(_TFLITE_STANDARD_PATHS   "${TFLITE_STANDARD_PATHS_FLAT}")
+
+# Convert back to CMake Lists
+separate_arguments(TFLITE_FORCE_LOAD_TARGETS NATIVE_COMMAND "${_TFLITE_FORCE_LOAD_PATHS}")
+separate_arguments(TFLITE_STANDARD_TARGETS   NATIVE_COMMAND "${_TFLITE_STANDARD_PATHS}")
+
+# Call the Macro (Loaded from LiteRTLM_TFLiteLinker.cmake)
+literlm_configure_tflite_interface(
+    "${TFLITE_FORCE_LOAD_TARGETS}" 
+    "${TFLITE_STANDARD_TARGETS}"
+    "${TFLITE_INCLUDE_DIR}"
+    "${TFLITE_BUILD_DIR}"
+)
+
+# Redirect the canonical target to our Kitchen Sink
+if(NOT TARGET tensorflow-lite)
+    add_library(tensorflow-lite ALIAS tflite_libs)
+endif()
+
+# --- 6. GLOBAL LINKAGE ENFORCEMENT ---
+# Use the re-generated list from section 2
+link_libraries("-Wl,--start-group" ${_ABSL_LIST} "-Wl,--end-group")
+include_directories(SYSTEM "${ABSL_INCLUDE_DIR}")
+
+
+
+
+#---- LiteRTLM_TFLiteLinker.cmake=
+
+macro(literlm_configure_tflite_interface force_load_targets standard_targets include_dirs build_dir)
+    # 1. Define the Interface Target (The Engine)
+    if(NOT TARGET tflite_libs)
+        add_library(tflite_libs INTERFACE IMPORTED GLOBAL)
+    endif()
+
+    # 2. Establish the Alias (The Sovereign API)
+    # This ensures consistent naming across the build ecosystem
+    if(NOT TARGET LiteRTLM::tflite::tflite)
+        add_library(LiteRTLM::tflite::tflite ALIAS tflite_libs)
+    endif()
+
+    # 3. Configure Include Directories
+    # We use SYSTEM to suppress warnings from TFLite headers
+    target_include_directories(tflite_libs SYSTEM INTERFACE 
+        ${include_dirs}
+        ${build_dir} # Required for generated headers (ruy/cpuinfo)
+    )
+
+    # 4. Configure Linker Logic
+    target_link_libraries(tflite_libs INTERFACE
+        # --- PHASE 1: FORCE LOAD (The Hammer) ---
+        # Ensures registration of static kernels and operators.
+        # Critical for TFLite's self-registering OpResolver.
+        $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--whole-archive>
+        $<$<PLATFORM_ID:Darwin>:-Wl,-force_load>
+            ${force_load_targets}
+        $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--no-whole-archive>
+
+        # --- PHASE 2: CIRCULAR DEPENDENCIES (The Group) ---
+        # Handles Math/Utility libs (XNNPACK, Ruy, cpuinfo) which often
+        # have circular symbol references.
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+            ${standard_targets}
+            
+            # Hermetic Shim Dependencies (Must be defined in calling scope)
+            LiteRTLM::absl::absl
+            LiteRTLM::flatbuffers::flatbuffers
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+
+        # --- PHASE 3: SYSTEM LINKS ---
+        pthread
+        $<$<PLATFORM_ID:Linux>:dl>
+        $<$<PLATFORM_ID:Android>:log>
+    )
+endmacro()

@@ -1,5 +1,5 @@
 include(ExternalProject)
-include("${LITERTLM_RECIPES_DIR}/tflite/LiteRTLM_TFLiteLinker.cmake")
+include("${LITERTLM_RECIPES_DIR}/tflite/tflite_omnibus.cmake")
 
 # ==============================================================================
 # SECTION 1: PATH CONFIGURATION
@@ -234,7 +234,7 @@ endforeach()
 # )
 
 
-literlm_configure_tflite_interface(
+generate_tflite_omnibus(
     "${TFLITE_FORCE_LOAD_TARGETS}" 
     "${TFLITE_STANDARD_TARGETS}"
     "${TFLITE_INCLUDE_DIR}"
