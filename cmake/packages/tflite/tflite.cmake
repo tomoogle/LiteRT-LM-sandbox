@@ -1,5 +1,5 @@
 include(ExternalProject)
-include("${LITERTLM_RECIPES_DIR}/tflite/tflite_omnibus.cmake")
+include("${LITERTLM_PACKAGES_DIR}/tflite/tflite_aggregate.cmake")
 
 # ==============================================================================
 # SECTION 1: PATH CONFIGURATION
@@ -76,8 +76,8 @@ if(NOT EXISTS "${TFLITE_STATIC_LIB}")
                 -DTFLITE_SRC_DIR=${TFLITE_SRC_DIR} 
                 -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
                 -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR} 
-                -DLITERTLM_RECIPES_DIR=${LITERTLM_RECIPES_DIR}
-                -P "${LITERTLM_RECIPES_DIR}/tflite/tflite_patcher.cmake"
+                -DLITERTLM_PACKAGES_DIR=${LITERTLM_PACKAGES_DIR}
+                -P "${LITERTLM_PACKAGES_DIR}/tflite/tflite_patcher.cmake"
 
         # --- CMake Configuration ---
         CMAKE_ARGS
@@ -143,7 +143,7 @@ if(NOT EXISTS "${TFLITE_STATIC_LIB}")
             # System Linking
             "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
             "-DCMAKE_CXX_STANDARD_LIBRARIES=-lpthread"
-            "-DLITERTLM_RECIPES_DIR=${LITERTLM_RECIPES_DIR}"
+            "-DLITERTLM_PACKAGES_DIR=${LITERTLM_PACKAGES_DIR}"
     )
 
 else()
@@ -234,7 +234,7 @@ endforeach()
 # )
 
 
-generate_tflite_omnibus(
+generate_tflite_aggregate(
     "${TFLITE_FORCE_LOAD_TARGETS}" 
     "${TFLITE_STANDARD_TARGETS}"
     "${TFLITE_INCLUDE_DIR}"

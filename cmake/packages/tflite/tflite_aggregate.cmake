@@ -1,12 +1,8 @@
 # ==============================================================================
 # LiteRTLM Shared TFLite Linker Logic
 # ==============================================================================
-# This file defines the canonical logic for linking TensorFlow Lite static archives.
-# It is shared between the TFLite build recipe (Producer) and the LiteRT Patcher (Consumer)
-# to ensure zero drift in linker flags or dependency ordering.
-# ==============================================================================
 
-macro(generate_tflite_omnibus force_load_targets standard_targets include_dirs build_dir)
+macro(generate_tflite_aggregate force_load_targets standard_targets include_dirs build_dir)
     # 1. Define the Interface Target (The Engine)
     if(NOT TARGET tflite_libs)
         add_library(tflite_libs INTERFACE IMPORTED GLOBAL)

@@ -1,6 +1,6 @@
 # --- Dependency Orchestration ---
 # Note: Order is preserved to satisfy inter-dependency requirements
-message(STATUS "[DEBUG] LITERTLM_RECIPES_DIR: ${LITERTLM_RECIPES_DIR}")
+message(STATUS "[DEBUG] LITERTLM_PACKAGES_DIR: ${LITERTLM_PACKAGES_DIR}")
 
 set(LITERTLM_DEPENDENCY_ORDER
     opencl
@@ -15,6 +15,6 @@ set(LITERTLM_DEPENDENCY_ORDER
     litert
 )
 
-foreach(recipe ${LITERTLM_DEPENDENCY_ORDER})
-    load_recipe(${recipe}) # macros.cmake
+foreach(package ${LITERTLM_DEPENDENCY_ORDER})
+    load_package(${package}) # macros.cmake
 endforeach()

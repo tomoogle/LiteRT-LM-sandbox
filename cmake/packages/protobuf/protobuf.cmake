@@ -44,8 +44,8 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
         git checkout -- . && git clean -df
       COMMAND ${CMAKE_COMMAND} 
       -DPROTO_SRC_DIR=${PROTO_SRC_DIR}
-      -DLITERTLM_PROTO_SHIM_PATH="${PROTOBUF_RECIPE_DIR}/protobuf_shims.cmake"
-      -P "${LITERTLM_RECIPES_DIR}/protobuf/protobuf_patcher.cmake"
+      -DLITERTLM_PROTO_SHIM_PATH="${PROTOBUF_PACKAGE_DIR}/protobuf_shims.cmake"
+      -P "${LITERTLM_PACKAGES_DIR}/protobuf/protobuf_patcher.cmake"
     CMAKE_ARGS
       -DCMAKE_PREFIX_PATH=${GTEST_INSTALL_PREFIX};${ABSL_INSTALL_PREFIX}
       -DCMAKE_INSTALL_PREFIX=${PROTO_INSTALL_PREFIX}
@@ -63,11 +63,11 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
       -DGTest_DIR=${GTEST_INSTALL_PREFIX}/lib/cmake/GTest
       -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/Protobuf
       
-      -DABSL_RECIPE_DIR=${ABSL_RECIPE_DIR}
+      -DABSL_PACKAGE_DIR=${ABSL_PACKAGE_DIR}
       -DABSL_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
       -DABSL_LIB_DIR=${ABSL_LIB_DIR}
       -DLITERTLM_MODULES_DIR=${LITERTLM_MODULES_DIR}
-      -DLITERTLM_PROTO_SHIM_PATH="${PROTOBUF_RECIPE_DIR}/protobuf_shims.cmake"
+      -DLITERTLM_PROTO_SHIM_PATH="${PROTOBUF_PACKAGE_DIR}/protobuf_shims.cmake"
 
     STEP_TARGETS
       verify_install_step

@@ -4,15 +4,15 @@ message(STATUS "[LiteRTLM] Redirecting SentencePiece dependencies...")
 
 
 include("${LITERTLM_MODULES_DIR}/utils.cmake")
-include("${ABSL_RECIPE_DIR}/absl_omnibus.cmake")
-include("${PROTOBUF_RECIPE_DIR}/protobuf_omnibus.cmake")
+include("${ABSL_PACKAGE_DIR}/absl_aggregate.cmake")
+include("${PROTOBUF_PACKAGE_DIR}/protobuf_aggregate.cmake")
 
 message(STATUS "DEBUG: ABSL_TARGET_MAP IS: '${ABSL_TARGET_MAP}'")
 message(STATUS "DEBUG: PROTOBUF_TARGET_MAP IS: '${PROTOBUF_TARGET_MAP}'")
 
-generate_absl_omnibus()
+generate_absl_aggregate()
 
-generate_protobuf_omnibus()
+generate_protobuf_aggregate()
 
 
 set(SPM_USE_BUILTIN_PROTOBUF OFF CACHE BOOL "" FORCE)
@@ -105,5 +105,5 @@ include_directories(${ABSL_INCLUDE_DIR} ${PROTO_INCLUDE_DIR})
 
 set(CMAKE_CXX_STANDARD_LIBRARIES 
     "${CMAKE_CXX_STANDARD_LIBRARIES} -Wl,--start-group -Wl,--whole-archive ${_PROTOBUF_LINK_FLAGS} ${_ABSL_LINK_FLAGS} -Wl,--no-whole-archive -Wl,--end-group" 
-    CACHE STRING "Forced Abseil Omnibus for Protobuf internal linking" FORCE
+    CACHE STRING "Forced Abseil and Protobuf aggregates for SentencePiece internal linking" FORCE
 )

@@ -11,7 +11,7 @@ set(LITERT_INTERNAL_ROOT "${LITERT_SOURCE_DIR}/litert")
 set(ROOT_LIST "${LITERT_INTERNAL_ROOT}/CMakeLists.txt")
 
 # Path to the Shim Hub we just created
-set(SHIM_PATH "${LITERT_RECIPE_DIR}/litert_shims.cmake")
+set(SHIM_PATH "${LITERT_PACKAGE_DIR}/litert_shims.cmake")
 
 # --- 1. INTEGRITY CHECKS ---
 if(NOT EXISTS "${ROOT_LIST}")

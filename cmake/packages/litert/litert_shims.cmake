@@ -4,9 +4,9 @@
 # ==============================================================================
 
 # --- 1. UTILITIES & MACROS ---
-include("${TFLITE_RECIPE_DIR}/tflite_omnibus.cmake")
+include("${TFLITE_PACKAGE_DIR}/tflite_aggregate.cmake")
 
-set(VENDOR_SHIM_PATH "${LITERT_RECIPES_DIR}/shims/vendor_shim.cmake")
+set(VENDOR_SHIM_PATH "${LITERT_PACKAGES_DIR}/shims/vendor_shim.cmake")
 
 
 
@@ -73,7 +73,7 @@ separate_arguments(TFLITE_FORCE_LOAD_TARGETS NATIVE_COMMAND "${_TFLITE_FORCE_LOA
 separate_arguments(TFLITE_STANDARD_TARGETS   NATIVE_COMMAND "${_TFLITE_STANDARD_PATHS}")
 
 # Call the Macro (Loaded from LiteRTLM_TFLiteLinker.cmake)
-generate_tflite_omnibus(
+generate_tflite_aggregate(
     "${TFLITE_FORCE_LOAD_TARGETS}" 
     "${TFLITE_STANDARD_TARGETS}"
     "${TFLITE_INCLUDE_DIR}"

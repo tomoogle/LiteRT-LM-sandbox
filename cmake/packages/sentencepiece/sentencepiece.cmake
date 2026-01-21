@@ -32,8 +32,8 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       git checkout -- . && git clean -df
       COMMAND ${CMAKE_COMMAND}
         -DSENTENCE_SRC_DIR=${SENTENCE_SRC_DIR}
-        -DLITERTLM_SENTENCE_SHIM_PATH="${SENTENCEPIECE_RECIPE_DIR}/sentencepiece_shims.cmake"
-        -P "${SENTENCEPIECE_RECIPE_DIR}/sentencepiece_patcher.cmake"
+        -DLITERTLM_SENTENCE_SHIM_PATH="${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_shims.cmake"
+        -P "${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_patcher.cmake"
 
 
     CMAKE_ARGS
@@ -59,7 +59,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DABSL_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
       -DABSL_SRC_DIR=${ABSL_SRC_DIR}
       -DABSL_LIB_DIR=${ABSL_LIB_DIR}
-      -DABSL_RECIPE_DIR=${ABSL_RECIPE_DIR}
+      -DABSL_PACKAGE_DIR=${ABSL_PACKAGE_DIR}
 
       -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf
       -DProtobuf_LIBRARIES=${PROTO_LIB_DIR}
@@ -72,7 +72,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DProtobuf_PROTOC_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotoc.a
       -DProtobuf_PROTOC_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotoc.a
       
-      -DPROTOBUF_RECIPE_DIR=${PROTOBUF_RECIPE_DIR}
+      -DPROTOBUF_PACKAGE_DIR=${PROTOBUF_PACKAGE_DIR}
       -DPROTO_LIB_DIR=${PROTO_LIB_DIR}
       -DPROTO_SRC_DIR=${PROTO_SRC_DIR}
       

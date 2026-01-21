@@ -8,10 +8,10 @@ file(REMOVE_RECURSE "${SENTENCE_SRC_DIR}/third_party/protobuf")
 file(REMOVE_RECURSE "${SENTENCE_SRC_DIR}/third_party/protobuf-lite")
 
 
-# ==============================================================================
-# CARPET BOMB: SharedBitGen -> BitGen
-# ==============================================================================
-message(STATUS "[LiteRTLM] Running Carpet Bomb: SharedBitGen -> BitGen in SentencePiece")
+# ------------------------------------------------------------------------------
+# HEADER CANONICALIZATION: In-place Source Path Normalization
+# ------------------------------------------------------------------------------
+message(STATUS "[LiteRTLM] Performing header canonicalization in ${SENTENCE_SRC_DIR}...")
 
 # Define the list of files to hit (or glob the whole src directory)
 file(GLOB_RECURSE SP_SOURCES 
@@ -39,11 +39,6 @@ foreach(FILE_PATH ${SP_SOURCES})
         message(STATUS "  - Patched: ${FILE_PATH}")
     endif()
 endforeach()
-
-# ------------------------------------------------------------------------------
-# THE CARPET BOMB: Recursive Header Normalization
-# ------------------------------------------------------------------------------
-message(STATUS "[LiteRTLM] Starting recursive header normalization in ${SENTENCE_SRC_DIR}...")
 
 # 1. Collect every source and header file in the project
 file(GLOB_RECURSE ALL_FILES 
@@ -99,7 +94,7 @@ set(CONTENT ${SHIM_INCLUDE}${CONTENT})
 file(WRITE "${SENTENCE_SRC_DIR}/CMakeLists.txt" ${CONTENT})
 
 
-# ---- ROOT/src/CMakeLists\
+# ---- ROOT/src/CMakeLists
 file(READ "${SENTENCE_SRC_DIR}/src/CMakeLists.txt" CONTENT)
 
 message(STATUS "[LiteRTLM] Redirecting SentencePiece internal Protobuf paths...")

@@ -83,7 +83,7 @@ endif()
 # Inject our shim at the very top of the TFLite root
 set(ROOT_LIST "${TFLITE_SRC_DIR}/CMakeLists.txt")
 file(READ "${ROOT_LIST}" CONTENT)
-set(INJECTION "include(${LITERTLM_RECIPES_DIR}/tflite/tflite_shims.cmake)\n")
+set(INJECTION "include(${LITERTLM_PACKAGES_DIR}/tflite/tflite_shims.cmake)\n")
 file(WRITE "${ROOT_LIST}" "${INJECTION}${CONTENT}")
 
 message(STATUS "[LITERTLM PATCHER] Orchestration complete.")

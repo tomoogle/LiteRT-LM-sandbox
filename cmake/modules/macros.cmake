@@ -57,7 +57,7 @@ endmacro()
 add_litertlm_library
 --------------------
 Wrapper for add_library that automatically ensures the library is only 
-processed after the external dependency recipes are configured.
+processed after the external dependency packages are configured.
 
 Supports all standard library types (STATIC, SHARED, INTERFACE).
 
@@ -109,7 +109,7 @@ endmacro()
 
 
 #[[.rst:
-load_recipe
+load_package
 -----------
 
 Orchestrates the configuration of a project dependency.
@@ -124,24 +124,24 @@ Users can pre-satisfy a dependency by:
 
 Example:
   set(ABSL_FOUND TRUE)
-  load_recipe(absl) # This will now skip the internal Abseil build.
+  load_package(absl) # This will now skip the internal Abseil build.
 
 Arguments:
-  name : The lowercase name of the recipe folder in cmake/recipes/
+  name : The lowercase name of the package folder in cmake/packages/
 
 Requires:
-  - LITERTLM_RECIPES_DIR must be set to the absolute path of the recipes folder.
+  - LITERTLM_packageS_DIR must be set to the absolute path of the packages folder.
   - LITERTLM_MODULES_DIR must be set to find supporting scripts.
 
 Note:
-  This macro is "sticky." Once a recipe is loaded, it sets a CACHE variable
+  This macro is "sticky." Once a package is loaded, it sets a CACHE variable
   to prevent redundant configuration cycles.
 #]]
-macro(load_recipe name)
+macro(load_package name)
     string(TOUPPER "${name}" upper_name)
     set(USE_SYSTEM_VAR "LITERTLM_USE_SYSTEM_${upper_name}")
     
-    option(${USE_SYSTEM_VAR} "LiteRT-LM: Use system/pre-existing ${name} instead of internal recipe" OFF)
+    option(${USE_SYSTEM_VAR} "LiteRT-LM: Use system/pre-existing ${name} instead of internal package" OFF)
 
     set(SHOULD_COOK TRUE)
 
@@ -170,8 +170,8 @@ macro(load_recipe name)
     endif()
 
     if(SHOULD_COOK)
-        message(STATUS "[LITERTLM] Policy: Using INTERNAL Recipe for ${name}")
-        include("${LITERTLM_RECIPES_DIR}/${name}/${name}.cmake")        
+        message(STATUS "[LITERTLM] Policy: Using INTERNAL package for ${name}")
+        include("${LITERTLM_PACKAGES_DIR}/${name}/${name}.cmake")        
     endif()
     cmake_checkpoint_target("${name}_external" TYPE CUSTOM QUIET)
 endmacro()
