@@ -62,9 +62,18 @@ if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
       -Dabsl_DIR=${ABSL_INSTALL_PREFIX}/lib/cmake/absl
       -DGTest_DIR=${GTEST_INSTALL_PREFIX}/lib/cmake/GTest
       -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/Protobuf
+      
+      -DABSL_RECIPE_DIR=${ABSL_RECIPE_DIR}
+      -DABSL_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
+      -DABSL_LIB_DIR=${ABSL_LIB_DIR}
+      -DLITERTLM_MODULES_DIR=${LITERTLM_MODULES_DIR}
+      -DLITERTLM_PROTO_SHIM_PATH="${PROTOBUF_RECIPE_DIR}/protobuf_shims.cmake"
+
     STEP_TARGETS
       verify_install_step
   )
+
+
   verify_install(protobuf_external ${PROTO_CONFIG_CMAKE_FILE})
 
 else()

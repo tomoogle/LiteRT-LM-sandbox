@@ -225,3 +225,43 @@ function(cmake_checkpoint_target TARGET_NAME)
     endif()
 
 endfunction()
+
+
+
+# ==============================================================================
+# kvp_parse_map
+# Purpose: Always extracts Keys (Target Names) and Values (File Paths).
+# Usage: kvp_parse_map(ABSL_TARGET_MAP _KEYS _VALS)
+# ==============================================================================
+function(kvp_parse_map MAP_VAR KEYS_OUT VALS_OUT)
+    set(_LOCAL_KEYS "")
+    set(_LOCAL_VALS "")
+
+    foreach(_entry IN ITEMS ${MAP_VAR})
+        # Find the delimiter
+        string(FIND "${_entry}" "=" _pos)
+        
+        if(_pos EQUAL -1)
+            message(FATAL_ERROR "[LiteRTLM] Malformed KVP entry: '${_entry}'. Expected 'Key|Value'")
+        endif()
+
+        # 1. Extract Key (Left of |)
+        string(SUBSTRING "${_entry}" 0 ${_pos} _key)
+        string(STRIP "${_key}" _key)
+
+        # 2. Extract Value (Right of |)
+        math(EXPR _val_start "${_pos} + 1")
+        string(SUBSTRING "${_entry}" ${_val_start} -1 _val)
+        string(STRIP "${_val}" _val)
+
+        # 3. Synchronized storage
+        list(APPEND _LOCAL_KEYS "${_key}")
+        list(APPEND _LOCAL_VALS "${_val}")
+    endforeach()
+
+    string(JOIN " " _FLAT_KEYS ${_LOCAL_KEYS})
+    string(JOIN " " _FLAT_VALS ${_LOCAL_VALS})
+
+    set(${KEYS_OUT} "${_FLAT_KEYS}" PARENT_SCOPE)
+    set(${VALS_OUT} "${_FLAT_VALS}" PARENT_SCOPE)
+endfunction()

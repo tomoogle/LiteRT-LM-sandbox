@@ -175,7 +175,10 @@ import_absl_lib(imp_absl_die_if_null             "${ABSL_LIB_DIR}/libabsl_die_if
 add_library(absl_libs INTERFACE)
 target_include_directories(absl_libs SYSTEM INTERFACE ${ABSL_INCLUDE_DIR})
 target_link_libraries(absl_libs INTERFACE
-  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
+    -Wl,--start-group
+    -Wl,--whole-archive
+  >
     # --- Base ---
     imp_absl_base imp_absl_spinlock_wait imp_absl_throw_delegate imp_absl_raw_logging_internal
     imp_absl_scoped_set_env imp_absl_log_severity imp_absl_malloc_internal imp_absl_poison
@@ -231,9 +234,11 @@ target_link_libraries(absl_libs INTERFACE
     imp_absl_die_if_null
 
     imp_absl_hashtable_profiler
-  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
-  
-  $<$<PLATFORM_ID:Linux>:pthread>
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
+    -Wl,--no-whole-archive
+    -Wl,--end-group
+  >
+  $<$<PLATFORM_ID:Linux>:pthread dl m>
   $<$<PLATFORM_ID:Darwin>:-framework CoreFoundation>
 )
 
