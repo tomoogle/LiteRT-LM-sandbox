@@ -6,7 +6,7 @@
 # --- 1. UTILITIES & MACROS ---
 include("${TFLITE_PACKAGE_DIR}/tflite_aggregate.cmake")
 
-set(VENDOR_SHIM_PATH "${LITERT_PACKAGES_DIR}/shims/vendor_shim.cmake")
+set(VENDOR_SHIM_PATH "${LITERT_PACKAGE_DIR}/shims/vendor_shim.cmake")
 
 
 

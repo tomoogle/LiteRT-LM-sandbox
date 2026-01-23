@@ -1,6 +1,6 @@
 # tflite_patcher.cmake
 
-message(STATUS "[LITERTLM PATCHER] Starting surgical orchestration...")
+message(STATUS "[LITERTLM] Starting surgical orchestration...")
 
 # --- 2. Version Compatibility Patches ---
 # Fixes the strict version checks that break modern Flatbuffers usage
@@ -86,7 +86,7 @@ file(READ "${ROOT_LIST}" CONTENT)
 set(INJECTION "include(${LITERTLM_PACKAGES_DIR}/tflite/tflite_shims.cmake)\n")
 file(WRITE "${ROOT_LIST}" "${INJECTION}${CONTENT}")
 
-message(STATUS "[LITERTLM PATCHER] Orchestration complete.")
+message(STATUS "[LITERTLM] Orchestration complete.")
 
 
 
