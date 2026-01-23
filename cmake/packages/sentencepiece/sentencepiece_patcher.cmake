@@ -78,72 +78,52 @@ message(STATUS "[LiteRTLM] Normalized ${SENTENCE_SRC_DIR} successfully.")
 
 # ---- ROOT/CMakeLists
 # 2. Source-level hijacks
-file(READ "${SENTENCE_SRC_DIR}/CMakeLists.txt" CONTENT)
+file(READ "${SENTENCE_SRC_DIR}/CMakeLists.txt" ROOT_CONTENT)
 string(REPLACE "project(sentencepiece VERSION \${SPM_VERSION} LANGUAGES C CXX)"
-    "project(sentencepiece VERSION \${SPM_VERSION} LANGUAGES C CXX)\ninclude(${LITERTLM_SENTENCE_SHIM_PATH})"
-    CONTENT "${CONTENT}")
+    "project(sentencepiece VERSION \${SPM_VERSION} LANGUAGES C CXX)\ninclude(${SENTENCE_ROOT_SHIM_PATH})"
+    ROOT_CONTENT "${ROOT_CONTENT}")
 
 string(REPLACE 
     "option(SPM_USE_BUILTIN_PROTOBUF \"Use builtin protobuf\" ON)" 
     "option(SPM_USE_BUILTIN_PROTOBUF \"Use builtin protobuf\" OFF)" 
-    CONTENT "${CONTENT}")
+    ROOT_CONTENT "${ROOT_CONTENT}")
 
-string(REPLACE "set(CMAKE_CXX_STANDARD 17)" "set(CMAKE_CXX_STANDARD 20)" CONTENT "${CONTENT}")
+string(REPLACE "set(CMAKE_CXX_STANDARD 17)" "set(CMAKE_CXX_STANDARD 20)" ROOT_CONTENT "${ROOT_CONTENT}")
 
-set(CONTENT ${SHIM_INCLUDE}${CONTENT})
-file(WRITE "${SENTENCE_SRC_DIR}/CMakeLists.txt" ${CONTENT})
+set(ROOT_CONTENT ${ROOT_CONTENT})
+file(WRITE "${SENTENCE_SRC_DIR}/CMakeLists.txt" ${ROOT_CONTENT})
 
 
 # ---- ROOT/src/CMakeLists
-file(READ "${SENTENCE_SRC_DIR}/src/CMakeLists.txt" CONTENT)
+file(READ "${SENTENCE_SRC_DIR}/src/CMakeLists.txt" SRC_CONTENT)
 
 message(STATUS "[LiteRTLM] Redirecting SentencePiece internal Protobuf paths...")
 string(REPLACE "\${CMAKE_CURRENT_SOURCE_DIR}/../third_party/protobuf-lite" 
                "\${PROTOBUF_SRC_FILE_PATH}" 
-               CONTENT "${CONTENT}")
+               SRC_CONTENT "${SRC_CONTENT}")
 
 string(REPLACE "\${CMAKE_CURRENT_SOURCE_DIR}/../third_party/absl/flags/flag.cc" 
                "\${ABSL_SRC_FILE_PATH}/flags/internal/flag.cc" 
-               CONTENT "${CONTENT}")
+               SRC_CONTENT "${SRC_CONTENT}")
 
 
 string(REPLACE 
     "include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/../third_party)" 
-    "include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/../third_party)\ninclude_directories(\${ABSL_INLUDE_FILE_PATH})\ninclude_directories(\${PROTOBUF_INCLUDE_DIR})" 
-    CONTENT "${CONTENT}")
+    "include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/../third_party)\ninclude_directories(${ABSL_INLUDE_DIR})\ninclude_directories(${PROTO_INCLUDE_DIR})" 
+    SRC_CONTENT "${SRC_CONTENT}")
 
-string(REPLACE 
-    "set(libprotobuf_lite \"\")"
-    "set(libprotobuf_lite LiteRTLM::protobuf::libprotobuf)"
-    CONTENT "${CONTENT}")
+# In your sentencepiece_patcher.cmake
+string(REPLACE "if (SPM_USE_BUILTIN_PROTOBUF)" "if (FALSE) # Forced by LiteRTLM" SRC_CONTENT "${SRC_CONTENT}")
+string(REPLACE "if (SPM_USE_EXTERNAL_ABSL)" "if (TRUE) # Forced by LiteRTLM" SRC_CONTENT "${SRC_CONTENT}")
 
-string(REPLACE "target_link_libraries(\${SPM_EXE} sentencepiece" 
-               "target_link_libraries(\${SPM_EXE} sentencepiece LiteRTLM::absl::absl" 
-               CONTENT "${CONTENT}")
-
-# Some SP versions use a different variable or direct names
-string(REPLACE "target_link_libraries(spm_export_vocab sentencepiece" 
-               "target_link_libraries(spm_export_vocab sentencepiece LiteRTLM::absl::absl" 
-               CONTENT "${CONTENT}")
-
-string(REPLACE 
-    "absl::strings"
-    "LiteRTLM::absl::absl" 
-    CONTENT "${CONTENT}")
+string(REPLACE "\${ABSL_STRINGS_SRCS}" "" SRC_CONTENT "${SRC_CONTENT}")
+string(REPLACE "\${ABSL_FLAGS_SRCS}" "" SRC_CONTENT "${SRC_CONTENT}")
 
 
-string(REPLACE 
-    "absl::flags_parse"
-    "LiteRTLM::absl::absl" 
-    CONTENT "${CONTENT}")
 
-string(REPLACE 
-    "absl::flags"
-    "LiteRTLM::absl::absl" 
-    CONTENT "${CONTENT}")
-
-set(CONTENT ${SHIM_INCLUDE}${CONTENT})
-file(WRITE "${SENTENCE_SRC_DIR}/src/CMakeLists.txt" ${CONTENT})
+set(SRC_CONTENT ${SRC_CONTENT})
+set(SRC_SHIM_INCLUDE "include(${SENTENCE_SRC_SHIM_PATH})")
+file(WRITE "${SENTENCE_SRC_DIR}/src/CMakeLists.txt" ${SRC_SHIM_INCLUDE}${SRC_CONTENT})
 
 
 

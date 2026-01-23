@@ -15,10 +15,9 @@ macro(generate_absl_aggregate)
         add_library(LiteRTLM::absl::absl INTERFACE IMPORTED GLOBAL)
         set_target_properties(LiteRTLM::absl::absl PROPERTIES 
             INTERFACE_LINK_LIBRARIES
-                "-Wl,--start-group -Wl,--whole-archive ${_absl_lib_paths} -Wl,--no-whole-archive -Wl,--end-group"
+                "-Wl,--start-group -Wl,--whole-archive ${_absl_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
             INTERFACE_INCLUDE_DIRECTORIES
                 "${ABSL_INCLUDE_DIR}"
-            )
         )
 
         add_library(LiteRTLM::absl::shim INTERFACE IMPORTED GLOBAL)

@@ -32,7 +32,10 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       git checkout -- . && git clean -df
       COMMAND ${CMAKE_COMMAND}
         -DSENTENCE_SRC_DIR=${SENTENCE_SRC_DIR}
-        -DLITERTLM_SENTENCE_SHIM_PATH="${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_shims.cmake"
+        -DSENTENCE_ROOT_SHIM_PATH="${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_root_shim.cmake"
+        -DSENTENCE_SRC_SHIM_PATH="${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_src_shim.cmake"
+        -DABSL_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
+        -DABSL_INCLUDE_DIR=${PROTO_INCLUDE_DIR}
         -P "${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_patcher.cmake"
 
 
@@ -64,10 +67,6 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DProtobuf_DIR=${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf
       -DProtobuf_LIBRARIES=${PROTO_LIB_DIR}
       -DProtobuf_INCLUDE_DIR=${PROTO_INCLUDE_DIR}
-      -DProtobuf_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf.a
-      -DProtobuf_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf.a
-      -DProtobuf_LITE_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf-lite.a
-      -DProtobuf_LITE_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf-lite.a
       -DProtobuf_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
       -DProtobuf_PROTOC_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotoc.a
       -DProtobuf_PROTOC_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotoc.a
@@ -85,6 +84,10 @@ else()
     add_custom_target(sentencepiece_external)
   endif()
 endif()
+      # -DProtobuf_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf.a
+      # -DProtobuf_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf.a
+      # -DProtobuf_LITE_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf.a
+      # -DProtobuf_LITE_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf.a
 
 # Import Libs
 import_static_lib(imp_sentencepiece       "${SENTENCE_LIBRARY_STATIC}")

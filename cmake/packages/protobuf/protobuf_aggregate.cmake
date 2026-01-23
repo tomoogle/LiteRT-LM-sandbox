@@ -10,17 +10,22 @@ macro(generate_protobuf_aggregate)
         kvp_parse_map("${PROTOBUF_TARGET_MAP}" _protobuf_lib_names _protobuf_lib_paths)
 
         add_library(LiteRTLM::protobuf::libprotobuf INTERFACE IMPORTED GLOBAL)
-        
         set_target_properties(LiteRTLM::protobuf::libprotobuf PROPERTIES 
             INTERFACE_LINK_LIBRARIES
                 "-Wl,--start-group -Wl,--whole-archive ${_protobuf_lib_paths} ${_absl_lib_paths} -Wl,--no-whole-archive -Wl,--end-group"
             INTERFACE_INCLUDE_DIRECTORIES
-                "${PROTO_INCLUDE_DIR}"
+                "${PROTO_INCLUDE_DIR};${ABSL_INCLUDE_DIR}"
         )
 
-        foreach(_comp_target IN LISTS _protobuf_lib_names)
+        add_library(LiteRTLM::protobuf::shim INTERFACE IMPORTED GLOBAL)        
+        set_target_properties(LiteRTLM::protobuf::shim PROPERTIES 
+            INTERFACE_INCLUDE_DIRECTORIES
+                "${PROTO_INCLUDE_DIR};${ABSL_INCLUDE_DIR}"
+        )
+
+        foreach(_comp_target IN LISTS ${_protobuf_lib_names})
             if(NOT TARGET ${_comp_target})
-                add_library(${_comp_target} ALIAS LiteRTLM::protobuf::libprotobuf)
+                add_library(${_comp_target} ALIAS LiteRTLM::protobuf::shim)
                 message(VERBOSE "[LiteRTLM] Redirected ${_comp_target} to aggregate")
             endif()
         endforeach()

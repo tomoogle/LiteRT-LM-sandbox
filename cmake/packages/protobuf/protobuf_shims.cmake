@@ -4,6 +4,8 @@ include_guard(GLOBAL)
 include("${LITERTLM_MODULES_DIR}/utils.cmake")
 include("${ABSL_PACKAGE_DIR}/absl_aggregate.cmake")
 
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+
 generate_absl_aggregate()
 message(STATUS "DEBUG: [PROTOBUF]ABSL_TARGET_MAP IS: '${ABSL_TARGET_MAP}'")
 

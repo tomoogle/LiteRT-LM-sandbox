@@ -23,6 +23,10 @@ if(NOT EXISTS "${ABSL_CONFIG_CMAKE_FILE}")
       ${ABSL_EXT_PREFIX}
     PATCH_COMMAND
       git checkout -- . && git clean -df
+      COMMAND ${CMAKE_COMMAND} 
+      -DABSL_PACKAGE_DIR=${ABSL_PACKAGE_DIR}
+      -DABSL_SRC_DIR=${ABSL_SRC_DIR}
+      -P "${ABSL_PACKAGE_DIR}/absl_patcher.cmake"
     
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${ABSL_INSTALL_PREFIX}

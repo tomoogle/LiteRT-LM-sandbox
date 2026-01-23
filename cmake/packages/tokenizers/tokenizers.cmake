@@ -27,7 +27,7 @@ if(NOT EXISTS "${TOKENIZER_LIB_CHECK}")
     GIT_REPOSITORY
         https://github.com/mlc-ai/tokenizers-cpp
     GIT_TAG
-        main
+        55d53aa38dc8df7d9c8bd9ed50907e82ae83ce66
     PREFIX
         ${TOKENIZER_EXT_PREFIX}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env 
