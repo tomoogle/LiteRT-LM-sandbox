@@ -8,6 +8,9 @@ set(GTEST_INSTALL_PREFIX ${GTEST_EXT_PREFIX}/install)
 set(GTEST_INCLUDE_DIR ${GTEST_INSTALL_PREFIX}/include)
 set(GTEST_CONFIG_CMAKE_FILE "${GTEST_INSTALL_PREFIX}/lib/cmake/GTest/GTestConfig.cmake")
 
+
+setup_external_install_structure("${GTEST_INSTALL_PREFIX}")
+
 if(NOT EXISTS "${GTEST_CONFIG_CMAKE_FILE}")
   message(STATUS "GoogleTest not found. Configuring external build...")
 

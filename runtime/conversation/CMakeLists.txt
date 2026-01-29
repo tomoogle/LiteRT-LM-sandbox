@@ -45,10 +45,7 @@ target_link_libraries(runtime_conversation_conversation
     # runtime_engine_engine_settings (Likely defined in runtime/engine)
     # runtime_engine_io_types (Likely defined in runtime/engine)
     runtime_util_litert_status_util
-
-    proto_lib
     LITERTLM_DEPS
-    litert_libs
 )
 
 # --- Internal Callback Util ---
@@ -70,7 +67,7 @@ target_link_libraries(runtime_conversation_internal_callback_util
     LiteRTLM::Runtime::Conversation::Processor::Interface
     # runtime_engine_io_types (Likely defined in runtime/engine)
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- IO Types ---
@@ -88,7 +85,7 @@ target_include_directories(runtime_conversation_io_types
 target_link_libraries(runtime_conversation_io_types
   PUBLIC 
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # --- Folder Facade ---

@@ -1,3 +1,4 @@
+include_guard(GLOBAL)
 # --- packages.cmake
 set(ABSL_PACKAGE_DIR "${LITERTLM_PACKAGES_DIR}/absl" CACHE PATH "Path to Abseil-cpp related build scrips")
 
@@ -11,8 +12,8 @@ set(SENTENCEPIECE_PACKAGE_DIR "${LITERTLM_PACKAGES_DIR}/sentencepiece" CACHE PAT
 
 set(TFLITE_PACKAGE_DIR "${LITERTLM_PACKAGES_DIR}/tflite" CACHE PATH "Path to TFLite related build scrips")
 
-# set(ABSL_PACKAGES_DIR "${LITERTLM_PACKAGES_DIR}/absl" CACHE PATH "Path to Abseil-cpp related build scrips")
+set(RE2_PACKAGE_DIR "${LITERTLM_PACKAGES_DIR}/re2" CACHE PATH "Path to RE2 related build scrips")
 
-# set(ABSL_PACKAGES_DIR "${LITERTLM_PACKAGES_DIR}/absl" CACHE PATH "Path to Abseil-cpp related build scrips")
+# set(ABSL_PACKAGE_DIR "${LITERTLM_PACKAGES_DIR}/absl" CACHE PATH "Path to Abseil-cpp related build scrips")
 
-# set(ABSL_PACKAGES_DIR "${LITERTLM_PACKAGES_DIR}/absl" CACHE PATH "Path to Abseil-cpp related build scrips")
+# set(ABSL_PACKAGE_DIR "${LITERTLM_PACKAGES_DIR}/absl" CACHE PATH "Path to Abseil-cpp related build scrips")

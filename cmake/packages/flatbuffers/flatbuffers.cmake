@@ -1,16 +1,18 @@
 include(ExternalProject)
 
-set(FLATBUFFERS_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/flatbuffers)
-set(FLATBUFFERS_INSTALL_PREFIX ${FLATBUFFERS_EXT_PREFIX}/install)
-set(FLATBUFFERS_INCLUDE_DIR ${FLATBUFFERS_INSTALL_PREFIX}/include)
-set(FLATBUFFERS_SRC_DIR ${FLATBUFFERS_EXT_PREFIX}/src)
-set(FLATBUFFERS_BIN_DIR ${FLATBUFFERS_INSTALL_PREFIX}/bin)
-set(FLATBUFFERS_LIB_DIR ${FLATBUFFERS_INSTALL_PREFIX}/lib)
+set(FLATBUFFERS_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/flatbuffers CACHE INTERNAL "")
+set(FLATBUFFERS_INSTALL_PREFIX ${FLATBUFFERS_EXT_PREFIX}/install CACHE INTERNAL "")
+set(FLATBUFFERS_INCLUDE_DIR ${FLATBUFFERS_INSTALL_PREFIX}/include CACHE INTERNAL "")
+set(FLATBUFFERS_SRC_DIR ${FLATBUFFERS_EXT_PREFIX}/src CACHE INTERNAL "")
+set(FLATBUFFERS_BIN_DIR ${FLATBUFFERS_INSTALL_PREFIX}/bin CACHE INTERNAL "")
+set(FLATBUFFERS_LIB_DIR ${FLATBUFFERS_INSTALL_PREFIX}/lib CACHE INTERNAL "")
 
 
 set(FLATBUFFERS_DIR ${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers CACHE INTERNAL "")
-set(FLATBUFFERS_CMAKE_CONFIG_FILE ${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers/flatbuffers-config.cmake)
+set(FLATBUFFERS_CMAKE_CONFIG_FILE ${FLATBUFFERS_LIB_DIR}/cmake/flatbuffers/flatbuffers-config.cmake CACHE INTERNAL "")
 set(FLATC_EXECUTABLE ${FLATBUFFERS_BIN_DIR}/flatc CACHE INTERNAL "" FORCE)
+
+setup_external_install_structure("${FLATBUFFERS_INSTALL_PREFIX}")
 
 if(NOT EXISTS "${FLATBUFFERS_CMAKE_CONFIG_FILE}")
   message(STATUS "Flatbuffers not found. Configuring external build...")
@@ -50,17 +52,10 @@ else()
     endif()
 endif()
 
-import_static_lib(imp_flatbuffers "${FLATBUFFERS_LIB_DIR}/libflatbuffers.a")
-
-add_library(flatbuffers_libs INTERFACE)
-target_link_libraries(flatbuffers_libs INTERFACE imp_flatbuffers)
-target_include_directories(flatbuffers_libs INTERFACE ${FLATBUFFERS_INCLUDE_DIR})
+include(${FLATBUFFERS_PACKAGE_DIR}/flatbuffers_aggregate.cmake)
+generate_flatbuffers_aggregate()
 
 
-if(NOT TARGET LiteRTLM::flatbuffers::flatbuffers)
-    add_library(LiteRTLM::flatbuffers::flatbuffers INTERFACE IMPORTED GLOBAL)
-    target_link_libraries(LiteRTLM::flatbuffers::flatbuffers INTERFACE flatbuffers_libs)
-endif()
 
 
 set(schema_fbs

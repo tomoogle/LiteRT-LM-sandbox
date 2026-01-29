@@ -10,7 +10,11 @@ macro(generate_protobuf_aggregate)
         kvp_parse_map("${PROTOBUF_TARGET_MAP}" _protobuf_lib_names _protobuf_lib_paths)
 
         add_library(LiteRTLM::protobuf::libprotobuf INTERFACE IMPORTED GLOBAL)
-        set_target_properties(LiteRTLM::protobuf::libprotobuf PROPERTIES 
+        set_target_properties(LiteRTLM::protobuf::libprotobuf PROPERTIES
+            INTERFACE_LIBRARY_NAMES
+                "${_protobuf_lib_names}"
+            INTERFACE_LIBRARY_PATHS
+                "${_protobuf_lib_paths}"
             INTERFACE_LINK_LIBRARIES
                 "-Wl,--start-group -Wl,--whole-archive ${_protobuf_lib_paths} ${_absl_lib_paths} -Wl,--no-whole-archive -Wl,--end-group"
             INTERFACE_INCLUDE_DIRECTORIES
@@ -29,6 +33,18 @@ macro(generate_protobuf_aggregate)
                 message(VERBOSE "[LiteRTLM] Redirected ${_comp_target} to aggregate")
             endif()
         endforeach()
+
+        if(NOT TARGET protobuf::libprotobuf)
+            add_library(protobuf::libprotobuf ALIAS LiteRTLM::protobuf::shim)
+        endif()
+
+
+        if(NOT TARGET protobuf::protoc)
+            add_executable(protobuf::protoc IMPORTED GLOBAL)
+            set_target_properties(protobuf::protoc PROPERTIES
+                IMPORTED_LOCATION "${PROTO_PROTOC_EXECUTABLE}"
+            )
+        endif()
 
         get_target_property(_PROTOBUF_PAYLOAD LiteRTLM::protobuf::libprotobuf INTERFACE_LINK_LIBRARIES)
         string(REPLACE ";" " " _PROTOBUF_LINK_FLAGS "${_PROTOBUF_PAYLOAD}")

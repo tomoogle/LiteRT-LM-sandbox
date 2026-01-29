@@ -49,10 +49,6 @@ target_link_libraries(runtime_components_preprocessor_audio_preprocessor_miniaud
     runtime_util_litert_status_util
   
     LITERTLM_DEPS
-    # litert_libs
-    # [FIX] Added missing Bazel dependencies
-    # miniaudio_lib
-    # kissfft_lib
 )
 
 # ==============================================================================

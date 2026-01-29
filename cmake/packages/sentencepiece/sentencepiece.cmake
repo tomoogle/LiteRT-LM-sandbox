@@ -1,9 +1,9 @@
 include(ExternalProject)
 
-set(SENTENCE_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/sentencepiece)
-set(SENTENCE_INSTALL_PREFIX ${SENTENCE_EXT_PREFIX}/install)
-set(SENTENCE_SRC_DIR ${SENTENCE_EXT_PREFIX}/src/sentencepiece_external)
-set(SENTENCE_INCLUDE_DIR ${SENTENCE_INSTALL_PREFIX}/include)
+set(SENTENCE_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/sentencepiece CACHE INTERNAL "")
+set(SENTENCE_INSTALL_PREFIX ${SENTENCE_EXT_PREFIX}/install CACHE INTERNAL "")
+set(SENTENCE_SRC_DIR ${SENTENCE_EXT_PREFIX}/src/sentencepiece_external CACHE INTERNAL "")
+set(SENTENCE_INCLUDE_DIR ${SENTENCE_INSTALL_PREFIX}/include CACHE INTERNAL "")
 
 # Detect lib vs lib64
 if(EXISTS "${SENTENCE_INSTALL_PREFIX}/lib64")
@@ -12,9 +12,11 @@ else()
   set(SENTENCE_LIB_DIR "${SENTENCE_INSTALL_PREFIX}/lib")
 endif()
 
-set(SENTENCE_LIBRARY_STATIC "${SENTENCE_LIB_DIR}/libsentencepiece.a")
-set(SENTENCE_LIBRARY_TRAIN  "${SENTENCE_LIB_DIR}/libsentencepiece_train.a")
+set(SENTENCE_LIBRARY_STATIC "${SENTENCE_LIB_DIR}/libsentencepiece.a" CACHE INTERNAL "")
+set(SENTENCE_LIBRARY_TRAIN  "${SENTENCE_LIB_DIR}/libsentencepiece_train.a" CACHE INTERNAL "")
 
+
+setup_external_install_structure("${SENTENCE_INSTALL_PREFIX}")
 
 if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
   message(STATUS "SentencePiece not found. Configuring external build...")
@@ -36,6 +38,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
         -DSENTENCE_SRC_SHIM_PATH="${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_src_shim.cmake"
         -DABSL_INCLUDE_DIR=${ABSL_INCLUDE_DIR}
         -DABSL_INCLUDE_DIR=${PROTO_INCLUDE_DIR}
+        -DPROTO_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
         -P "${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_patcher.cmake"
 
 
@@ -70,6 +73,7 @@ if(NOT EXISTS "${SENTENCE_LIBRARY_STATIC}")
       -DProtobuf_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
       -DProtobuf_PROTOC_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotoc.a
       -DProtobuf_PROTOC_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotoc.a
+      -DPROTO_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
       
       -DPROTOBUF_PACKAGE_DIR=${PROTOBUF_PACKAGE_DIR}
       -DPROTO_LIB_DIR=${PROTO_LIB_DIR}
@@ -89,27 +93,5 @@ endif()
       # -DProtobuf_LITE_LIBRARY_DEBUG=${PROTO_LIB_DIR}/libprotobuf.a
       # -DProtobuf_LITE_LIBRARY_RELEASE=${PROTO_LIB_DIR}/libprotobuf.a
 
-# Import Libs
-import_static_lib(imp_sentencepiece       "${SENTENCE_LIBRARY_STATIC}")
-import_static_lib(imp_sentencepiece_train "${SENTENCE_LIBRARY_TRAIN}")
-
-add_library(sentencepiece_libs INTERFACE)
-add_dependencies(sentencepiece_libs 
-  sentencepiece_external
-  proto_lib
-  absl_libs
-)
-target_include_directories(sentencepiece_libs INTERFACE ${SENTENCE_INCLUDE_DIR})
-
-target_link_libraries(sentencepiece_libs INTERFACE 
-    imp_sentencepiece_train
-    imp_sentencepiece
-
-    proto_lib
-    absl_libs
-)
-
-if(NOT TARGET LiteRTLM::sentencepiece::sentencepiece)
-    add_library(LiteRTLM::sentencepiece::sentencepiece INTERFACE IMPORTED GLOBAL)
-    target_link_libraries(LiteRTLM::sentencepiece::sentencepiece INTERFACE sentencepiece_libs)
-endif()
+include(${SENTENCEPIECE_PACKAGE_DIR}/sentencepiece_aggregate.cmake)
+generate_sentencepiece_aggregate()

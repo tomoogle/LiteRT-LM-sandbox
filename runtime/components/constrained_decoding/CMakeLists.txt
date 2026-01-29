@@ -77,7 +77,6 @@ target_link_libraries(runtime_components_constrained_decoding_constrained_decode
     LiteRTLM::Runtime::Util::ConvertTensorBuffer
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
 
-    # litert_libs     # Covers layout, macros, model, tensor_buffer
     LITERTLM_DEPS   # Covers absl
 )
 

@@ -117,8 +117,6 @@ target_link_libraries(runtime_core_session_utils
     runtime_engine_engine_settings
     runtime_engine_io_types
     runtime_util_litert_status_util
-  
-    litert_libs
 )
 
 # ==============================================================================

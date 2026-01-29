@@ -1,51 +1,62 @@
 # ==============================================================================
 # LiteRTLM Shared TFLite Linker Logic
 # ==============================================================================
+include_guard(GLOBAL)
+include(${LITERTLM_MODULES_DIR}/utils.cmake)
+include("${LITERTLM_PACKAGES_DIR}/packages.cmake")
+include(${TFLITE_PACKAGE_DIR}/tflite_target_map.cmake)
 
-macro(generate_tflite_aggregate force_load_targets standard_targets include_dirs build_dir)
-    # 1. Define the Interface Target (The Engine)
-    if(NOT TARGET tflite_libs)
-        add_library(tflite_libs INTERFACE IMPORTED GLOBAL)
-    endif()
 
-    # 2. Establish the Alias (The Sovereign API)
-    # This ensures consistent naming across the build ecosystem
+macro(generate_tflite_aggregate)
     if(NOT TARGET LiteRTLM::tflite::tflite)
-        add_library(LiteRTLM::tflite::tflite ALIAS tflite_libs)
+        message(STATUS "[LiteRTLM] Generating the TFLite aggregate...")
+        
+        set(_tflite_lib_names "")
+        set(_tflite_lib_paths "")
+        kvp_parse_map("${TFLITE_TARGET_MAP}" _tflite_lib_names _tflite_lib_paths)
+
+        add_library(LiteRTLM::tflite::tflite INTERFACE IMPORTED GLOBAL)
+        
+        set_target_properties(LiteRTLM::tflite::tflite PROPERTIES 
+            INTERFACE_LIBRARY_NAMES
+                "${_tflite_lib_names}"
+            INTERFACE_LIBRARY_PATHS
+                "${_tflite_lib_paths}"
+            INTERFACE_LINK_LIBRARIES
+                "-Wl,--start-group -Wl,--whole-archive ${_tflite_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
+            INTERFACE_INCLUDE_DIRECTORIES
+                "${TFLITE_INCLUDE_DIR}"
+        )
+        
+        add_library(LiteRTLM::tflite::shim INTERFACE IMPORTED GLOBAL)
+        set_target_properties(LiteRTLM::tflite::shim PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES
+                "${TFLITE_INCLUDE_DIR};${TFLITE_BUILD_DIR}" # Build dir needed for generated ruy headers
+        )
+
+        foreach(_comp_target IN LISTS ${_tflite_lib_names})
+            if(NOT TARGET ${_comp_target})
+                add_library(${_comp_target} ALIAS LiteRTLM::tflite::shim)
+                message(VERBOSE "[LiteRTLM] Redirected ${_comp_target} to TFLite aggregate")
+            endif()
+        endforeach()
+
+        get_target_property(_TFLITE_PAYLOAD LiteRTLM::tflite::tflite INTERFACE_LINK_LIBRARIES)
+        string(REPLACE ";" " " _TFLITE_LINK_FLAGS "${_TFLITE_PAYLOAD}")
+
+
+
+
+        if(NOT TARGET tflite_libs)
+            add_library(tflite_libs ALIAS LiteRTLM::tflite::tflite)
+        endif()
+        if(NOT TARGET tensorflow-lite)
+            add_library(tensorflow-lite ALIAS LiteRTLM::tflite::tflite)
+        endif()
+
+        set(tflite_FOUND TRUE CACHE BOOL "" FORCE)
+        message(STATUS "[LiteRTLM] TFLite aggregate has been generated.")
     endif()
-
-    # 3. Configure Include Directories
-    # We use SYSTEM to suppress warnings from TFLite headers
-    target_include_directories(tflite_libs SYSTEM INTERFACE 
-        ${include_dirs}
-        ${build_dir} # Required for generated headers (ruy/cpuinfo)
-    )
-
-    # 4. Configure Linker Logic
-    target_link_libraries(tflite_libs INTERFACE
-        # --- PHASE 1: FORCE LOAD (The Hammer) ---
-        # Ensures registration of static kernels and operators.
-        # Critical for TFLite's self-registering OpResolver.
-        $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--whole-archive>
-        $<$<PLATFORM_ID:Darwin>:-Wl,-force_load>
-            ${force_load_targets}
-        $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--no-whole-archive>
-
-        # --- PHASE 2: CIRCULAR DEPENDENCIES (The Group) ---
-        # Handles Math/Utility libs (XNNPACK, Ruy, cpuinfo) which often
-        # have circular symbol references.
-        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-            ${standard_targets}
-            
-            # Hermetic Shim Dependencies (Must be defined in calling scope)
-            LiteRTLM::absl::absl
-            LiteRTLM::protobuf::libprotobuf
-            LiteRTLM::flatbuffers::flatbuffers
-        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
-
-        # --- PHASE 3: SYSTEM LINKS ---
-        pthread
-        $<$<PLATFORM_ID:Linux>:dl>
-        $<$<PLATFORM_ID:Android>:log>
-    )
 endmacro()
+
+

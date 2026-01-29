@@ -44,7 +44,6 @@ target_link_libraries(runtime_executor_audio_executor_base
   INTERFACE
     LiteRTLM::Runtime::Executor::LLMExecutorIoTypes
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -217,7 +216,6 @@ target_link_libraries(runtime_executor_llm_executor_base
     LiteRTLM::Runtime::Executor::LLMExecutorIoTypes
     LiteRTLM::Runtime::Executor::LLMExecutorSettings
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -386,7 +384,6 @@ target_link_libraries(runtime_executor_llm_litert_compiled_model_executor
     runtime_util_lora_util
     runtime_util_scoped_file
     LITERTLM_DEPS
-    imp_XNNPACK 
 )
 
 # ==============================================================================
@@ -480,7 +477,6 @@ target_link_libraries(runtime_executor_vision_executor_base
   INTERFACE
     LiteRTLM::Runtime::Executor::LLMExecutorIoTypes
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================
@@ -502,7 +498,6 @@ target_link_libraries(runtime_executor_vision_executor_settings
   PUBLIC
     LiteRTLM::Runtime::Executor::ExecutorSettingsBase
     runtime_util_litert_status_util
-  
     LITERTLM_DEPS
 )
 

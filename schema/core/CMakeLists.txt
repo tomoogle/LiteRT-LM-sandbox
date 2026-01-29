@@ -29,7 +29,6 @@ target_include_directories(schema_core_litertlm_header_schema
 
 target_link_libraries(schema_core_litertlm_header_schema
   INTERFACE
-    flatbuffers_libs
     LITERTLM_DEPS
 )
 
@@ -49,7 +48,6 @@ target_include_directories(schema_core_litertlm_header
 target_link_libraries(schema_core_litertlm_header
   INTERFACE
     LiteRTLM::Schema::Core::HeaderSchema
-    flatbuffers_libs
     LITERTLM_DEPS
 )
 
@@ -120,7 +118,6 @@ target_link_libraries(schema_core_litertlm_section
   INTERFACE
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Runtime::Util::LiteRtStatusUtil
-    flatbuffers_libs
     zlib_lib
     LITERTLM_DEPS
 )
@@ -146,9 +143,6 @@ target_link_libraries(schema_core_litertlm_export
     LiteRTLM::Schema::Core::HeaderSchema
     LiteRTLM::Schema::Core::Section
     LiteRTLM::Schema::Core::Utils
-    litert_libs
-    proto_lib
-    flatbuffers_libs
     LITERTLM_DEPS
 )
 

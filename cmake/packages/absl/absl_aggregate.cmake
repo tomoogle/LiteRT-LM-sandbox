@@ -13,7 +13,11 @@ macro(generate_absl_aggregate)
         kvp_parse_map("${ABSL_TARGET_MAP}" _absl_lib_names _absl_lib_paths)
 
         add_library(LiteRTLM::absl::absl INTERFACE IMPORTED GLOBAL)
-        set_target_properties(LiteRTLM::absl::absl PROPERTIES 
+        set_target_properties(LiteRTLM::absl::absl PROPERTIES
+            INTERFACE_LIBRARY_NAMES
+                "${_absl_lib_names}"
+            INTERFACE_LIBRARY_PATHS
+                "${_absl_lib_paths}"
             INTERFACE_LINK_LIBRARIES
                 "-Wl,--start-group -Wl,--whole-archive ${_absl_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
             INTERFACE_INCLUDE_DIRECTORIES

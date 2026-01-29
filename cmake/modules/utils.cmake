@@ -265,3 +265,31 @@ function(kvp_parse_map MAP_VAR KEYS_OUT VALS_OUT)
     set(${KEYS_OUT} "${_FLAT_KEYS}" PARENT_SCOPE)
     set(${VALS_OUT} "${_FLAT_VALS}" PARENT_SCOPE)
 endfunction()
+
+
+
+# ==============================================================================
+# setup_external_install_structure
+# Purpose: Pre-creates the standard GNU directory tree for an external project.
+# Rationale: Satisfies CMake's strict path validation for IMPORTED targets
+#            before the ExternalProject build phase actually runs.
+# ==============================================================================
+function(setup_external_install_structure prefix_path)
+    if(NOT prefix_path)
+        message(FATAL_ERROR "[LiteRTLM] setup_external_install_structure called with empty path.")
+    endif()
+
+    # Define the standard subdirectories
+    set(_subdirs 
+        "${prefix_path}/include"
+        "${prefix_path}/lib"
+        "${prefix_path}/bin"
+    )
+
+    foreach(_dir IN LISTS _subdirs)
+        if(NOT EXISTS "${_dir}")
+            message(STATUS "[LiteRTLM] Pre-creating install directory: ${_dir}")
+            file(MAKE_DIRECTORY "${_dir}")
+        endif()
+    endforeach()
+endfunction()

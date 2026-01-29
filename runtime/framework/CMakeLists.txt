@@ -59,7 +59,6 @@ target_link_libraries(runtime_framework_threadpool
   PUBLIC 
     LiteRTLM::Framework::ThreadOptions 
     LITERTLM_DEPS
-    litert_libs
 )
 
 # ==============================================================================

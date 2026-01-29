@@ -4,14 +4,14 @@ include(ExternalProject)
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-set(TOKENIZER_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/tokenizers-cpp)
-set(TOKENIZER_SRC_DIR ${TOKENIZER_EXT_PREFIX}/src/tokenizers-cpp_external)
-set(TOKENIZER_BUILD_DIR ${TOKENIZER_EXT_PREFIX}/src/tokenizers-cpp_external-build) 
-set(TOKENIZER_INSTALL_PREFIX ${TOKENIZER_EXT_PREFIX}/install)
-set(TOKENIZER_INCLUDE_DIR 
+set(TOKENIZER_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/tokenizers-cpp CACHE INTERNAL "")
+set(TOKENIZER_SRC_DIR ${TOKENIZER_EXT_PREFIX}/src/tokenizers-cpp_external CACHE INTERNAL "")
+set(TOKENIZER_BUILD_DIR ${TOKENIZER_EXT_PREFIX}/src/tokenizers-cpp_external-build CACHE INTERNAL "")
+set(TOKENIZER_INSTALL_PREFIX ${TOKENIZER_EXT_PREFIX}/install CACHE INTERNAL "")
+set(TOKENIZER_INCLUDE_DIR
   ${TOKENIZER_INSTALL_PREFIX}/include
   ${TOKENIZER_SRC_DIR}
-)
+ CACHE INTERNAL "")
 
 set(TOKENIZER_LIB_CHECK "${TOKENIZER_BUILD_DIR}/libtokenizers_cpp.a")
 
@@ -64,8 +64,6 @@ target_include_directories(tokenizers_libs INTERFACE ${TOKENIZER_INCLUDE_DIR})
 target_link_libraries(tokenizers_libs INTERFACE
   imp_tokenizers_c
   imp_tokenizers_cpp
-  sentencepiece_libs 
-  absl_libs
 )
 
 
@@ -73,3 +71,8 @@ if(NOT TARGET LiteRTLM::tokenizers::tokenizers)
     add_library(LiteRTLM::tokenizers::tokenizers INTERFACE IMPORTED GLOBAL)
     target_link_libraries(LiteRTLM::tokenizers::tokenizers INTERFACE tokenizers_libs)
 endif()
+
+set(_tokenizers_lib_path 
+  "${TOKENIZER_BUILD_DIR}/libtokenizers_c.a"
+  "${TOKENIZER_BUILD_DIR}/libtokenizers_cpp.a"
+)

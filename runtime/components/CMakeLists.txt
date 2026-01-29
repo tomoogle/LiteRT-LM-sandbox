@@ -38,7 +38,7 @@ target_link_libraries(runtime_components_tokenizer
   INTERFACE
     runtime_util_convert_tensor_buffer # [FIX] Added dependency from Bazel
     LITERTLM_DEPS                      # For absl::status
-    litert_libs
+    
 )
 
 # ==============================================================================
@@ -181,7 +181,6 @@ target_include_directories(runtime_components_model_resources
 target_link_libraries(runtime_components_model_resources
   INTERFACE
     LiteRTLM::Runtime::Components::Tokenizer::Interface
-    proto_lib # For llm_metadata_cc_proto
     LITERTLM_DEPS
 )
 
@@ -255,7 +254,6 @@ target_include_directories(runtime_components_sampler
 target_link_libraries(runtime_components_sampler
   INTERFACE
     LITERTLM_DEPS # absl::status
-    litert_libs   # tensor buffer types
 )
 
 # ==============================================================================
@@ -322,7 +320,7 @@ target_link_libraries(runtime_components_scoring_cpu_util
   PUBLIC
     LiteRTLM::Runtime::Components::SamplingCpuUtil 
     runtime_util_litert_status_util
-    litert_libs
+    
     LITERTLM_DEPS
 )
 
@@ -343,7 +341,7 @@ target_include_directories(runtime_components_stop_token_detector
 target_link_libraries(runtime_components_stop_token_detector
   PUBLIC
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # ==============================================================================
@@ -363,7 +361,7 @@ target_include_directories(runtime_components_token_id_util
 target_link_libraries(runtime_components_token_id_util
   PUBLIC
     LITERTLM_DEPS
-    litert_libs
+    
 )
 
 # ==============================================================================

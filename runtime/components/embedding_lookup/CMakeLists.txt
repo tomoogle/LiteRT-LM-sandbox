@@ -44,7 +44,6 @@ target_link_libraries(runtime_components_embedding_lookup_embedding_lookup_end_o
     runtime_util_litert_status_util
   
     LITERTLM_DEPS
-    # litert_libs
 )
 
 # --- Manager ---

@@ -19,6 +19,25 @@ if(CMAKE_VERSION VERSION_LESS "3.25")
         "Please upgrade CMake to proceed."
     )
 endif()
+
+
+string(TIMESTAMP FAIL_TIME "%Y%m%d_%H%M%S")
+set(FAIL_SNAPSHOT_DIR "${PROJECT_ROOT}/debug_fails/build_at_${FAIL_TIME}")
+
+
+option(LITERTLM_DEBUG_BUILD_SYSTEM "Enable verbose build system debugging" OFF)
+if(LITERTLM_DEBUG_BUILD_SYSTEM)
+    if(EXISTS CMAKE_BINARY_DIR)
+        add_custom_target(backup_build
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${FAIL_SNAPSHOT_DIR}"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}" "${FAIL_SNAPSHOT_DIR}"
+            COMMENT "📸 Backing up current (likely broken) build state to ${FAIL_SNAPSHOT_DIR}"
+            VERBATIM
+        )
+    endif()
+endif()
+
+
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 project(LiteRT-LM LANGUAGES C CXX)
 
@@ -92,6 +111,12 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.20 CACHE STRING "Required CMake policy versio
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive" CACHE STRING "Required CXX flags" FORCE)
 # add_link_options("-Wl,-z,muldefs")
 
+set(LITERTLM_LOCAL_STAGING_DIR "${CMAKE_BINARY_DIR}/staging/lib" CACHE INTERNAL "")
+file(MAKE_DIRECTORY "${LITERTLM_LOCAL_STAGING_DIR}")
+# set(LITERTLM_LOCAL_ARCHIVE_REGISTRY "" CACHE INTERNAL "")
+# set(LITERTLM_LOCAL_TARGET_REGISTRY "" CACHE INTERNAL "")
+
+
 
 # --- Optimization
 option(ENABLE_CCACHE "Enables the use of ccache" OFF)
@@ -105,6 +130,7 @@ if(${ENABLE_CCACHE} STREQUAL "ON")
       message(WARNING "⚠️ CCache not found. Install it (`sudo apt install ccache`) for faster builds!")
   endif()
 endif()
+
 
 
 # --- Utilities
@@ -136,19 +162,18 @@ list(APPEND LITERTLM_INCLUDE_PATHS
   ${FETCHCONTENT_MODULE_INCLUDE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}/antlr_generated
 )
+
 include(collect_dependencies)
-
-
-# --- LiteRT-LM Targets
-include(setup_generated_src_files)
-generate_src_files(ALL_GENERATED_FILES ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES})
-
-
 if(TARGET LITERTLM_DEPS)
     message(STATUS "✅ DEBUG: LITERTLM_DEPS exists!")
 else()
     message(FATAL_ERROR "❌ DEBUG: LITERTLM_DEPS is MISSING!")
 endif()
+
+# --- LiteRT-LM Targets
+include(setup_generated_src_files)
+generate_src_files(ALL_GENERATED_FILES ${ALL_SOURCE_FILES} ${ALL_HEADER_FILES})
+
 
 
 add_compile_definitions(
@@ -160,157 +185,22 @@ add_compile_definitions(
 # # set(CMAKE_EXE_LINKER_FLAGS "${ABSL_LINK_FLAGS}")
 # # set(CMAKE_SHARED_LINKER_FLAGS "${ABSL_LINK_FLAGS}")
 
-set(CMAKE_EXE_LINKER_FLAGS
-    " -L${ABSL_LIB_DIR} \
-    -L${PROTO_INSTALL_PREFIX}/lib \
-    -L${TFLITE_LIB_DIR} \
-    -L${TFLITE_BUILD_DIR} \
-    -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy"
-)
-set(CMAKE_SHARED_LINKER_FLAGS
-    " -L${ABSL_LIB_DIR} \
-    -L${PROTO_INSTALL_PREFIX}/lib \
-    -L${TFLITE_LIB_DIR} \
-    -L${TFLITE_BUILD_DIR} \
-    -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy \
-    -L${LITERT_INCLUDE_PATHS}"
-)
-# set(CMAKE_CXX_STANDARD_LIBRARIES
-#                 "-Wl,--start-group \
-#                 -labsl_log_internal_proto \
-#                 -labsl_log_internal_message \
-#                 -labsl_log_internal_structured_proto \
-#                 -labsl_log_internal_check_op \
-#                 -labsl_log_severity \
-#                 -labsl_cord \
-#                 -labsl_cord_internal \
-#                 -labsl_cordz_handle \
-#                 -labsl_cordz_info \
-#                 -labsl_cordz_functions \
-#                 -labsl_cordz_sample_token \
-#                 -labsl_crc_cord_state \
-#                 -labsl_crc32c \
-#                 -labsl_crc_internal\
-#                 -labsl_crc_cpu_detect \
-#                 -labsl_exponential_biased \
-#                 -labsl_symbolize \
-#                 -labsl_stacktrace \
-#                 -labsl_tracing_internal \
-#                 -labsl_debugging_internal \
-#                 -labsl_examine_stack \
-#                 -labsl_demangle_internal \
-#                 -labsl_demangle_rust \
-#                 -labsl_decode_rust_punycode \
-#                 -labsl_log_internal_globals \
-#                 -labsl_log_globals \
-#                 -labsl_log_sink \
-#                 -labsl_log_internal_log_sink_set \
-#                 -labsl_log_internal_format \
-#                 -labsl_log_internal_conditions \
-#                 -labsl_log_internal_nullguard \
-#                 -labsl_log_internal_fnmatch \
-#                 -labsl_status \
-#                 -labsl_statusor \
-#                 -labsl_raw_logging_internal \
-#                 -labsl_base \
-#                 -labsl_spinlock_wait \
-#                 -labsl_malloc_internal \
-#                 -labsl_failure_signal_handler \
-#                 -labsl_throw_delegate \
-#                 -labsl_int128 \
-#                 -labsl_strings \
-#                 -labsl_strings_internal \
-#                 -labsl_string_view \
-#                 -labsl_hashtable_profiler \
-#                 -labsl_strerror \
-#                 -labsl_poison \
-#                 -labsl_bad_any_cast_impl \
-#                 -labsl_bad_optional_access \
-#                 -labsl_bad_variant_access \
-#                 -labsl_synchronization \
-#                 -labsl_periodic_sampler \
-#                 -labsl_scoped_set_env \
-#                 -labsl_kernel_timeout_internal \
-#                 -labsl_time \
-#                 -labsl_time_zone \
-#                 -labsl_hash \
-#                 -labsl_city \
-#                 -labsl_leak_check \
-#                 -labsl_raw_hash_set \
-#                 -labsl_utf8_for_code_point \
-#                 -labsl_hashtablez_sampler \
-#                 -labsl_flags_parse \
-#                 -labsl_flags_usage \
-#                 -labsl_flags_usage_internal \
-#                 -labsl_flags_marshalling \
-#                 -labsl_flags_internal \
-#                 -labsl_flags_reflection \
-#                 -labsl_flags_config \
-#                 -labsl_flags_commandlineflag \
-#                 -labsl_flags_commandlineflag_internal \
-#                 -labsl_flags_private_handle_accessor \
-#                 -labsl_flags_program_name \
-#                 -labsl_die_if_null \
-#                 -lprotobuf \
-#                 -lprotobuf-lite \
-#                 -ltensorflow-lite \
-#                 -lXNNPACK \
-#                 -lxnnpack-microkernels-prod \
-#                 -lxnnpack-delegate \
-#                 -lcpuinfo \
-#                 -lpthreadpool \
-
-#                 -leight_bit_int_gemm \
-#                 -lfft2d_fftsg \
-#                 -lfft2d_fftsg2d \
-#                 -lfarmhash \
-#                 -lflatbuffers \
-
-#                 -lruy_allocator \
-#                 -lruy_apply_multiplier \
-#                 -lruy_block_map \
-#                 -lruy_blocking_counter \
-#                 -lruy_context \
-#                 -lruy_context_get_ctx \
-#                 -lruy_cpuinfo \
-#                 -lruy_ctx \
-#                 -lruy_denormal \
-#                 -lruy_frontend \
-#                 -lruy_have_built_path_for_avx \
-#                 -lruy_have_built_path_for_avx2_fma \
-#                 -lruy_have_built_path_for_avx512 \
-#                 -lruy_kernel_arm \
-#                 -lruy_kernel_avx \
-#                 -lruy_kernel_avx2_fma \
-#                 -lruy_kernel_avx512 \
-#                 -lruy_pack_arm \
-#                 -lruy_pack_avx \
-#                 -lruy_pack_avx2_fma \
-#                 -lruy_pack_avx512 \
-#                 -lruy_prepacked_cache \
-#                 -lruy_prepare_packed_matrices \
-#                 -lruy_profiler_instrumentation \
-#                 -lruy_profiler_profiler \
-#                 -lruy_system_aligned_alloc \
-#                 -lruy_thread_pool \
-#                 -lruy_trmul \
-#                 -lruy_tune \
-#                 -lruy_wait \
-#                 -llitert_cc_api \
-#                 -llitert_cc_options \
-
-#                 -llitert_c_api \
-#                 -llitert_c_options \
-#                 -llitert_logging \
-
-#                 -llitert_core \
-#                 -llitert_core_model \
-#                 -llitert_compiler_plugin \
-#                 -llitert_runtime \
-
-#                 -Wl,--end-group \
-#                 -lpthread"
+# set(CMAKE_EXE_LINKER_FLAGS
+#     "-L${ABSL_LIB_DIR}"
+#     "-L${PROTO_INSTALL_PREFIX}/lib"
+#     "-L${TFLITE_LIB_DIR}"
+#     "-L${TFLITE_BUILD_DIR}"
+#     "-L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy"
 # )
+# set(CMAKE_SHARED_LINKER_FLAGS
+#     " -L${ABSL_LIB_DIR} \
+#     -L${PROTO_INSTALL_PREFIX}/lib \
+#     -L${TFLITE_LIB_DIR} \
+#     -L${TFLITE_BUILD_DIR} \
+#     -L${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build/ruy \
+#     -L${LITERT_INCLUDE_PATHS}"
+# )
+
 
 set(TENSORFLOW_MISSING_SRCS
     "${TENSORFLOW_SOURCE_DIR}/tensorflow/compiler/mlir/lite/allocation.cc"
@@ -322,7 +212,111 @@ set(TENSORFLOW_MISSING_SRCS
 )
 set_source_files_properties(${TENSORFLOW_MISSING_SRCS} PROPERTIES GENERATED TRUE)
 
+# add_link_options(
+#     "-Wl,--whole-archive"
+#     "-Wl,--allow-multiple-definition"
+#     "-Wl,--start-group"
+
+# )
+
+
+# set(LITERTLM_UNIFIED_LINK_SPEC
+#     "LINKER:--allow-multiple-definition"
+#     "LINKER:--start-group"
+#     "LINKER:--whole-archive"
+    
+#     # 1. Local Registered Archives
+#     ${LITERTLM_LOCAL_ARCHIVE_REGISTRY}
+    
+#     # 2. External Project Aggregates
+#     ${_litert_lib_paths} 
+#     ${_tflite_lib_paths} 
+#     ${_sentencepiece_lib_paths} 
+#     ${_protobuf_lib_paths} 
+#     ${_absl_lib_paths}
+#     ${_re2_lib_paths}
+    
+#     "LINKER:--no-whole-archive"
+#     "LINKER:--end-group"
+#     "-lz" "-lrt" "-lpthread" "-ldl"
+# )
+
+
+
 
 add_subdirectory(c)
 add_subdirectory(schema)
 add_subdirectory(runtime)
+
+
+include("${LITERTLM_MODULES_DIR}/local_aggregate.cmake")
+generate_local_aggregate()
+
+# set(CMAKE_CXX_STANDARD_LIBRARIES
+#     "${CMAKE_CXX_STANDARD_LIBRARIES} ${_LITERTLM_LINK_FLAGS}" CACHE STRING "" FORCE
+# )
+
+add_executable(litert_lm_main
+    "runtime/engine/litert_lm_main.cc"
+)
+
+if(TARGET litertlm_local_anchor)
+    add_dependencies(litert_lm_main litertlm_local_anchor)
+endif()
+
+target_link_options(litert_lm_main PRIVATE
+  "LINKER:--export-dynamic-symbol=LiteRt*"
+)
+# target_link_libraries(litert_lm_main
+#     PUBLIC
+#         "Wl,--allow-multiple-definition -Wl,--start-group -Wl,--whole-archive"
+#         libpng_lib
+#         kissfft_lib
+#         miniaudio_lib
+#         minizip_lib
+#         minja_lib
+#         zlib_lib
+#         antlr_lib
+#         LiteRTLM::nlohmann_json::nlohmann_json
+#         opencl_headers_lib
+#         ${_LITERTLM_PAYLOAD}
+#         "-lz -lrt -lpthread -ldl -Wl,--end-group"
+# )
+separate_arguments(_LITERTLM_EXPANDED_LIST NATIVE_COMMAND "${_LITERTLM_PAYLOAD}")
+target_link_libraries(litert_lm_main
+    PUBLIC
+        "-Wl,--allow-multiple-definition"
+        "-Wl,--start-group"
+        "-Wl,--whole-archive"
+        
+        libpng_lib
+        kissfft_lib
+        miniaudio_lib
+        minizip_lib
+        minja_lib
+        zlib_lib
+        antlr_lib
+        
+        
+        LiteRTLM::nlohmann_json::nlohmann_json
+        opencl_headers_lib
+
+        ${_LITERTLM_EXPANDED_LIST}
+        "-lz" "-lrt" "-lpthread" "-ldl" 
+        "-Wl,--end-group"
+)
+
+target_include_directories(litert_lm_main PRIVATE
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+
+
+# # Android Specifics
+# if(ANDROID)
+#   target_link_libraries(litert_lm_main PRIVATE EGL GLESv3)
+# endif()
+
+# set(CMAKE_CXX_STANDARD_LIBRARIES 
+#     "${CMAKE_CXX_STANDARD_LIBRARIES} -Wl,--allow-multiple-definition -Wl,--start-group -Wl,--whole-archive ${_litert_lib_paths} ${_tflite_lib_paths} ${_sentencepiece_lib_paths} ${_flatbuffers_lib_paths} ${_protobuf_lib_paths} ${_absl_lib_paths} -lz -lrt -lpthread -ldl -Wl,--end-group" CACHE PATH "" FORCE
+# )

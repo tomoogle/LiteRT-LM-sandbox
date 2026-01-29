@@ -1,34 +1,18 @@
-# ==============================================================================
-# LITERT-LM SURGICAL PATCHER
-# Purpose: Inject the Hermetic Shim and neutralize internal dependency fetching.
-# ==============================================================================
 include("${LITERTLM_MODULES_DIR}/utils.cmake")
 
-message(STATUS "[LITERTLM] Initializing Surgical Build-System Remediation for LiteRT...")
+set(ROOT_LIST "${LITERT_SRC_DIR}/CMakeLists.txt")
+set(LITERTLM_LITERT_SHIM_PATH "${LITERT_PACKAGE_DIR}/litert_shims.cmake")
 
-# --- 0. ENVIRONMENT SETUP ---
-set(LITERT_INTERNAL_ROOT "${LITERT_SOURCE_DIR}/litert")
-set(ROOT_LIST "${LITERT_INTERNAL_ROOT}/CMakeLists.txt")
 
-# Path to the Shim Hub we just created
-set(SHIM_PATH "${LITERT_PACKAGE_DIR}/litert_shims.cmake")
+if(EXISTS "${ROOT_LIST}")
+    message(STATUS "[LITERTLM PATCHER] Injecting shim into LiteRT root...")
 
-# --- 1. INTEGRITY CHECKS ---
-if(NOT EXISTS "${ROOT_LIST}")
-    message(FATAL_ERROR "[LITERTLM] Integrity Failure: Root manifest not found at ${ROOT_LIST}.")
-endif()
-
-# --- 2. ROOT MANIFEST INJECTION (The Single-Line Piercing) ---
-file(READ "${ROOT_LIST}" ROOT_CONTENT)
-
-# Check for idempotency so we don't inject twice
-if(NOT ROOT_CONTENT MATCHES "litert_shims.cmake")
-    message(STATUS "[LITERTLM] Injecting Global Dependency Shims into Root Manifest...")
+    file(READ "${ROOT_LIST}" ROOT_CONTENT)    
+    string(REPLACE "project(LiteRT VERSION 1.4.0 LANGUAGES CXX C)"
+           "project(LiteRT VERSION 1.4.0 LANGUAGES CXX C)\ninclude(${LITERTLM_LITERT_SHIM_PATH})" 
+           ROOT_CONTENT "${ROOT_CONTENT}")
     
-    # We simply include the Hub. All aliases and targets are defined there.
-    set(INJECTION "include(\"${SHIM_PATH}\")\n")
-    
-    file(WRITE "${ROOT_LIST}" "${INJECTION}${ROOT_CONTENT}")
+    file(WRITE "${ROOT_LIST}" "${ROOT_CONTENT}")
 else()
     message(STATUS "[LITERTLM] Root manifest already shimmed. Skipping injection.")
 endif()
@@ -38,9 +22,9 @@ endif()
 # Prevent LiteRT from entering these directories and triggering downloads/errors.
 
 set(GUILLOTINE_PATHS
-    "${LITERT_INTERNAL_ROOT}/third_party/tensorflow/CMakeLists.txt"       # The 2GB Download
-    "${LITERT_INTERNAL_ROOT}/tflite/CMakeLists.txt"                       # Legacy Internal TFLite
-    "${LITERT_INTERNAL_ROOT}/tflite/tools/cmake/CMakeLists.txt"           # Conflicting Toolchains
+    "${LITERT_SRC_DIR}/third_party/tensorflow/CMakeLists.txt"       # The 2GB Download
+    "${LITERT_SRC_DIR}/tflite/CMakeLists.txt"                       # Legacy Internal TFLite
+    "${LITERT_SRC_DIR}/tflite/tools/cmake/CMakeLists.txt"           # Conflicting Toolchains
 )
 
 foreach(TARGET_HEAD ${GUILLOTINE_PATHS})
@@ -57,7 +41,7 @@ endforeach()
 
 # --- 4. TRANSITIVE TARGET REDIRECTION (Recursive Sweep) ---
 # We scan for hardcoded paths and FetchContent calls that aliases can't fix.
-file(GLOB_RECURSE ALL_CMAKELISTS "${LITERT_INTERNAL_ROOT}/*.cmake" "${LITERT_INTERNAL_ROOT}/**/CMakeLists.txt")
+file(GLOB_RECURSE ALL_CMAKELISTS "${LITERT_SRC_DIR}/*.cmake" "${LITERT_SRC_DIR}/**/CMakeLists.txt")
 
 foreach(C_FILE ${ALL_CMAKELISTS})
     if("${C_FILE}" STREQUAL "${ROOT_LIST}")
@@ -85,7 +69,7 @@ endforeach()
 
 # --- 5. SOURCE-LEVEL REMEDIATION ---
 # Correcting C++ API signature drifts.
-patch_file_content("${LITERT_INTERNAL_ROOT}/runtime/compiled_model.cc" 
+patch_file_content("${LITERT_SRC_DIR}/runtime/compiled_model.cc" 
     " return litert_cpu_buffer_requirements" 
     "return litert::Expected<const LiteRtTensorBufferRequirementsT*>(litert_cpu_buffer_requirements)" FALSE)
 
@@ -94,7 +78,7 @@ patch_file_content("${ROOT_LIST}" "add_subdirectory(compiler_plugin)" "add_subdi
 
 
 # --- 6. VENDOR SUBSYSTEM DECOUPLING ---
-set(V_LIST "${LITERT_INTERNAL_ROOT}/vendors/CMakeLists.txt")
+set(V_LIST "${LITERT_SRC_DIR}/vendors/CMakeLists.txt")
 if(EXISTS "${V_LIST}")
     file(READ "${V_LIST}" V_CONTENT)
     
@@ -131,7 +115,7 @@ endif()
 # --- 7. MANDATORY BUILD CONFIGURATION ---
 # Enforce deterministic GPU/NPU flags via a generated header.
 message(STATUS "[LITERTLM] Enforcing deterministic build_config.h...")
-set(LITERT_GEN_DIR "${LITERT_INTERNAL_ROOT}/build_common") 
+set(LITERT_GEN_DIR "${LITERT_SRC_DIR}/build_common") 
 
 if(NOT EXISTS "${LITERT_GEN_DIR}")
     file(MAKE_DIRECTORY "${LITERT_GEN_DIR}")

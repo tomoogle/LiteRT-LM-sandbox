@@ -1,0 +1,16 @@
+
+        # $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--whole-archive>
+        # $<$<PLATFORM_ID:Darwin>:-Wl,-force_load>
+        #     ${force_load_targets}
+        # $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--no-whole-archive>
+
+        # $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
+        #     ${standard_targets}
+        #     LiteRTLM::absl::absl
+        #     LiteRTLM::protobuf::libprotobuf
+        #     LiteRTLM::flatbuffers::flatbuffers
+        # $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
+
+        # pthread
+        # $<$<PLATFORM_ID:Linux>:dl>
+        # $<$<PLATFORM_ID:Android>:log>

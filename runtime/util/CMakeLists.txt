@@ -35,8 +35,12 @@ add_litertlm_library(runtime_util_external_file_cc_proto STATIC
   ${EXTERNAL_FILE_PROTO_SRCS}
   ${EXTERNAL_FILE_PROTO_HDRS}
 )
-target_include_directories(runtime_util_external_file_cc_proto PUBLIC ${CMAKE_BINARY_DIR})
-target_link_libraries(runtime_util_external_file_cc_proto PUBLIC proto_lib)
+target_include_directories(runtime_util_external_file_cc_proto 
+  PUBLIC
+    ${LITERTLM_INCLUDE_PATHS}
+    ${CMAKE_BINARY_DIR}
+  )
+target_link_libraries(runtime_util_external_file_cc_proto PUBLIC LITERTLM_DEPS)
 
 # ==============================================================================
 # 1. Convert Tensor Buffer
@@ -52,7 +56,6 @@ target_include_directories(runtime_util_convert_tensor_buffer
 
 target_link_libraries(runtime_util_convert_tensor_buffer 
   INTERFACE
-    litert_libs
     LITERTLM_DEPS 
 )
 
@@ -167,7 +170,6 @@ target_include_directories(runtime_util_file_util
 
 target_link_libraries(runtime_util_file_util 
   PUBLIC
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -256,7 +258,6 @@ target_include_directories(runtime_util_logging
 
 target_link_libraries(runtime_util_logging 
   INTERFACE
-    litert_libs
     LITERTLM_DEPS
 )
 
@@ -276,7 +277,6 @@ target_include_directories(runtime_util_logging_tensor_buffer
 
 target_link_libraries(runtime_util_logging_tensor_buffer 
   PUBLIC
-    litert_libs
     LITERTLM_DEPS
 )
 

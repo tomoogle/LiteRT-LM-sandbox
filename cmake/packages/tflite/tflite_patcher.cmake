@@ -79,25 +79,23 @@ if(EXISTS "${XNN_DELEGATE_CMAKELISTS}")
 endif()
 
 
-# --- 5. Final Root Injection ---
-# Inject our shim at the very top of the TFLite root
 set(ROOT_LIST "${TFLITE_SRC_DIR}/CMakeLists.txt")
 file(READ "${ROOT_LIST}" CONTENT)
-set(INJECTION "include(${LITERTLM_PACKAGES_DIR}/tflite/tflite_shims.cmake)\n")
-file(WRITE "${ROOT_LIST}" "${INJECTION}${CONTENT}")
-
-message(STATUS "[LITERTLM] Orchestration complete.")
 
 
+string(REPLACE "project(tensorflow-lite C CXX)"
+    "project(tensorflow-lite C CXX)\ninclude(${LITERTLM_PACKAGES_DIR}/tflite/tflite_shims.cmake)"
+    CONTENT "${CONTENT}")
+file(WRITE "${ROOT_LIST}" "${CONTENT}")
 
-# --- 1. Define Surgery Paths ---
-# set(XNN_DIR "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/")
+
+
+#--- XNN CMakeLists ---
+
 set(XNN_CMAKELISTS "${TFLITE_SRC_DIR}/CMakeLists.txt")
 
 message(STATUS "[LITERTLM] Performing manual XNNPACK schema generation...")
 
-# --- 2. Generate the file OURSELVES ---
-# We run this during the patch phase so the file is ready before configuration
 execute_process(
     COMMAND "${FLATC_EXECUTABLE}" -c 
             -o "${TFLITE_SRC_DIR}/" 
@@ -110,14 +108,10 @@ if(NOT manual_gen_res EQUAL 0)
     message(FATAL_ERROR "LITERTLM: Manual flatc generation failed! Path: ${FLATC_EXECUTABLE}")
 endif()
 
-# --- 3. Lobotomize the TFLite/XNNPACK logic ---
-# We delete the specific add_custom_command block so CMake stops trying to be 'helpful'
 execute_process(
     COMMAND sed -i "/add_custom_command(/,/)/d" "${XNN_CMAKELISTS}"
 )
 
-# --- 4. Handle the Build-Tree 'Stutter' ---
-# TFLite expects the file to also exist in the build directory. We'll put it there.
 file(MAKE_DIRECTORY "${TFLITE_SRC_DIR}/delegates/xnnpack")
 file(COPY "${TFLITE_SRC_DIR}/weight_cache_schema_generated.h" 
      DESTINATION "${TFLITE_BUILD_DIR}/tensorflow/lite/delegates/xnnpack")
@@ -138,17 +132,12 @@ foreach(RECORD ${PROTO_RECORDS})
     if(EXISTS "${TARGET_LIST}")
         message(STATUS "[LITERTLM] Applying surgical fix to ${PLIST}...")
 
-        # Get the directory part of the PLIST (e.g., tensorflow/lite/profiling/proto)
         get_filename_component(PDIR "${PLIST}" DIRECTORY)
 
-        # 1. Force the --proto_path to the repo root
         execute_process(COMMAND sed -i "s|--proto_path=[^ ]*|--proto_path=${TENSORFLOW_SOURCE_DIR}|g" "${TARGET_LIST}")
 
-        # 2. Fix the input file path ONLY in COMMAND/DEPENDS arguments
-        # We use the absolute path we constructed: ${TENSORFLOW_SOURCE_DIR}/${PDIR}/${PFILE}
         execute_process(COMMAND sed -i "s| [^ ]*${PFILE}| ${TENSORFLOW_SOURCE_DIR}/${PDIR}/${PFILE}|g" "${TARGET_LIST}")
         
-        # 3. Final cleanup for any stray 'tflite/' prefixes
         execute_process(COMMAND sed -i "s|tflite/|tensorflow/lite/|g" "${TARGET_LIST}")
     endif()
 endforeach()

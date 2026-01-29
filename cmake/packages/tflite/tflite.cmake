@@ -1,27 +1,28 @@
 include(ExternalProject)
-include("${LITERTLM_PACKAGES_DIR}/tflite/tflite_aggregate.cmake")
-
 # ==============================================================================
 # SECTION 1: PATH CONFIGURATION
 # ==============================================================================
-set(TFLITE_EXT_PREFIX       "${EXTERNAL_PROJECT_BINARY_DIR}/tensorflow")
-set(TFLITE_INSTALL_PREFIX   "${TFLITE_EXT_PREFIX}/install")
+set(TFLITE_EXT_PREFIX       "${EXTERNAL_PROJECT_BINARY_DIR}/tensorflow" CACHE INTERNAL "")
+set(TFLITE_INSTALL_PREFIX   "${TFLITE_EXT_PREFIX}/install" CACHE INTERNAL "") 
 
 # --- Exported Paths for LiteRT-LM ---
-set(TFLITE_INCLUDE_DIR      "${TFLITE_INSTALL_PREFIX}/include")
-set(TFLITE_LIB_DIR          "${TFLITE_INSTALL_PREFIX}/lib")
-set(TFLITE_SRC_DIR          "${TFLITE_EXT_PREFIX}/src/tflite_external/tensorflow/lite")
+set(TFLITE_INCLUDE_DIR      "${TFLITE_INSTALL_PREFIX}/include" CACHE INTERNAL "")
+set(TFLITE_LIB_DIR          "${TFLITE_INSTALL_PREFIX}/lib" CACHE INTERNAL "")
+set(TFLITE_SRC_DIR          "${TFLITE_EXT_PREFIX}/src/tflite_external/tensorflow/lite" CACHE INTERNAL "")
 set(TFLITE_BUILD_DIR        "${TFLITE_EXT_PREFIX}/src/tflite_external-build" CACHE INTERNAL "TFLite Build Directory")
-set(TENSORFLOW_SOURCE_DIR   "${TFLITE_EXT_PREFIX}/src/tflite_external")
-set(TFLITE_STATIC_LIB       "${TFLITE_BUILD_DIR}/libtensorflow-lite.a")
-set(RUY_INCLUDE_DIR         "${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build")
+set(TENSORFLOW_SOURCE_DIR   "${TFLITE_EXT_PREFIX}/src/tflite_external" CACHE INTERNAL "")
+set(TFLITE_STATIC_LIB       "${TFLITE_BUILD_DIR}/libtensorflow-lite.a" CACHE INTERNAL "")
+set(RUY_INCLUDE_DIR         "${EXTERNAL_PROJECT_BINARY_DIR}/tflite_external-build" CACHE INTERNAL "")
+
+setup_external_install_structure("${TFLITE_INSTALL_PREFIX}")
+
 
 
 # ==============================================================================
 # SECTION 2: EXTERNAL BUILD DEFINITION
 # ==============================================================================
 if(NOT EXISTS "${TFLITE_STATIC_LIB}")
-    message(STATUS "[TFLite] Binary not found. Configuring external build at ${TFLITE_EXT_PREFIX}...")
+    message(STATUS "TFLite not found. Configuring external build...")
 
     # Define shim code for dependencies if needed by patch scripts
     set(SHIM_CODE 
@@ -77,6 +78,11 @@ if(NOT EXISTS "${TFLITE_STATIC_LIB}")
                 -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
                 -DTENSORFLOW_SOURCE_DIR=${TENSORFLOW_SOURCE_DIR} 
                 -DLITERTLM_PACKAGES_DIR=${LITERTLM_PACKAGES_DIR}
+                -DLITERTLM_MODULES_DIR=${LITERTLM_MODULES_DIR}
+                -DTFLITE_PACKAGE_DIR=${TFLITE_PACKAGE_DIR}
+                -DLITERTLM_ABSL_INCLUDE_DIRS=${ABSL_INCLUDE_DIR}
+                -DPROTOBUF_PACKAGE_DIR=${PROTOBUF_PACKAGE_DIR}
+                -DLITERTLM_PROTOBUF_INCLUDE_DIRS=${PROTOBUF_INCLUDE_DIR}
                 -P "${LITERTLM_PACKAGES_DIR}/tflite/tflite_patcher.cmake"
 
         # --- CMake Configuration ---
@@ -103,6 +109,7 @@ if(NOT EXISTS "${TFLITE_STATIC_LIB}")
             -D_abseil-cpp_LICENSE_FILE:FILEPATH=${ABSL_SRC_DIR}/absl_external/LICENSE
             "-DLITERTLM_ABSL_LIBRARIES=${ABSL_LIBS_FLAT}"
             "-DLITERTLM_ABSL_INCLUDE_DIRS=${ABSL_INCLUDE_DIR}"
+            "-DLITERTLM_PROTOBUF_INCLUDE_DIRS=${PROTOBUF_INCLUDE_DIR}"
 
             # Dependency Injection: FlatBuffers
             -DFLATBUFFERS_BUILD_FLATC=OFF
@@ -144,6 +151,15 @@ if(NOT EXISTS "${TFLITE_STATIC_LIB}")
             "-DCMAKE_EXE_LINKER_FLAGS=-L${ABSL_LIB_DIR} -L${PROTO_INSTALL_PREFIX}/lib"
             "-DCMAKE_CXX_STANDARD_LIBRARIES=-lpthread"
             "-DLITERTLM_PACKAGES_DIR=${LITERTLM_PACKAGES_DIR}"
+            -DTFLITE_PACKAGE_DIR=${TFLITE_PACKAGE_DIR}
+            -DABSL_PACKAGE_DIR=${ABSL_PACKAGE_DIR}
+            -DPROTOBUF_PACKAGE_DIR=${PROTOBUF_PACKAGE_DIR}
+
+            -DLITERTLM_MODULES_DIR=${LITERTLM_MODULES_DIR}
+            -DTFLITE_SRC_DIR=${TFLITE_SRC_DIR}
+            -DTFLITE_BUILD_DIR=${TFLITE_BUILD_DIR}
+            -DPROTO_PROTOC_EXECUTABLE=${PROTO_PROTOC_EXECUTABLE}
+
     )
 
 else()
@@ -153,90 +169,5 @@ else()
     endif()
 endif()
 
-
-# ==============================================================================
-# SECTION 3: LIBRARY DISCOVERY (THE PRODUCER)
-# ==============================================================================
-# Glob all TFLite and related dependency libraries.
-# We search both the external install lib dir and the internal build dir.
-file(GLOB _TFLITE_ALL_STATIC_LIBS 
-    "${TFLITE_LIB_DIR}/*.a"
-    "${TFLITE_BUILD_DIR}/*.a"
-)
-
-if(NOT _TFLITE_ALL_STATIC_LIBS)
-    message(WARNING "[TFLite] No static libraries found. Ensure build has completed.")
-endif()
-
-# Lists to classify libraries for linking strategy
-set(TFLITE_FORCE_LOAD_TARGETS "")  # Core libs requiring --whole-archive
-set(TFLITE_STANDARD_TARGETS "")    # Support libs for standard linking
-
-foreach(_LIB_PATH ${_TFLITE_ALL_STATIC_LIBS})
-    get_filename_component(_LIB_FILENAME ${_LIB_PATH} NAME)
-    
-    # Create a sanitized target name (e.g., tflite_imp_libXNNPACK)
-    string(REPLACE "." "_" _SAFE_NAME "tflite_imp_${_LIB_FILENAME}")
-    
-    if(NOT TARGET ${_SAFE_NAME})
-        add_library(${_SAFE_NAME} STATIC IMPORTED)
-        set_target_properties(${_SAFE_NAME} PROPERTIES IMPORTED_LOCATION "${_LIB_PATH}")
-    endif()
-
-    # Classification Logic
-    # Core TFLite, LiteRT, and Delegates must be whole-archived for op registration.
-    if(_LIB_FILENAME MATCHES "libtensorflow-lite.a" OR 
-       _LIB_FILENAME MATCHES "libxnnpack-delegate.a" OR 
-       _LIB_FILENAME MATCHES "liblitert")
-        list(APPEND TFLITE_FORCE_LOAD_TARGETS ${_SAFE_NAME})
-    else()
-        list(APPEND TFLITE_STANDARD_TARGETS ${_SAFE_NAME})
-    endif()
-endforeach()
-
-
-# ==============================================================================
-# SECTION 4: THE KITCHEN SINK INTERFACE
-# ==============================================================================
-# This creates a single logical target that encapsulates all TFLite complexity.
-# Linking against this target automatically handles circular dependencies and
-# static symbol registration.
-
-# add_library(tflite_kitchen_sink INTERFACE)
-# add_library(LiteRTLM::tflite::tflite ALIAS tflite_kitchen_sink)
-
-# target_include_directories(tflite_kitchen_sink SYSTEM INTERFACE 
-#     "${TFLITE_INCLUDE_DIR}"
-#     "${TFLITE_BUILD_DIR}" # Required for generated ruy/cpuinfo headers
-# )
-
-# target_link_libraries(tflite_kitchen_sink INTERFACE
-#     # --- PHASE 1: FORCE LOAD (The Hammer) ---
-#     # Ensures registration of static kernels and operators
-#     $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--whole-archive>
-#     $<$<PLATFORM_ID:Darwin>:-Wl,-force_load>
-#         ${TFLITE_FORCE_LOAD_TARGETS}
-#     $<$<PLATFORM_ID:Linux,Android,FreeBSD>:-Wl,--no-whole-archive>
-
-#     # --- PHASE 2: CIRCULAR DEPENDENCIES (The Group) ---
-#     # Handles Math/Utility libs (XNNPACK, Ruy, cpuinfo)
-#     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-#         ${TFLITE_STANDARD_TARGETS}
-#         # Include Hermetic Shim Dependencies
-#         LiteRTLM::absl::absl
-#         LiteRTLM::flatbuffers::flatbuffers
-#     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
-
-#     # --- PHASE 3: SYSTEM LINKS ---
-#     pthread
-#     $<$<PLATFORM_ID:Linux>:dl>
-#     $<$<PLATFORM_ID:Android>:log>
-# )
-
-
-generate_tflite_aggregate(
-    "${TFLITE_FORCE_LOAD_TARGETS}" 
-    "${TFLITE_STANDARD_TARGETS}"
-    "${TFLITE_INCLUDE_DIR}"
-    "${TFLITE_BUILD_DIR}"
-)
+include(${TFLITE_PACKAGE_DIR}/tflite_aggregate.cmake)
+generate_tflite_aggregate()

@@ -59,7 +59,6 @@ target_link_libraries(runtime_engine_engine_settings
     runtime_executor_vision_executor_settings
     runtime_util_litert_status_util
     runtime_util_model_type_utils
-    proto_lib
   
     LITERTLM_DEPS 
 )
@@ -85,7 +84,6 @@ target_link_libraries(runtime_engine_io_types
   PUBLIC
     LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_util_litert_status_util
-    proto_lib
   
     LITERTLM_DEPS 
 )
@@ -147,71 +145,91 @@ target_link_libraries(runtime_engine_shared_flags
 #    Bazel: cc_binary(name = "litert_lm_advanced_main" ...)
 # ==============================================================================
 
-set(MEMORY_USAGE_MONITOR_SRC "${TFLITE_SRC_DIR}/profiling/memory_usage_monitor.cc")
+# set(MEMORY_USAGE_MONITOR_SRC "${TFLITE_SRC_DIR}/profiling/memory_usage_monitor.cc")
 
-set_source_files_properties(${MEMORY_USAGE_MONITOR_SRC} PROPERTIES GENERATED TRUE)
+# set_source_files_properties(${MEMORY_USAGE_MONITOR_SRC} PROPERTIES GENERATED TRUE)
 
-add_litertlm_executable(runtime_engine_litert_lm_advanced_main
-  litert_lm_advanced_main.cc
-  ${MEMORY_USAGE_MONITOR_SRC}
-)
+# add_litertlm_executable(runtime_engine_litert_lm_advanced_main
+#   litert_lm_advanced_main.cc
+#   ${MEMORY_USAGE_MONITOR_SRC}
+# )
 
-target_link_options(runtime_engine_litert_lm_advanced_main PRIVATE
-  "LINKER:--export-dynamic-symbol=LiteRt*"
-)
-target_include_directories(runtime_engine_litert_lm_advanced_main PRIVATE
-  ${LITERTLM_INCLUDE_PATHS}
-  ${LITERT_INCLUDE_PATHS}
-  ${TENSORFLOW_SOURCE_DIR}
-)
+# target_link_options(runtime_engine_litert_lm_advanced_main PRIVATE
+#   "LINKER:--export-dynamic-symbol=LiteRt*"
+# )
+# target_include_directories(runtime_engine_litert_lm_advanced_main PRIVATE
+#   ${LITERTLM_INCLUDE_PATHS}
+#   ${LITERT_INCLUDE_PATHS}
+#   ${TENSORFLOW_SOURCE_DIR}
+# )
 
-target_link_libraries(runtime_engine_litert_lm_advanced_main
-  PUBLIC
-      LiteRTLM::Runtime::Engine::IoTypes
-      LiteRTLM::Runtime::Engine::Lib
-      LiteRTLM::Runtime::Engine::SharedFlags
-      LiteRTLM::Schema::Core
+# target_link_libraries(runtime_engine_litert_lm_advanced_main
+#   PUBLIC
+#       LiteRTLM::Runtime::Engine::IoTypes
+#       LiteRTLM::Runtime::Engine::Lib
+#       LiteRTLM::Runtime::Engine::SharedFlags
+#       LiteRTLM::Schema::Core
 
-      runtime_util_litert_status_util
-      LITERTLM_DEPS
-)
+#       runtime_util_litert_status_util
+#       LITERTLM_DEPS
+# )
 
 # ==============================================================================
 # 7. Main Executable (The Target We Care About)
 #    Bazel: cc_binary(name = "litert_lm_main" ...)
 # ==============================================================================
-add_litertlm_executable(litert_lm_main
-  litert_lm_main.cc
-)
+# add_litertlm_executable(litert_lm_main
+#   litert_lm_main.cc
+# )
+# # Apply specifically to the main binary
+# target_link_options(litert_lm_main PRIVATE ${LITERTLM_UNIFIED_LINK_SPEC})
 
-target_link_options(litert_lm_main PRIVATE
-  "LINKER:--export-dynamic-symbol=LiteRt*"
-)
+# # Ensure litert_lm_main waits for all local archives to be archived
+# # We use a dummy target to anchor the build order
 
-target_include_directories(litert_lm_main PRIVATE
-  ${LITERTLM_INCLUDE_PATHS}
-  ${LITERT_INCLUDE_PATHS}
-  ${THIRD_PARTY_DIR}/json/include
-)
+# target_link_options(litert_lm_main PRIVATE
+#   "LINKER:--export-dynamic-symbol=LiteRt*"
+# )
 
-target_link_libraries(litert_lm_main
-  PUBLIC
-      LiteRTLM::Runtime::Engine::Interface
-      LiteRTLM::Runtime::Engine::Settings
-      LiteRTLM::Runtime::Engine::IoTypes
-      LiteRTLM::Runtime::Conversation
-      LiteRTLM::Runtime::Conversation::IoTypes
-      LiteRTLM::Runtime::Core::EngineImpl
-      runtime_executor_executor_settings_base
-      runtime_executor_llm_executor_settings
-      runtime_util_litert_status_util
-      LITERTLM_DEPS
-)
+# target_include_directories(litert_lm_main PRIVATE
+#   ${LITERTLM_INCLUDE_PATHS}
+#   ${LITERT_INCLUDE_PATHS}
+#   ${THIRD_PARTY_DIR}/json/include
+# )
 
-# Android Specifics
-if(ANDROID)
-  target_link_libraries(litert_lm_main PRIVATE EGL GLESv3)
-endif()
+# target_link_libraries(litert_lm_main
+#   PUBLIC
+#     LiteRTLM::Runtime::Engine::Interface
+#     LiteRTLM::Runtime::Engine::Settings
+#     LiteRTLM::Runtime::Engine::IoTypes
+#     LiteRTLM::Runtime::Conversation
+#     LiteRTLM::Runtime::Conversation::IoTypes
+#     LiteRTLM::Runtime::Core::EngineImpl
+#     runtime_executor_executor_settings_base
+#     runtime_executor_llm_executor_settings
+#     runtime_util_litert_status_util
+#     LITERTLM_DEPS
+# )
+# add_litertlm_executable(litert_lm_main
+#     litert_lm_main.cc
+# )
+# target_link_options(litert_lm_main PRIVATE
+#   "LINKER:--export-dynamic-symbol=LiteRt*"
+# )
+
+# target_include_directories(litert_lm_main PRIVATE
+#     ${LITERTLM_INCLUDE_PATHS}
+#     ${LITERT_INCLUDE_PATHS}
+#     ${THIRD_PARTY_DIR}/json/include
+# )
+
+
+
+
+# # Android Specifics
+# if(ANDROID)
+#   target_link_libraries(litert_lm_main PRIVATE EGL GLESv3)
+# endif()
 
 # ==============================================================================
 # 8. Folder Facade

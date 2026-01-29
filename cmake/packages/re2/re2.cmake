@@ -3,12 +3,14 @@ include(ExternalProject)
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-set(RE2_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/re2)
-set(RE2_INSTALL_PREFIX ${RE2_EXT_PREFIX}/install)
-set(RE2_LIB_DIR ${RE2_INSTALL_PREFIX}/lib)
-set(RE2_INCLUDE_DIR ${RE2_INSTALL_PREFIX}/include)
-set(RE2_CONFIG_CMAKE_FILE "${RE2_LIB_DIR}/cmake/re2/re2Config.cmake")
+set(RE2_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/re2 CACHE INTERNAL "")
+set(RE2_INSTALL_PREFIX ${RE2_EXT_PREFIX}/install CACHE INTERNAL "")
+set(RE2_LIB_DIR ${RE2_INSTALL_PREFIX}/lib CACHE INTERNAL "")
+set(RE2_INCLUDE_DIR ${RE2_INSTALL_PREFIX}/include CACHE INTERNAL "")
+set(RE2_CONFIG_CMAKE_FILE "${RE2_LIB_DIR}/cmake/re2/re2Config.cmake" CACHE INTERNAL "")
 
+
+setup_external_install_structure("${RE2_INSTALL_PREFIX}")
 
 if(NOT EXISTS "${RE2_CONFIG_CMAKE_FILE}")
   message(STATUS "RE2 not found. Configuring external build...")
@@ -41,16 +43,5 @@ else()
 endif()
 
 
-import_static_lib(imp_re2
-  "${RE2_LIB_DIR}/libre2.a"
-)
-
-add_library(re2_libs INTERFACE)
-target_link_libraries(re2_libs INTERFACE
-    imp_re2
-)
-
-if(NOT TARGET LiteRTLM::re2::re2)
-    add_library(LiteRTLM::re2::re2 INTERFACE IMPORTED GLOBAL)
-    target_link_libraries(LiteRTLM::re2::re2 INTERFACE re2_libs)
-endif()
+include(${RE2_PACKAGE_DIR}/re2_aggregate.cmake)
+generate_re2_aggregate()

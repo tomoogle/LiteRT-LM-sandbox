@@ -1,18 +1,18 @@
 include(ExternalProject)
 
-set(PROTO_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/protobuf)
-set(PROTO_INSTALL_PREFIX ${PROTO_EXT_PREFIX}/install)
-set(PROTO_CONFIG_CMAKE_FILE "${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf/protobuf-config.cmake")
+set(PROTO_EXT_PREFIX ${EXTERNAL_PROJECT_BINARY_DIR}/protobuf CACHE INTERNAL "")
+set(PROTO_INSTALL_PREFIX ${PROTO_EXT_PREFIX}/install CACHE INTERNAL "")
+set(PROTO_CONFIG_CMAKE_FILE "${PROTO_INSTALL_PREFIX}/lib/cmake/protobuf/protobuf-config.cmake" CACHE INTERNAL "")
 
 
-set(PROTO_SRC_DIR ${PROTO_EXT_PREFIX}/src/protobuf_external)
-set(PROTO_INCLUDE_DIR ${PROTO_INSTALL_PREFIX}/include)
-set(PROTO_LIB_DIR ${PROTO_INSTALL_PREFIX}/lib)
-set(PROTO_LITE_LIBRARY ${PROTO_INSTALL_PREFIX}/lib/libprotobuf-lite.a)
-set(PROTO_BIN_DIR ${PROTO_INSTALL_PREFIX}/bin)
+set(PROTO_SRC_DIR ${PROTO_EXT_PREFIX}/src/protobuf_external CACHE INTERNAL "")
+set(PROTO_INCLUDE_DIR ${PROTO_INSTALL_PREFIX}/include CACHE INTERNAL "")
+set(PROTO_LIB_DIR ${PROTO_INSTALL_PREFIX}/lib CACHE INTERNAL "")
+set(PROTO_LITE_LIBRARY ${PROTO_INSTALL_PREFIX}/lib/libprotobuf-lite.a CACHE INTERNAL "")
+set(PROTO_BIN_DIR ${PROTO_INSTALL_PREFIX}/bin CACHE INTERNAL "")
 
-set(PROTO_PROTOC_EXECUTABLE ${PROTO_BIN_DIR}/protoc)
-set(protobuf_generate_PROTOC_EXE ${PROTO_BIN_DIR}/protoc)
+set(PROTO_PROTOC_EXECUTABLE ${PROTO_BIN_DIR}/protoc CACHE INTERNAL "")
+set(protobuf_generate_PROTOC_EXE ${PROTO_BIN_DIR}/protoc CACHE INTERNAL "")
 
 
 set(PROTO_FILES
@@ -23,9 +23,11 @@ set(PROTO_FILES
   ${PROJECT_ROOT}/runtime/proto/token.proto
   ${PROJECT_ROOT}/runtime/executor/proto/constrained_decoding_options.proto
   ${PROJECT_ROOT}/runtime/util/external_file.proto
-)
+CACHE INTERNAL "")
 
 
+
+setup_external_install_structure("${PROTO_INSTALL_PREFIX}")
 
 if(NOT EXISTS "${PROTO_CONFIG_CMAKE_FILE}")
   message(STATUS "Protobuf not found. Configuring external build...")
@@ -83,31 +85,15 @@ else()
   endif()
 endif()
 
-
-import_static_lib(imp_protobuf      "${PROTO_LIB_DIR}/libprotobuf.a")
-import_static_lib(imp_protobuf_lite "${PROTO_LIB_DIR}/libprotobuf-lite.a")
-import_static_lib(imp_protoc        "${PROTO_LIB_DIR}/libprotoc.a")
-import_static_lib(imp_upb           "${PROTO_LIB_DIR}/libupb.a")
-import_static_lib(imp_utf8_validity "${PROTO_LIB_DIR}/libutf8_validity.a")
-import_static_lib(imp_utf8_range    "${PROTO_LIB_DIR}/libutf8_range.a")
+include(${PROTOBUF_PACKAGE_DIR}/protobuf_aggregate.cmake)
+generate_protobuf_aggregate()
 
 
-if(NOT TARGET protobuf::libprotobuf)
-    add_library(protobuf::libprotobuf ALIAS imp_protobuf)
-endif()
 
-if(NOT TARGET protobuf::protoc)
-    add_executable(protobuf::protoc IMPORTED GLOBAL)
-    set_target_properties(protobuf::protoc PROPERTIES
-        IMPORTED_LOCATION "${PROTO_PROTOC_EXECUTABLE}"
-    )
-endif()
+add_litertlm_library(litertlm_generated_protobuf STATIC)
+add_dependencies(litertlm_generated_protobuf protobuf_external)
 
-
-add_library(proto_lib STATIC)
-add_dependencies(proto_lib protobuf_external)
-
-target_include_directories(proto_lib
+target_include_directories(litertlm_generated_protobuf
   PUBLIC
     ${CMAKE_BINARY_DIR}
     ${PROJECT_ROOT}
@@ -116,52 +102,17 @@ target_include_directories(proto_lib
     ${ABSL_INCLUDE_DIR}
 )
 
-target_link_libraries(proto_lib
+target_link_libraries(litertlm_generated_protobuf
   PUBLIC
     protobuf::libprotobuf
-    absl_libs
+    LiteRTLM::absl::absl
 )
 
-generate_protobuf(proto_lib)
+if(NOT TARGET protobuf::protoc)
+    add_executable(protobuf::protoc IMPORTED GLOBAL)
+    set_target_properties(protobuf::protoc PROPERTIES
+        IMPORTED_LOCATION "${PROTO_PROTOC_EXECUTABLE}"
+    )
+endif()
 
-
-# 1. Glob Protobuf and its hidden friends
-file(GLOB PROTO_INTERNAL_LIBS 
-    "${PROTO_LIB_DIR}/libprotobuf.a"
-    "${PROTO_LIB_DIR}/libutf8_range.a"
-    "${PROTO_LIB_DIR}/libutf8_validity.a"
-    "${PROTO_LIB_DIR}/libprotoc.a"
-)
-
-
-set(PROTO_IMPORTED_TARGETS "")
-foreach(LIB_PATH ${PROTO_INTERNAL_LIBS})
-    get_filename_component(LIB_FILENAME ${LIB_PATH} NAME)
-    string(REPLACE "." "_" SAFE_NAME "imp_${LIB_FILENAME}")
-    
-    add_library(${SAFE_NAME} STATIC IMPORTED)
-    set_target_properties(${SAFE_NAME} PROPERTIES IMPORTED_LOCATION "${LIB_PATH}")
-    
-    # Add to our list
-    list(APPEND PROTO_IMPORTED_TARGETS ${SAFE_NAME})
-endforeach()
-
-add_library(proto_libs INTERFACE)
-add_library(LiteRTLM::protobuf::libprotobuf ALIAS proto_libs)
-
-target_include_directories(proto_libs SYSTEM INTERFACE 
-  ${PROTO_INCLUDE_DIR}
-  ${ABSL_INCLUDE_DIR}
-)
-
-# 3. Link them all inside a "Start Group" block
-target_link_libraries(proto_libs INTERFACE
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--start-group>
-    ${PROTO_IMPORTED_TARGETS}
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--end-group>
-    
-    # System deps often needed by Abseil
-    $<$<PLATFORM_ID:Linux>:pthread>
-    $<$<PLATFORM_ID:Darwin>:-framework CoreFoundation>
-)
-string(REPLACE ";" " " PROTO_LIBS_FLAT "${ALL_PROTO_LIBS}")
+generate_protobuf(litertlm_generated_protobuf)

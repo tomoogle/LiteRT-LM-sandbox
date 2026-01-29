@@ -7,13 +7,10 @@ include("${ABSL_PACKAGE_DIR}/absl_aggregate.cmake")
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
 generate_absl_aggregate()
-message(STATUS "DEBUG: [PROTOBUF]ABSL_TARGET_MAP IS: '${ABSL_TARGET_MAP}'")
 
 set(protobuf_ABSL_PROVIDER "package" CACHE INTERNAL "" FORCE)
 set(protobuf_ABSL_USED_TARGETS "LiteRTLM::absl::absl" CACHE INTERNAL "" FORCE)
 set(protobuf_ABSL_USED_TEST_TARGETS "LiteRTLM::absl::absl" CACHE INTERNAL "" FORCE)
-
-message(STATUS "DEBUG: [PROTOBUF]ABSL_TARGET_MAP IS: '${_ABSL_LINK_FLAGS}'")
 
 
 set(CMAKE_CXX_STANDARD_LIBRARIES 
