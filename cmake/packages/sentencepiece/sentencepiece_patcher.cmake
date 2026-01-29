@@ -13,7 +13,6 @@ file(REMOVE_RECURSE "${SENTENCE_SRC_DIR}/third_party/protobuf-lite")
 # ------------------------------------------------------------------------------
 message(STATUS "[LiteRTLM] Performing header canonicalization in ${SENTENCE_SRC_DIR}...")
 
-# Define the list of files to hit (or glob the whole src directory)
 file(GLOB_RECURSE SP_SOURCES 
     "${SENTENCE_SRC_DIR}/src/*.cc" 
     "${SENTENCE_SRC_DIR}/src/*.h"
@@ -22,14 +21,10 @@ file(GLOB_RECURSE SP_SOURCES
 foreach(FILE_PATH ${SP_SOURCES})
     file(READ "${FILE_PATH}" CONTENT)
     
-    # Check if the file contains SharedBitGen before processing
     if(CONTENT MATCHES "SharedBitGen")
-        # 1. Swap the class name
         string(REPLACE "absl::SharedBitGen" "absl::BitGen" CONTENT "${CONTENT}")
         
-        # 2. Ensure random.h is included if we swapped a name
         if(NOT CONTENT MATCHES "#include \"absl/random/random.h\"")
-            # Inject it after strings/string_view.h or any other absl header
             string(REPLACE "#include \"absl/strings/string_view.h\"" 
                            "#include \"absl/strings/string_view.h\"\n#include \"absl/random/random.h\"" 
                            CONTENT "${CONTENT}")
@@ -40,7 +35,6 @@ foreach(FILE_PATH ${SP_SOURCES})
     endif()
 endforeach()
 
-# 1. Collect every source and header file in the project
 file(GLOB_RECURSE ALL_FILES 
     "${SENTENCE_SRC_DIR}/*.h"
     "${SENTENCE_SRC_DIR}/*.cc"
@@ -52,19 +46,16 @@ foreach(FILE_PATH ${ALL_FILES})
     
     set(MODIFIED FALSE)
 
-    # Hijack Abseil includes
     if(FILE_CONTENT MATCHES "third_party/absl/")
         string(REPLACE "third_party/absl/" "absl/" FILE_CONTENT "${FILE_CONTENT}")
         set(MODIFIED TRUE)
     endif()
 
-    # Hijack Protobuf includes (the Lite variant)
     if(FILE_CONTENT MATCHES "third_party/protobuf-lite/")
         string(REPLACE "third_party/protobuf-lite/" "google/protobuf/" FILE_CONTENT "${FILE_CONTENT}")
         set(MODIFIED TRUE)
     endif()
 
-    # 3. Only write back if we actually changed something (saves disk I/O)
     if(MODIFIED)
         file(WRITE "${FILE_PATH}" "${FILE_CONTENT}")
     endif()
@@ -75,9 +66,6 @@ message(STATUS "[LiteRTLM] Normalized ${SENTENCE_SRC_DIR} successfully.")
 
 
 
-
-# ---- ROOT/CMakeLists
-# 2. Source-level hijacks
 file(READ "${SENTENCE_SRC_DIR}/CMakeLists.txt" ROOT_CONTENT)
 string(REPLACE "project(sentencepiece VERSION \${SPM_VERSION} LANGUAGES C CXX)"
     "project(sentencepiece VERSION \${SPM_VERSION} LANGUAGES C CXX)\ninclude(${SENTENCE_ROOT_SHIM_PATH})"
@@ -90,7 +78,6 @@ string(REPLACE
 
 string(REPLACE "set(CMAKE_CXX_STANDARD 17)" "set(CMAKE_CXX_STANDARD 20)" ROOT_CONTENT "${ROOT_CONTENT}")
 
-set(ROOT_CONTENT ${ROOT_CONTENT})
 file(WRITE "${SENTENCE_SRC_DIR}/CMakeLists.txt" ${ROOT_CONTENT})
 
 
@@ -112,7 +99,6 @@ string(REPLACE
     "include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/../third_party)\ninclude_directories(${ABSL_INLUDE_DIR})\ninclude_directories(${PROTO_INCLUDE_DIR})" 
     SRC_CONTENT "${SRC_CONTENT}")
 
-# In your sentencepiece_patcher.cmake
 string(REPLACE "if (SPM_USE_BUILTIN_PROTOBUF)" "if (FALSE) # Forced by LiteRTLM" SRC_CONTENT "${SRC_CONTENT}")
 string(REPLACE "if (SPM_USE_EXTERNAL_ABSL)" "if (TRUE) # Forced by LiteRTLM" SRC_CONTENT "${SRC_CONTENT}")
 

@@ -17,7 +17,7 @@ macro(generate_flatbuffers_aggregate)
             INTERFACE_LIBRARY_PATHS
                 "${_flatbuffers_lib_paths}"
             INTERFACE_LINK_LIBRARIES 
-                "-Wl,--start-group ${_flatbuffers_lib_paths} -Wl,--end-group"
+                "${_flatbuffers_lib_paths}"
             INTERFACE_INCLUDE_DIRECTORIES 
                 "${FLATBUFFERS_INCLUDE_DIR}"
         )

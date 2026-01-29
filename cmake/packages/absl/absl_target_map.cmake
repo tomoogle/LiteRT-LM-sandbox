@@ -94,6 +94,10 @@ set(ABSL_TARGET_MAP
     "absl::vlog_config_internal=${ABSL_LIB_DIR}/libabsl_vlog_config_internal.a"
 )
 
+set(_removed_absl_target_map
+
+)
+
 set(_DEPRECATED_ABSL_TARGET_MAP
     "absl::base=${ABSL_LIB_DIR}/libabsl_base.a"
     "absl::spinlock_wait=${ABSL_LIB_DIR}/libabsl_spinlock_wait.a"

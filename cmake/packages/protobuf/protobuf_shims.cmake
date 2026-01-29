@@ -13,8 +13,12 @@ set(protobuf_ABSL_USED_TARGETS "LiteRTLM::absl::absl" CACHE INTERNAL "" FORCE)
 set(protobuf_ABSL_USED_TEST_TARGETS "LiteRTLM::absl::absl" CACHE INTERNAL "" FORCE)
 
 
+include_directories(${ABSL_INCLUDE_DIR})
+link_libraries(LiteRTLM::absl::shim)
+
+
 set(CMAKE_CXX_STANDARD_LIBRARIES 
-    "${CMAKE_CXX_STANDARD_LIBRARIES} ${_ABSL_LINK_FLAGS}" 
+    "${CMAKE_CXX_STANDARD_LIBRARIES} -Wl,--start-group ${_ABSL_PAYLOAD} -lz -lrt -lpthread -ldl -Wl,--end-group" 
     CACHE STRING "Forced Abseil aggregate for Protobuf internal linking" FORCE
 )
 

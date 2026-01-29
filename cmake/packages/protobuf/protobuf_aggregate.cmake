@@ -16,15 +16,15 @@ macro(generate_protobuf_aggregate)
             INTERFACE_LIBRARY_PATHS
                 "${_protobuf_lib_paths}"
             INTERFACE_LINK_LIBRARIES
-                "-Wl,--start-group -Wl,--whole-archive ${_protobuf_lib_paths} ${_absl_lib_paths} -Wl,--no-whole-archive -Wl,--end-group"
+                "${_protobuf_lib_paths}"
             INTERFACE_INCLUDE_DIRECTORIES
-                "${PROTO_INCLUDE_DIR};${ABSL_INCLUDE_DIR}"
+                "${PROTO_INCLUDE_DIR}"
         )
 
         add_library(LiteRTLM::protobuf::shim INTERFACE IMPORTED GLOBAL)        
         set_target_properties(LiteRTLM::protobuf::shim PROPERTIES 
             INTERFACE_INCLUDE_DIRECTORIES
-                "${PROTO_INCLUDE_DIR};${ABSL_INCLUDE_DIR}"
+                "${PROTO_INCLUDE_DIR}"
         )
 
         foreach(_comp_target IN LISTS ${_protobuf_lib_names})

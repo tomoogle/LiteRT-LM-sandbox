@@ -21,8 +21,7 @@ set(LITERT_TARGET_MAP
     "litert::qnn_core=${LITERT_BUILD_DIR}/vendors/qualcomm/core/libqnn_core.a"
 )
 
-# Core targets that should likely be WHOLE_ARCHIVE to ensure 
-# delegate and plugin registration.
+
 set(_litert_exhaustive_targets
     "litert::runtime"
     "litert::c_api"

@@ -20,7 +20,7 @@ macro(generate_sentencepiece_aggregate)
             INTERFACE_LIBRARY_PATHS
                 "${_sentencepiece_lib_paths}"
             INTERFACE_LINK_LIBRARIES
-                "-Wl,--start-group -Wl,--whole-archive ${_sentencepiece_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
+                "${_sentencepiece_lib_paths}"
             INTERFACE_INCLUDE_DIRECTORIES
                 "${SENTENCEPIECE_INCLUDE_DIR}"
         )

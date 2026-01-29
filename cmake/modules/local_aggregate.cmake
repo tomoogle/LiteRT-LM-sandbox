@@ -22,7 +22,17 @@ macro(generate_local_aggregate)
         
         set_target_properties(LiteRTLM::Local::Aggregate PROPERTIES 
             INTERFACE_LINK_LIBRARIES
-                "${_local_lib_paths} ${_litert_lib_paths} ${_tflite_lib_paths} ${_tokenizers_lib_path} ${_sentencepiece_lib_paths} ${_re2_lib_paths} ${_flatbuffers_lib_paths} ${_protobuf_lib_paths} ${_absl_lib_paths}"
+                "-Wl,--whole-archive"
+                "${_local_lib_paths}"
+                "${_litert_lib_paths}"
+                "${_tflite_lib_paths}"
+                "-Wl,--no-whole-archive"
+                "${_tokenizers_lib_path}"
+                "${_sentencepiece_lib_paths}"
+                "${_re2_lib_paths}"
+                "${_flatbuffers_lib_paths}"
+                "${_protobuf_lib_paths}"
+                "${_absl_lib_paths}"
         )
 
 

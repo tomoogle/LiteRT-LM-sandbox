@@ -23,7 +23,7 @@ macro(generate_tflite_aggregate)
             INTERFACE_LIBRARY_PATHS
                 "${_tflite_lib_paths}"
             INTERFACE_LINK_LIBRARIES
-                "-Wl,--start-group -Wl,--whole-archive ${_tflite_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
+                "${_tflite_lib_paths}"
             INTERFACE_INCLUDE_DIRECTORIES
                 "${TFLITE_INCLUDE_DIR}"
         )

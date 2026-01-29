@@ -26,10 +26,10 @@ generate_protobuf_aggregate()
 
 
 include_directories(${ABSL_INCLUDE_DIR} ${PROTO_INCLUDE_DIR})
-link_libraries(LiteRTLM::absl::shim LiteRTLM::protobuf::shim)
+# link_libraries(LiteRTLM::absl::shim LiteRTLM::protobuf::shim)
 
 
 
-set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -Wl,--allow-multiple-definition ${_PROTOBUF_LINK_FLAGS} -lz -lrt -lpthread -ldl" 
+set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -Wl,--allow-multiple-definition -Wl,--start-group ${_PROTOBUF_PAYLOAD} ${_ABSL_PAYLOAD} -lz -lrt -lpthread -ldl -Wl,--end-group" 
     CACHE STRING "" FORCE
 )

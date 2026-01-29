@@ -20,7 +20,7 @@ macro(generate_litert_aggregate)
             INTERFACE_LIBRARY_PATHS
                 "${_litert_lib_paths}"
             INTERFACE_LINK_LIBRARIES
-                "-Wl,--start-group -Wl,--whole-archive ${_litert_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
+                "${_litert_lib_paths}"
             INTERFACE_INCLUDE_DIRECTORIES
                 "${LITERT_INCLUDE_DIR}"
         )

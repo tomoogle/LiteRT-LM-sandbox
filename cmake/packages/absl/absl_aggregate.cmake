@@ -19,7 +19,10 @@ macro(generate_absl_aggregate)
             INTERFACE_LIBRARY_PATHS
                 "${_absl_lib_paths}"
             INTERFACE_LINK_LIBRARIES
-                "-Wl,--start-group -Wl,--whole-archive ${_absl_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
+                "${_absl_lib_paths}"
+
+            # INTERFACE_LINK_LIBRARIES
+            #     "-Wl,--start-group -Wl,--whole-archive ${_absl_lib_paths} -Wl,--no-whole-archive -lz -lrt -lpthread -ldl -Wl,--end-group"
             INTERFACE_INCLUDE_DIRECTORIES
                 "${ABSL_INCLUDE_DIR}"
         )
