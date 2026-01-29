@@ -287,7 +287,6 @@ target_link_libraries(litert_lm_main
     PUBLIC
         "-Wl,--allow-multiple-definition"
         "-Wl,--start-group"
-        "-Wl,--whole-archive"
         
         libpng_lib
         kissfft_lib
@@ -301,7 +300,7 @@ target_link_libraries(litert_lm_main
         LiteRTLM::nlohmann_json::nlohmann_json
         opencl_headers_lib
 
-        ${_LITERTLM_EXPANDED_LIST}
+        ${_LITERTLM_PAYLOAD}
         "-lz" "-lrt" "-lpthread" "-ldl" 
         "-Wl,--end-group"
 )
