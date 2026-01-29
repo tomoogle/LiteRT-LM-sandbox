@@ -282,12 +282,18 @@ target_link_options(litert_lm_main PRIVATE
 #         ${_LITERTLM_PAYLOAD}
 #         "-lz -lrt -lpthread -ldl -Wl,--end-group"
 # )
+
 separate_arguments(_LITERTLM_EXPANDED_LIST NATIVE_COMMAND "${_LITERTLM_PAYLOAD}")
 target_link_libraries(litert_lm_main
     PUBLIC
         "-Wl,--allow-multiple-definition"
         "-Wl,--start-group"
         
+        "-Wl,--whole-archive"
+        ${INTERFACE_LINK_LIBRARIES_ODML}
+        "-Wl,--no-whole-archive"
+        
+        ${INTERFACE_LINK_LIBRARIES_CORE}
         libpng_lib
         kissfft_lib
         miniaudio_lib
@@ -295,12 +301,8 @@ target_link_libraries(litert_lm_main
         minja_lib
         zlib_lib
         antlr_lib
-        
-        
         LiteRTLM::nlohmann_json::nlohmann_json
         opencl_headers_lib
-
-        ${_LITERTLM_PAYLOAD}
         "-lz" "-lrt" "-lpthread" "-ldl" 
         "-Wl,--end-group"
 )
