@@ -115,4 +115,4 @@ if(NOT TARGET protobuf::protoc)
     )
 endif()
 
-generate_protobuf(litertlm_generated_protobuf)
+generate_protobuf(litertlm_generated_protobuf ${PROJECT_ROOT})

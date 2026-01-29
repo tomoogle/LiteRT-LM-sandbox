@@ -60,7 +60,7 @@ endfunction()
 
 
 
-function(generate_protobuf TARGET_NAME)
+function(generate_protobuf TARGET_NAME _root_path)
     set(GENERATED_SRCS)
     set(GENERATED_HDRS)
 
@@ -72,7 +72,7 @@ function(generate_protobuf TARGET_NAME)
     )
 
     foreach(PROTO_FILE ${PROTO_FILES})
-        file(RELATIVE_PATH REL_PROTO_PATH "${PROJECT_ROOT}" "${PROTO_FILE}")
+        file(RELATIVE_PATH REL_PROTO_PATH "${_root_path}" "${PROTO_FILE}")
         
         get_filename_component(REL_DIR "${REL_PROTO_PATH}" DIRECTORY)
         get_filename_component(FIL_WE "${REL_PROTO_PATH}" NAME_WE)
@@ -87,7 +87,7 @@ function(generate_protobuf TARGET_NAME)
             OUTPUT "${SRC_FILE}" "${HDR_FILE}"
             COMMAND $<TARGET_FILE:protobuf::protoc>
             ARGS --cpp_out "${CMAKE_BINARY_DIR}"
-                 -I "${PROJECT_ROOT}" 
+                 -I "${_root_path}" 
                  "${PROTO_FILE}"
                  
             DEPENDS "${PROTO_FILE}" protobuf::protoc

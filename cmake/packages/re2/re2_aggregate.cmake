@@ -7,9 +7,9 @@ macro(generate_re2_aggregate)
 
     if(NOT TARGET LiteRTLM::re2::re2)
 
-        set(re2_lib_names "")
-        set(re2_lib_paths "")
-        kvp_parse_map("${RE2_TARGET_MAP}" re2_lib_names re2_lib_paths)
+        set(_re2_lib_names "")
+        set(_re2_lib_paths "")
+        kvp_parse_map("${RE2_TARGET_MAP}" _re2_lib_names _re2_lib_paths)
 
         add_library(LiteRTLM::re2::re2 INTERFACE IMPORTED GLOBAL)
         set_target_properties(LiteRTLM::re2::re2 PROPERTIES

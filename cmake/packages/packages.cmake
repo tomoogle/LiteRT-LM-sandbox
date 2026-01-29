@@ -1,4 +1,3 @@
-include_guard(GLOBAL)
 # --- packages.cmake
 set(ABSL_PACKAGE_DIR "${LITERTLM_PACKAGES_DIR}/absl" CACHE PATH "Path to Abseil-cpp related build scrips")
 
