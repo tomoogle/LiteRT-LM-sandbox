@@ -268,6 +268,10 @@ target_link_options(litert_lm_main PRIVATE
   "LINKER:--export-dynamic-symbol=LiteRt*"
 )
 
+target_compile_definitions(litert_lm_main PRIVATE 
+    ENABLE_HUGGINGFACE_TOKENIZER
+    ENABLE_SENTENCEPIECE_TOKENIZER
+)
 
 separate_arguments(_LITERTLM_ODML_EXPANDED_LIST NATIVE_COMMAND "${_LITERTLM_ODML_PAYLOAD}")
 separate_arguments(_LITERTLM_CORE_EXPANDED_LIST NATIVE_COMMAND "${_LITERTLM_CORE_PAYLOAD}")
