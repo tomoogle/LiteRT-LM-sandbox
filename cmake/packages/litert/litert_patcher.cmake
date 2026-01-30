@@ -47,7 +47,7 @@ foreach(C_FILE ${ALL_CMAKELISTS})
     if("${C_FILE}" STREQUAL "${ROOT_LIST}")
         continue()
     endif()
-    patch_file_content("${C_FILE}" "absl::[a-zA-Z0-9_]+" "LiteRTLM::absl::absl" TRUE)
+    patch_file_content("${C_FILE}" "absl::[a-zA-Z0-9_]+" "LiteRTLM::absl::shim" TRUE)
    
     # A. Neutralize Hardcoded Flatbuffer Paths (Crucial)
     # TFLite/LiteRT loves to look for ".../flatbuffers-build/libflatbuffers.a" directly.

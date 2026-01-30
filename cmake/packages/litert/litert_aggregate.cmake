@@ -39,7 +39,7 @@ macro(generate_litert_aggregate)
         endforeach()
 
         if(NOT TARGET litert_libs)
-            add_library(litert_libs ALIAS LiteRTLM::litert::litert)
+            add_library(litert_libs ALIAS LiteRTLM::litert::shim)
         endif()
 
         set(LITERT_FOUND TRUE CACHE BOOL "" FORCE)

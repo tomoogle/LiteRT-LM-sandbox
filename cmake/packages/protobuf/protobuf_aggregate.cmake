@@ -9,8 +9,8 @@ macro(generate_protobuf_aggregate)
         set(_protobuf_lib_paths "")
         kvp_parse_map("${PROTOBUF_TARGET_MAP}" _protobuf_lib_names _protobuf_lib_paths)
 
-        add_library(LiteRTLM::protobuf::libprotobuf INTERFACE IMPORTED GLOBAL)
-        set_target_properties(LiteRTLM::protobuf::libprotobuf PROPERTIES
+        add_library(LiteRTLM::protobuf::protobuf INTERFACE IMPORTED GLOBAL)
+        set_target_properties(LiteRTLM::protobuf::protobuf PROPERTIES
             INTERFACE_LIBRARY_NAMES
                 "${_protobuf_lib_names}"
             INTERFACE_LIBRARY_PATHS
@@ -46,7 +46,7 @@ macro(generate_protobuf_aggregate)
             )
         endif()
 
-        get_target_property(_PROTOBUF_PAYLOAD LiteRTLM::protobuf::libprotobuf INTERFACE_LINK_LIBRARIES)
+        get_target_property(_PROTOBUF_PAYLOAD LiteRTLM::protobuf::protobuf INTERFACE_LINK_LIBRARIES)
         string(REPLACE ";" " " _PROTOBUF_LINK_FLAGS "${_PROTOBUF_PAYLOAD}")
 
         message(STATUS "[LiteRTLM] Protobuf aggregate has been generated.")

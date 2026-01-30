@@ -267,33 +267,18 @@ endif()
 target_link_options(litert_lm_main PRIVATE
   "LINKER:--export-dynamic-symbol=LiteRt*"
 )
-# target_link_libraries(litert_lm_main
-#     PUBLIC
-#         "Wl,--allow-multiple-definition -Wl,--start-group -Wl,--whole-archive"
-#         libpng_lib
-#         kissfft_lib
-#         miniaudio_lib
-#         minizip_lib
-#         minja_lib
-#         zlib_lib
-#         antlr_lib
-#         LiteRTLM::nlohmann_json::nlohmann_json
-#         opencl_headers_lib
-#         ${_LITERTLM_PAYLOAD}
-#         "-lz -lrt -lpthread -ldl -Wl,--end-group"
-# )
 
-separate_arguments(_LITERTLM_EXPANDED_LIST NATIVE_COMMAND "${_LITERTLM_PAYLOAD}")
+
+separate_arguments(_LITERTLM_ODML_EXPANDED_LIST NATIVE_COMMAND "${_LITERTLM_ODML_PAYLOAD}")
+separate_arguments(_LITERTLM_CORE_EXPANDED_LIST NATIVE_COMMAND "${_LITERTLM_CORE_PAYLOAD}")
 target_link_libraries(litert_lm_main
     PUBLIC
         "-Wl,--allow-multiple-definition"
         "-Wl,--start-group"
-        
         "-Wl,--whole-archive"
-        ${INTERFACE_LINK_LIBRARIES_ODML}
+        ${_LITERTLM_ODML_EXPANDED_LIST}
         "-Wl,--no-whole-archive"
-        
-        ${INTERFACE_LINK_LIBRARIES_CORE}
+        ${_LITERTLM_CORE_EXPANDED_LIST}
         libpng_lib
         kissfft_lib
         miniaudio_lib
@@ -311,6 +296,21 @@ target_include_directories(litert_lm_main PRIVATE
     ${LITERTLM_INCLUDE_PATHS}
 )
 
+# target_link_libraries(litert_lm_main
+#     PUBLIC
+#         "Wl,--allow-multiple-definition -Wl,--start-group -Wl,--whole-archive"
+#         libpng_lib
+#         kissfft_lib
+#         miniaudio_lib
+#         minizip_lib
+#         minja_lib
+#         zlib_lib
+#         antlr_lib
+#         LiteRTLM::nlohmann_json::nlohmann_json
+#         opencl_headers_lib
+#         ${_LITERTLM_PAYLOAD}
+#         "-lz -lrt -lpthread -ldl -Wl,--end-group"
+# )
 
 
 # # Android Specifics

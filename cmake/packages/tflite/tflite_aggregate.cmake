@@ -31,7 +31,7 @@ macro(generate_tflite_aggregate)
         add_library(LiteRTLM::tflite::shim INTERFACE IMPORTED GLOBAL)
         set_target_properties(LiteRTLM::tflite::shim PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES
-                "${TFLITE_INCLUDE_DIR};${TFLITE_BUILD_DIR}" # Build dir needed for generated ruy headers
+                "${TFLITE_INCLUDE_DIR};${TFLITE_BUILD_DIR}"
         )
 
         foreach(_comp_target IN LISTS ${_tflite_lib_names})
@@ -48,10 +48,10 @@ macro(generate_tflite_aggregate)
 
 
         if(NOT TARGET tflite_libs)
-            add_library(tflite_libs ALIAS LiteRTLM::tflite::tflite)
+            add_library(tflite_libs ALIAS LiteRTLM::tflite::shim)
         endif()
         if(NOT TARGET tensorflow-lite)
-            add_library(tensorflow-lite ALIAS LiteRTLM::tflite::tflite)
+            add_library(tensorflow-lite ALIAS LiteRTLM::tflite::shim)
         endif()
 
         set(tflite_FOUND TRUE CACHE BOOL "" FORCE)
