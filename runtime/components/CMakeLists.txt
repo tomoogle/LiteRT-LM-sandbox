@@ -51,7 +51,7 @@ add_litertlm_library(runtime_components_huggingface_tokenizer STATIC
 add_library(LiteRTLM::Runtime::Components::Tokenizer::HuggingFace ALIAS runtime_components_huggingface_tokenizer)
 
 target_compile_definitions(runtime_components_huggingface_tokenizer 
-  PRIVATE ENABLE_HUGGINGFACE_TOKENIZER
+  PUBLIC ENABLE_HUGGINGFACE_TOKENIZER
 )
 
 target_include_directories(runtime_components_huggingface_tokenizer
@@ -81,7 +81,7 @@ add_litertlm_library(runtime_components_sentencepiece_tokenizer STATIC
 add_library(LiteRTLM::Runtime::Components::Tokenizer::SentencePiece ALIAS runtime_components_sentencepiece_tokenizer)
 
 target_compile_definitions(runtime_components_sentencepiece_tokenizer 
-  PRIVATE ENABLE_SENTENCEPIECE_TOKENIZER
+  PUBLIC ENABLE_SENTENCEPIECE_TOKENIZER
 )
 
 target_include_directories(runtime_components_sentencepiece_tokenizer
