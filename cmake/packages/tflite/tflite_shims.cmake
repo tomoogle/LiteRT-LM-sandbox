@@ -24,7 +24,6 @@ include(${FLATBUFFERS_PACKAGE_DIR}/flatbuffers_aggregate.cmake)
 generate_flatbuffers_aggregate()
 
 
-
 message(STATUS "[LiteRTLM] Injecting missing CMakeLists into profiling/...")
 
 file(GLOB PROFILING_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/profiling/*.cc")

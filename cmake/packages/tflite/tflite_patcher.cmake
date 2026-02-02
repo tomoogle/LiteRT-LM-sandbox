@@ -14,9 +14,9 @@ if(EXISTS "${CONFIG_GEN_H}")
 endif()
 
 # Unzip the converter (Native CMake extraction)
-if(EXISTS "${PROJECT_ROOT}/cmake/patches/litert_converter.zip")
+if(EXISTS "${LITERTLM_PROJECT_ROOT}/cmake/patches/litert_converter.zip")
     message(STATUS "[LITERTLM PATCHER] Extracting litert_converter.zip...")
-    file(ARCHIVE_EXTRACT INPUT "${PROJECT_ROOT}/cmake/patches/litert_converter.zip" DESTINATION "${TFLITE_SRC_DIR}")
+    file(ARCHIVE_EXTRACT INPUT "${LITERTLM_PROJECT_ROOT}/cmake/patches/litert_converter.zip" DESTINATION "${TFLITE_SRC_DIR}")
 endif()
 
 # ------------------------------------------------------------------------------
