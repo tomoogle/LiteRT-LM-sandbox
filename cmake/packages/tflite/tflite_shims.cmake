@@ -20,6 +20,10 @@ if(NOT TARGET protobuf::protoc)
     )
 endif()
 
+include(${FLATBUFFERS_PACKAGE_DIR}/flatbuffers_aggregate.cmake)
+generate_flatbuffers_aggregate()
+
+
 
 message(STATUS "[LiteRTLM] Injecting missing CMakeLists into profiling/...")
 

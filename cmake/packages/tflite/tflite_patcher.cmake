@@ -2,6 +2,85 @@
 
 message(STATUS "[LITERTLM] Starting surgical orchestration...")
 
+------------------------------------------------------------------------------
+# 1. Version Constraints & Converter Patches
+# ------------------------------------------------------------------------------
+set(CONFIG_GEN_H "${TFLITE_SRC_DIR}/tensorflow/lite/acceleration/configuration/configuration_generated.h")
+if(EXISTS "${CONFIG_GEN_H}")
+    file(READ "${CONFIG_GEN_H}" CONTENT)
+    # Patch FLATBUFFERS_VERSION_MAJOR == [0-9]* -> FLATBUFFERS_VERSION_MAJOR >= 25
+    string(REGEX REPLACE "FLATBUFFERS_VERSION_MAJOR == [0-9]+" "FLATBUFFERS_VERSION_MAJOR >= 25" CONTENT "${CONTENT}")
+    file(WRITE "${CONFIG_GEN_H}" "${CONTENT}")
+endif()
+
+# Unzip the converter (Native CMake extraction)
+if(EXISTS "${PROJECT_ROOT}/cmake/patches/litert_converter.zip")
+    message(STATUS "[LITERTLM PATCHER] Extracting litert_converter.zip...")
+    file(ARCHIVE_EXTRACT INPUT "${PROJECT_ROOT}/cmake/patches/litert_converter.zip" DESTINATION "${TFLITE_SRC_DIR}")
+endif()
+
+# ------------------------------------------------------------------------------
+# 2. Build Logic Overrides (Force FLATC)
+# ------------------------------------------------------------------------------
+set(TFLITE_CMAKELISTS "${TFLITE_SRC_DIR}/tensorflow/lite/CMakeLists.txt")
+if(EXISTS "${TFLITE_CMAKELISTS}")
+    file(READ "${TFLITE_CMAKELISTS}" CONTENT)
+    # Replace find_program(FLATC_BIN...) with a hardcoded set()
+    string(REGEX REPLACE "find_program\\(FLATC_BIN flatc HINTS \\\${FLATC_PATHS}\\)" 
+           "set(FLATC_BIN \"${FLATC_EXECUTABLE}\" CACHE FILEPATH \"Forced by LiteRT-LM\")" CONTENT "${CONTENT}")
+    file(WRITE "${TFLITE_CMAKELISTS}" "${CONTENT}")
+endif()
+
+# ------------------------------------------------------------------------------
+# 3. Schema Version Relaxations
+# ------------------------------------------------------------------------------
+set(SCHEMA_GEN_H "${TFLITE_SRC_DIR}/tensorflow/compiler/mlir/lite/schema/schema_generated.h")
+if(EXISTS "${SCHEMA_GEN_H}")
+    file(READ "${SCHEMA_GEN_H}" CONTENT)
+    string(REPLACE "FLATBUFFERS_VERSION_MAJOR == 24" "FLATBUFFERS_VERSION_MAJOR >= 24" CONTENT "${CONTENT}")
+    string(REPLACE "FLATBUFFERS_VERSION_MINOR == 3" "FLATBUFFERS_VERSION_MINOR >= 0" CONTENT "${CONTENT}")
+    string(REPLACE "FLATBUFFERS_VERSION_REVISION == 25" "FLATBUFFERS_VERSION_REVISION >= 0" CONTENT "${CONTENT}")
+    file(WRITE "${SCHEMA_GEN_H}" "${CONTENT}")
+endif()
+
+# ------------------------------------------------------------------------------
+# 4. Neutralize TFLite Downloaders (Prevent Network Access)
+# ------------------------------------------------------------------------------
+set(_downloader_modules
+    "tensorflow/lite/tools/cmake/modules/abseil-cpp.cmake"
+    "tensorflow/lite/tools/cmake/modules/protobuf.cmake"
+    "tensorflow/lite/tools/cmake/modules/flatbuffers.cmake"
+)
+
+foreach(_mod IN LISTS _downloader_modules)
+    set(_mod_path "${TFLITE_SRC_DIR}/${_mod}")
+    if(EXISTS "${_mod_path}")
+        message(STATUS "[LITERTLM PATCHER] Neutralizing ${_mod}")
+        file(READ "${_mod_path}" CONTENT)
+        # Prepend return() to the top of the file
+        file(WRITE "${_mod_path}" "return()\n${CONTENT}")
+    endif()
+endforeach()
+
+# ------------------------------------------------------------------------------
+# 5. Global Dependency Redirection (Recursive Shim Injection)
+# ------------------------------------------------------------------------------
+# Instead of `find -exec sed`, we use GLOB_RECURSE to find all CMakeLists.txt
+file(GLOB_RECURSE _tflite_cmakelists "${TFLITE_SRC_DIR}/tensorflow/lite/CMakeLists.txt")
+
+foreach(_list IN LISTS _tflite_cmakelists)
+    file(READ "${_list}" CONTENT)
+    
+    # Redirection for Absl, Protobuf, and Flatbuffers
+    # Regex: [[:space:]]namespace::target -> Space + LiteRTLM::namespace::target
+    string(REGEX REPLACE "[ \t\n\r]+absl::([a-zA-Z0-9_]+)" " LiteRTLM::absl::absl" CONTENT "${CONTENT}")
+    string(REGEX REPLACE "[ \t\n\r]+protobuf::([a-zA-Z0-9_-]+)" " LiteRTLM::protobuf::libprotobuf" CONTENT "${CONTENT}")
+    string(REGEX REPLACE "[ \t\n\r]+flatbuffers::([a-zA-Z0-9_-]+)" " LiteRTLM::flatbuffers::flatbuffers" CONTENT "${CONTENT}")
+
+    file(WRITE "${_list}" "${CONTENT}")
+endforeach()
+
+
 # --- 2. Version Compatibility Patches ---
 # Fixes the strict version checks that break modern Flatbuffers usage
 set(V_FILES 
