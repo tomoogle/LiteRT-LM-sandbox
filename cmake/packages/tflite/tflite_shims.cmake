@@ -23,6 +23,7 @@ endif()
 include(${FLATBUFFERS_PACKAGE_DIR}/flatbuffers_aggregate.cmake)
 generate_flatbuffers_aggregate()
 
+include_directories(${ABSL_INCLUDE_DIR} ${PROTO_INCLUDE_DIR} ${FLATBUFFERS_INCLUDE_DIR})
 
 message(STATUS "[LiteRTLM] Injecting missing CMakeLists into profiling/...")
 
@@ -45,8 +46,8 @@ else()
 endif()
 
 set(PROTO_FILES 
-    "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/profiling/proto/profiling_info.proto"
-    "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/profiling/proto/model_runtime_info.proto"
+    "${TFLITE_SRC_DIR}/profiling/proto/profiling_info.proto"
+    "${TFLITE_SRC_DIR}/profiling/proto/model_runtime_info.proto"
 )
 
 add_library(tflite_profiling STATIC ${PROFILING_SRCS})
@@ -60,7 +61,7 @@ target_link_libraries(tflite_profiling PRIVATE
 target_include_directories(tflite_profiling PUBLIC 
     ${CMAKE_BINARY_DIR}
     ${TENSORFLOW_SOURCE_DIR}
-    ${ABSL_INCLUDE_DIRS}}
+    ${ABSL_INCLUDE_DIRS}
     ${PROTOBUF_INCLUDE_DIRS}
 )
 

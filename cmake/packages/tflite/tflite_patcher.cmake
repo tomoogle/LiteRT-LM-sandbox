@@ -5,7 +5,7 @@ message(STATUS "[LITERTLM] Starting surgical orchestration...")
 #------------------------------------------------------------------------------
 # 1. Version Constraints & Converter Patches
 # ------------------------------------------------------------------------------
-set(CONFIG_GEN_H "${TFLITE_SRC_DIR}/tensorflow/lite/acceleration/configuration/configuration_generated.h")
+set(CONFIG_GEN_H "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/acceleration/configuration/configuration_generated.h")
 if(EXISTS "${CONFIG_GEN_H}")
     file(READ "${CONFIG_GEN_H}" CONTENT)
     # Patch FLATBUFFERS_VERSION_MAJOR == [0-9]* -> FLATBUFFERS_VERSION_MAJOR >= 25
@@ -22,7 +22,7 @@ endif()
 # ------------------------------------------------------------------------------
 # 2. Build Logic Overrides (Force FLATC)
 # ------------------------------------------------------------------------------
-set(TFLITE_CMAKELISTS "${TFLITE_SRC_DIR}/tensorflow/lite/CMakeLists.txt")
+set(TFLITE_CMAKELISTS "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/CMakeLists.txt")
 if(EXISTS "${TFLITE_CMAKELISTS}")
     file(READ "${TFLITE_CMAKELISTS}" CONTENT)
     # Replace find_program(FLATC_BIN...) with a hardcoded set()
@@ -34,7 +34,7 @@ endif()
 # ------------------------------------------------------------------------------
 # 3. Schema Version Relaxations
 # ------------------------------------------------------------------------------
-set(SCHEMA_GEN_H "${TFLITE_SRC_DIR}/tensorflow/compiler/mlir/lite/schema/schema_generated.h")
+set(SCHEMA_GEN_H "${TENSORFLOW_SOURCE_DIR}/tensorflow/compiler/mlir/lite/schema/schema_generated.h")
 if(EXISTS "${SCHEMA_GEN_H}")
     file(READ "${SCHEMA_GEN_H}" CONTENT)
     string(REPLACE "FLATBUFFERS_VERSION_MAJOR == 24" "FLATBUFFERS_VERSION_MAJOR >= 24" CONTENT "${CONTENT}")
@@ -66,7 +66,7 @@ endforeach()
 # 5. Global Dependency Redirection (Recursive Shim Injection)
 # ------------------------------------------------------------------------------
 # Instead of `find -exec sed`, we use GLOB_RECURSE to find all CMakeLists.txt
-file(GLOB_RECURSE _tflite_cmakelists "${TFLITE_SRC_DIR}/tensorflow/lite/CMakeLists.txt")
+file(GLOB_RECURSE _tflite_cmakelists "${TFLITE_SRC_DIR}/CMakeLists.txt")
 
 foreach(_list IN LISTS _tflite_cmakelists)
     file(READ "${_list}" CONTENT)
