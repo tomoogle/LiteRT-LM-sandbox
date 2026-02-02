@@ -2,7 +2,7 @@
 
 message(STATUS "[LITERTLM] Starting surgical orchestration...")
 
-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # 1. Version Constraints & Converter Patches
 # ------------------------------------------------------------------------------
 set(CONFIG_GEN_H "${TFLITE_SRC_DIR}/tensorflow/lite/acceleration/configuration/configuration_generated.h")
