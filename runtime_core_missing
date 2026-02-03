@@ -1,0 +1,14 @@
+--------------------------------------------------
+AUDIT RESULTS for: ./runtime/core
+--------------------------------------------------
+🔴 ERROR: The following .cc files exist on disk but are MISSING from CMakeLists.txt:
+  - engine_legacy_impl.cc
+  - session_advanced.cc
+  - session_advanced_test.cc
+  - session_utils.cc
+  - session_utils_test.cc
+  - tasks.cc
+  - tasks_test.cc
+
+These files are likely the cause of 'undefined reference' errors.
+--------------------------------------------------

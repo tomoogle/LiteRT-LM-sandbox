@@ -1,0 +1,21 @@
+macro(generate_X_aggregate)
+    # 1. The Muscle (Aggregate)
+    add_library(LiteRTLM::X::aggregate INTERFACE IMPORTED GLOBAL)
+    set_target_properties(LiteRTLM::X::aggregate PROPERTIES
+        INTERFACE_LINK_LIBRARIES "-Wl,--start-group -Wl,--whole-archive ${_X_lib_paths} -Wl,--no-whole-archive -Wl,--end-group"
+        INTERFACE_INCLUDE_DIRECTORIES "${X_INCLUDE_DIR}"
+    )
+
+    # 2. The Brain (Shim)
+    add_library(LiteRTLM::X::shim INTERFACE IMPORTED GLOBAL)
+    set_target_properties(LiteRTLM::X::shim PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${X_INCLUDE_DIR}"
+    )
+
+    # 3. The Facade (Aliases) - Point these to the BRAIN
+    foreach(_name IN LISTS _X_names)
+        if(NOT TARGET ${_name})
+            add_library(${_name} ALIAS LiteRTLM::X::shim)
+        endif()
+    endforeach()
+endmacro()

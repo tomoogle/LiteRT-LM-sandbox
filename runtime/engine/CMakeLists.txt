@@ -1,54 +1,77 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_litert_library(runtime_engine_engine_interface INTERFACE)
+# ==============================================================================
+# 1. Engine Interface
+#    Bazel: cc_library(name = "engine_interface" ...)
+# ==============================================================================
+add_litertlm_library(runtime_engine_engine_interface INTERFACE)
+add_library(LiteRTLM::Runtime::Engine::Interface ALIAS runtime_engine_engine_interface)
+
 target_include_directories(runtime_engine_engine_interface
   INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-add_litert_library(runtime_engine_engine_settings STATIC
+target_link_libraries(runtime_engine_engine_interface
+  INTERFACE
+    LiteRTLM::Runtime::Engine::Settings
+    LiteRTLM::Runtime::Engine::IoTypes
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
+    LITERTLM_DEPS
+)
+
+# ==============================================================================
+# 2. Engine Settings
+#    Bazel: cc_library(name = "engine_settings" ...)
+# ==============================================================================
+add_litertlm_library(runtime_engine_engine_settings STATIC
   engine_settings.cc
 )
+add_library(LiteRTLM::Runtime::Engine::Settings ALIAS runtime_engine_engine_settings)
+
 target_include_directories(runtime_engine_engine_settings 
   PRIVATE
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
-  )
+)
+
 target_link_libraries(runtime_engine_engine_settings
   PUBLIC
+    LiteRTLM::Runtime::Components::Tokenizer::Interface
     runtime_executor_audio_executor_settings
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor_settings
+    runtime_executor_vision_executor_settings
     runtime_util_litert_status_util
     runtime_util_model_type_utils
-    runtime_components_tokenizer
-  PRIVATE
-    litert_libs
-    LITERTLM_DEPS
-    proto_lib
+  
+    LITERTLM_DEPS 
 )
 
-# add_litert_executable(runtime_engine_engine_settings_test
-#   engine_settings_test.cc
-# )
-# target_link_libraries(runtime_engine_engine_settings_test PRIVATE
-#   runtime_engine_engine_settings
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   runtime_components_tokenizer
-#   runtime_executor_executor_settings_base
-#   runtime_proto_engine_cc_proto
-#   runtime_proto_llm_metadata_cc_proto
-#   runtime_proto_llm_model_type_cc_proto
-#   runtime_proto_token_cc_proto
-#   runtime_util_test_utils
-# )
-# add_test(NAME runtime_engine_engine_settings_test COMMAND runtime_engine_engine_settings_test)
-
-add_litert_library(runtime_engine_io_types STATIC
+# ==============================================================================
+# 3. IO Types
+#    Bazel: cc_library(name = "io_types" ...)
+# ==============================================================================
+add_litertlm_library(runtime_engine_io_types STATIC
   io_types.cc
 )
+add_library(LiteRTLM::Runtime::Engine::IoTypes ALIAS runtime_engine_io_types)
+
 target_include_directories(runtime_engine_io_types
   PRIVATE 
     ${CMAKE_BINARY_DIR}
@@ -56,159 +79,168 @@ target_include_directories(runtime_engine_io_types
     ${LITERTLM_INCLUDE_PATHS}
     ${THIRD_PARTY_DIR}
 )
+
 target_link_libraries(runtime_engine_io_types
   PUBLIC
-    runtime_components_constrained_decoding_constraint
+    LiteRTLM::Runtime::Components::ConstrainedDecoding::Constraint
     runtime_util_litert_status_util
-  PUBLIC
-    proto_lib
-    litert_libs
-    LITERTLM_DEPS
-  # litert_litert_cc_litert_api_with_dynamic_runtime
-  # litert_litert_cc_litert_macros
-  # litert_litert_cc_litert_tensor_buffer
+  
+    LITERTLM_DEPS 
 )
 
-# add_litert_executable(runtime_engine_io_types_test
-#   io_types_test.cc
-# )
-# target_link_libraries(runtime_engine_io_types_test PRIVATE
-#   runtime_engine_io_types
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   # litert_litert_cc_litert_environment
-#   # litert_litert_cc_litert_layout
-#   # litert_litert_cc_litert_model
-#   # litert_litert_cc_litert_tensor_buffer
-#   # litert_litert_cc_litert_tensor_buffer_types
-#   # litert_litert_test_matchers
-#   runtime_components_constrained_decoding_fake_constraint
-#   runtime_util_convert_tensor_buffer
-#   runtime_util_test_utils
-# )
-# add_test(NAME runtime_engine_io_types_test COMMAND runtime_engine_io_types_test)
-
-
-add_litert_executable(runtime_engine_litert_lm_advanced_main
-  litert_lm_advanced_main.cc
-)
-target_link_libraries(runtime_engine_litert_lm_advanced_main
-  PUBLIC
-    c_engine
-    runtime_engine_libs
-    runtime_components_libs
-    runtime_conversation_libs
-    runtime_executor_libs
-    runtime_util_libs
-    runtime_core_libs
-    runtime_core_tasks
-    runtime_engine_litert_lm_lib
-    runtime_engine_shared_flags
-    runtime_util_litert_status_util
-  PRIVATE
-    litert_libs
-    # absl::status
-    # absl::statusor
-    # absl::strings
-    # absl::log
-        
-    # # Link the specific LiteRT libraries that define the status/logging wrappers
-    # # litert_logging
-    LITERTLM_DEPS
-)
-
-
-add_litert_library(runtime_engine_litert_lm_lib STATIC
+# ==============================================================================
+# 4. Engine Lib (The Core Logic)
+#    Bazel: cc_library(name = "litert_lm_lib" ...)
+# ==============================================================================
+add_litertlm_library(runtime_engine_litert_lm_lib STATIC
   litert_lm_lib.cc
 )
+add_library(LiteRTLM::Runtime::Engine::Lib ALIAS runtime_engine_litert_lm_lib)
+
 target_include_directories(runtime_engine_litert_lm_lib
   PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LITERTLM_INCLUDE_PATHS}
+    ${THIRD_PARTY_DIR}/json/include
 )
+
 target_link_libraries(runtime_engine_litert_lm_lib
   PUBLIC
-    runtime_engine_libs
-    runtime_components_libs
-    runtime_conversation_libs
-    runtime_executor_libs
-    runtime_util_libs
-    runtime_core_libs
-    # runtime_engine_libs
-    # runtime_engine_engine_interface
-    # runtime_engine_engine_settings
-    # runtime_engine_io_types
-    # runtime_conversation_conversation
-    # runtime_conversation_io_types
-    # runtime_executor_executor_settings_base
-    # runtime_executor_llm_executor_settings
-    # runtime_util_litert_status_util
-    
-    # stb_stb_image
-    # litert_tflite_profiling_memory_info
-    # litert_tflite_profiling_memory_usage_monitor
-    # runtime_core_engine_impl
-  PRIVATE
-    litert_libs
-    # absl::status
-    # absl::statusor
-    # absl::strings
-    # absl::log
-    # # litert_logging
-    LITERTLM_DEPS
-
-)
-
-
-add_litert_executable(runtime_engine_litert_lm_main
-  litert_lm_main.cc
-)
-target_link_libraries(runtime_engine_litert_lm_main
-  PUBLIC
-    runtime_engine_libs
-    runtime_components_libs
-    runtime_conversation_libs
-    runtime_executor_libs
-    runtime_util_libs
-    runtime_core_libs
-    runtime_core_tasks
-    runtime_engine_engine_interface
-    runtime_engine_engine_settings
-    runtime_engine_io_types
-    runtime_conversation_conversation
-    runtime_conversation_io_types
-    runtime_core_engine_impl
+    # Internal Modules (Bazel deps)
+    LiteRTLM::Runtime::Conversation
+    LiteRTLM::Runtime::Conversation::IoTypes
+    LiteRTLM::Runtime::Core::EngineImpl
+    LiteRTLM::Runtime::Engine::Interface
+    LiteRTLM::Runtime::Engine::Settings
+    LiteRTLM::Runtime::Engine::IoTypes
     runtime_executor_executor_settings_base
     runtime_executor_llm_executor_settings
     runtime_util_litert_status_util
-    c_engine
-  PRIVATE
-    litert_libs
     LITERTLM_DEPS
 )
 
-
-add_litert_library(runtime_engine_shared_flags STATIC
+# ==============================================================================
+# 5. Shared Flags
+#    Bazel: cc_library(name = "shared_flags" ...)
+# ==============================================================================
+add_litertlm_library(runtime_engine_shared_flags STATIC
   shared_flags.cc
 )
+add_library(LiteRTLM::Runtime::Engine::SharedFlags ALIAS runtime_engine_shared_flags)
+
 target_include_directories(runtime_engine_shared_flags
   PUBLIC
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
+
 target_link_libraries(runtime_engine_shared_flags
-  PRIVATE
-    litert_libs
-    LITERTLM_DEPS
+  PUBLIC
+    
+    LITERTLM_DEPS 
 )
 
+# ==============================================================================
+# 6. Advanced Main Executable
+#    Bazel: cc_binary(name = "litert_lm_advanced_main" ...)
+# ==============================================================================
+
+# set(MEMORY_USAGE_MONITOR_SRC "${TFLITE_SRC_DIR}/profiling/memory_usage_monitor.cc")
+
+# set_source_files_properties(${MEMORY_USAGE_MONITOR_SRC} PROPERTIES GENERATED TRUE)
+
+# add_litertlm_executable(runtime_engine_litert_lm_advanced_main
+#   litert_lm_advanced_main.cc
+#   ${MEMORY_USAGE_MONITOR_SRC}
+# )
+
+# target_link_options(runtime_engine_litert_lm_advanced_main PRIVATE
+#   "LINKER:--export-dynamic-symbol=LiteRt*"
+# )
+# target_include_directories(runtime_engine_litert_lm_advanced_main PRIVATE
+#   ${LITERTLM_INCLUDE_PATHS}
+#   ${LITERT_INCLUDE_PATHS}
+#   ${TENSORFLOW_SOURCE_DIR}
+# )
+
+# target_link_libraries(runtime_engine_litert_lm_advanced_main
+#   PUBLIC
+#       LiteRTLM::Runtime::Engine::IoTypes
+#       LiteRTLM::Runtime::Engine::Lib
+#       LiteRTLM::Runtime::Engine::SharedFlags
+#       LiteRTLM::Schema::Core
+
+#       runtime_util_litert_status_util
+#       LITERTLM_DEPS
+# )
+
+# ==============================================================================
+# 7. Main Executable (The Target We Care About)
+#    Bazel: cc_binary(name = "litert_lm_main" ...)
+# ==============================================================================
+# add_litertlm_executable(litert_lm_main
+#   litert_lm_main.cc
+# )
+# # Apply specifically to the main binary
+# target_link_options(litert_lm_main PRIVATE ${LITERTLM_UNIFIED_LINK_SPEC})
+
+# # Ensure litert_lm_main waits for all local archives to be archived
+# # We use a dummy target to anchor the build order
+
+# target_link_options(litert_lm_main PRIVATE
+#   "LINKER:--export-dynamic-symbol=LiteRt*"
+# )
+
+# target_include_directories(litert_lm_main PRIVATE
+#   ${LITERTLM_INCLUDE_PATHS}
+#   ${LITERT_INCLUDE_PATHS}
+#   ${THIRD_PARTY_DIR}/json/include
+# )
+
+# target_link_libraries(litert_lm_main
+#   PUBLIC
+#     LiteRTLM::Runtime::Engine::Interface
+#     LiteRTLM::Runtime::Engine::Settings
+#     LiteRTLM::Runtime::Engine::IoTypes
+#     LiteRTLM::Runtime::Conversation
+#     LiteRTLM::Runtime::Conversation::IoTypes
+#     LiteRTLM::Runtime::Core::EngineImpl
+#     runtime_executor_executor_settings_base
+#     runtime_executor_llm_executor_settings
+#     runtime_util_litert_status_util
+#     LITERTLM_DEPS
+# )
+# add_litertlm_executable(litert_lm_main
+#     litert_lm_main.cc
+# )
+# target_link_options(litert_lm_main PRIVATE
+#   "LINKER:--export-dynamic-symbol=LiteRt*"
+# )
+
+# target_include_directories(litert_lm_main PRIVATE
+#     ${LITERTLM_INCLUDE_PATHS}
+#     ${LITERT_INCLUDE_PATHS}
+#     ${THIRD_PARTY_DIR}/json/include
+# )
 
 
+
+
+# # Android Specifics
+# if(ANDROID)
+#   target_link_libraries(litert_lm_main PRIVATE EGL GLESv3)
+# endif()
+
+# ==============================================================================
+# 8. Folder Facade
+# ==============================================================================
 add_library(runtime_engine_libs INTERFACE)
+add_library(LiteRTLM::Runtime::Engine ALIAS runtime_engine_libs)
+
 target_link_libraries(runtime_engine_libs INTERFACE
-  runtime_engine_engine_interface
-  runtime_engine_engine_settings
-  runtime_engine_io_types
-  runtime_engine_litert_lm_lib
-  runtime_engine_shared_flags
+  LiteRTLM::Runtime::Engine::Interface
+  LiteRTLM::Runtime::Engine::Settings
+  LiteRTLM::Runtime::Engine::IoTypes
+  LiteRTLM::Runtime::Engine::Lib
+  LiteRTLM::Runtime::Engine::SharedFlags
 )

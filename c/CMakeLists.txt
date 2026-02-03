@@ -1,51 +1,55 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-
-set(C_ENGINE_SRCS
+# ==============================================================================
+# 1. Engine Library
+#    Bazel: cc_library(name = "engine", ...)
+# ==============================================================================
+add_litertlm_library(c_engine STATIC
   "${GEN_C_DIR}/engine.cc"
   "${GEN_C_DIR}/litert_lm_logging.cc"
 )
-add_litert_static_library(c_engine ${C_ENGINE_SRCS})
-# add_library(c_engine STATIC
-#   ${C_ENGINE_SRCS}
-# )
+add_library(LiteRTLM::C::Engine ALIAS c_engine)
 
-target_include_directories(c_engine 
+target_include_directories(c_engine
   PRIVATE
-    ${CMAKE_BINARY_DIR}
-    ${GENERATED_SRC_DIR}
-    ${LITERT_INCLUDE_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-    ${THIRD_PARTY_DIR}/json/include
-    ${THIRD_PARTY_DIR}/minja/include
+    ${LITERTLM_INCLUDE_PATHS}        # Project Root & Generated Headers
+    ${LITERT_INCLUDE_PATHS}          # LiteRT External Headers
+    ${THIRD_PARTY_DIR}/json/include # @nlohmann_json//:json
 )
 
 target_link_libraries(c_engine
-  PRIVATE
-    litert_libs
+  PUBLIC
     LITERTLM_DEPS
-    proto_lib
+
+    LiteRTLM::Runtime::Conversation
+    LiteRTLM::Runtime::Conversation::IoTypes
+    LiteRTLM::Runtime::Core::EngineImpl
+    LiteRTLM::Runtime::Engine::Interface
+    LiteRTLM::Runtime::Engine::Settings
+    LiteRTLM::Runtime::Engine::IoTypes
+    LiteRTLM::Runtime::Executor::ExecutorSettingsBase
 )
 
+# ==============================================================================
+# 2. Folder Facade
+# ==============================================================================
+add_library(c_libs INTERFACE)
+add_library(LiteRTLM::C ALIAS c_libs)
 
-# _clean_path( c_engine_test_src
-#   engine_test.cc
-# )
-
-# add_executable(c_engine_test
-#   ${c_engine_test_src}
-# )
-
-# target_link_libraries(c_engine_test PRIVATE 
-#   c_engine 
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-# )
-
-# add_test(NAME c_engine_test COMMAND engine_test)
-
-
-add_library(litert_lm_c_libs INTERFACE)
-target_link_libraries(litert_lm_c_libs INTERFACE
-  c_engine
+target_link_libraries(c_libs INTERFACE
+  LiteRTLM::C::Engine
 )

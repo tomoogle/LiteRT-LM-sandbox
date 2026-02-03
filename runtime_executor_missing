@@ -1,0 +1,10 @@
+--------------------------------------------------
+AUDIT RESULTS for: ./runtime/executor
+--------------------------------------------------
+🔴 ERROR: The following .cc files exist on disk but are MISSING from CMakeLists.txt:
+  - llm_executor_settings_utils.cc
+  - llm_executor_settings_utils_test.cc
+  - llm_litert_compiled_model_executor_factory_test.cc
+
+These files are likely the cause of 'undefined reference' errors.
+--------------------------------------------------

@@ -1,2 +1,2 @@
 
-set(PKG_ROOT ${_project_root})
+set(PKG_ROOT ${PROJECT_ROOT})

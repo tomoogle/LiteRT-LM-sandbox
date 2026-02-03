@@ -1,40 +1,73 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_litert_library(runtime_framework_thread_options INTERFACE)
-target_include_directories(runtime_framework_thread_options INTERFACE ${PKG_ROOT}
-    ${LITERTLM_INCLUDE_PATHS})
+# ==============================================================================
+# 1. Thread Options
+#    Bazel: cc_library(name = "thread_options" ...)
+# ==============================================================================
+add_litertlm_library(runtime_framework_thread_options INTERFACE)
+add_library(LiteRTLM::Framework::ThreadOptions ALIAS runtime_framework_thread_options)
 
-add_litert_library(runtime_framework_threadpool STATIC
+target_include_directories(runtime_framework_thread_options 
+  INTERFACE 
+    ${PKG_ROOT}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+# ==============================================================================
+# 2. Thread Pool
+#    Bazel: cc_library(name = "threadpool" ...)
+# ==============================================================================
+
+set(THREADPOOL_SRCS
   threadpool.cc
   worker_thread.cc
-  worker_thread_std_thread.cc
-  worker_thread_pthread.cc
 )
-target_include_directories(runtime_framework_threadpool PUBLIC ${PKG_ROOT}
-    ${LITERTLM_INCLUDE_PATHS})
+
+if(WIN32 OR LITERTLM_USE_STD_THREAD)
+  list(APPEND THREADPOOL_SRCS worker_thread_std_thread.cc)
+else()
+  # Default for Linux/Android/macOS
+  list(APPEND THREADPOOL_SRCS worker_thread_pthread.cc)
+endif()
+
+add_litertlm_library(runtime_framework_threadpool STATIC
+  ${THREADPOOL_SRCS}
+)
+add_library(LiteRTLM::Framework::ThreadPool ALIAS runtime_framework_threadpool)
+
+target_include_directories(runtime_framework_threadpool 
+  PUBLIC 
+    ${PKG_ROOT}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
 target_link_libraries(runtime_framework_threadpool
   PUBLIC 
-  runtime_framework_thread_options
-  PRIVATE 
-  LITERTLM_DEPS
-  litert_libs
-  )
+    LiteRTLM::Framework::ThreadOptions 
+    LITERTLM_DEPS
+)
 
-# add_litert_executable(runtime_framework_threadpool_test
-#   threadpool_test.cc
-# )
-# target_link_libraries(runtime_framework_threadpool_test PRIVATE
-#   runtime_framework_thread_options
-#   runtime_framework_threadpool
-#   runtime_util_test_utils
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-# )
-# add_test(NAME runtime_framework_threadpool_test COMMAND threadpool_test)
-
-# Unsupported rule config_setting for //runtime/framework:litert_lm_std_thread
-
+# ==============================================================================
+# 3. Folder Facade
+# ==============================================================================
 add_library(runtime_framework_libs INTERFACE)
+add_library(LiteRTLM::Framework ALIAS runtime_framework_libs)
+
 target_link_libraries(runtime_framework_libs INTERFACE
-  runtime_framework_threadpool
+  LiteRTLM::Framework::ThreadOptions
+  LiteRTLM::Framework::ThreadPool
 )

@@ -1,165 +1,65 @@
+# Copyright 2026 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set(PKG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
+# ==============================================================================
+# 1. Header Schema (Consuming the pre-generated FlatBuffer)
+#    Bazel: flatbuffer_cc_library(name = "litertlm_header_schema", ...)
+# ==============================================================================
+add_litertlm_library(schema_core_litertlm_header_schema INTERFACE)
+add_library(LiteRTLM::Schema::Core::HeaderSchema ALIAS schema_core_litertlm_header_schema)
 
-add_litert_library(schema_core_litertlm_export STATIC
-  litertlm_export.cc
-)
-# add_dependencies(schema_core_litertlm_export generated_flatbuffer_headers)
-target_include_directories(schema_core_litertlm_export
-  PRIVATE 
-    ${GENERATED_SRC_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-
-target_link_libraries(schema_core_litertlm_export 
-  PRIVATE
-    LITERTLM_DEPS
-    litert_libs
-    # flatbuffers
-)
-
-# litertlm_header litertlm_header_schema litertlm_section litertlm_utils com_google_absl_absl_log_absl_log com_google_absl_absl_status_status com_google_absl_absl_status_statusor com_google_absl_absl_strings_strings com_google_absl_absl_strings_str_format flatbuffers_flatbuffers runtime_util_litert_status_util)
-
-
-add_litert_library(schema_core_litertlm_header INTERFACE)
-# add_dependencies(schema_core_litertlm_header generated_flatbuffer_headers)
-target_include_directories(schema_core_litertlm_header
-  INTERFACE
-    ${GENERATED_SRC_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-
-add_litert_library(schema_core_litertlm_header_schema INTERFACE)
-# add_dependencies(schema_core_litertlm_header_schema generated_flatbuffer_headers)
 target_include_directories(schema_core_litertlm_header_schema 
   INTERFACE
     ${GENERATED_SRC_DIR}
     ${LITERTLM_INCLUDE_PATHS}
 )
 
-# add_litert_executable(schema_core_litertlm_header_test
-#   litertlm_header_test.cc
-# )
-# target_link_libraries(schema_core_litertlm_header_test PRIVATE 
-#   ${LITERTLM_DEPS}
-#   schema_core_litertlm_header
-#   schema_core_litertlm_header_schema
-#   # gtest
-#   # flatbuffers
-# )
-# add_test(NAME schema_core_litertlm_header_test COMMAND litertlm_header_test)
-
-
-add_litert_library(schema_core_litertlm_print STATIC
-  litertlm_print.cc
-)
-target_include_directories(schema_core_litertlm_print
-  PRIVATE
-    ${GENERATED_SRC_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-
-target_link_libraries(schema_core_litertlm_print
-  PUBLIC
-    schema_core_litertlm_header_schema 
-    schema_core_litertlm_read 
-    schema_core_litertlm_utils 
-  PRIVATE 
+target_link_libraries(schema_core_litertlm_header_schema
+  INTERFACE
     LITERTLM_DEPS
-    litert_libs
 )
 
+# ==============================================================================
+# 2. Header
+#    Bazel: cc_library(name = "litertlm_header", ...)
+# ==============================================================================
+add_litertlm_library(schema_core_litertlm_header INTERFACE)
+add_library(LiteRTLM::Schema::Core::Header ALIAS schema_core_litertlm_header)
 
-# add_litert_executable(schema_core_litertlm_print_test
-#   litertlm_print_test.cc
-# )
-# target_link_libraries(schema_core_litertlm_print_test PRIVATE 
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   schema_core_litertlm_print
-#   runtime_proto_llm_metadata_cc_proto
-#   # gtest 
-#   # flatbuffers
-# )
-# add_test(NAME schema_core_litertlm_print_test COMMAND litertlm_print_test)
-
-
-add_litert_library(schema_core_litertlm_read STATIC
-  litertlm_read.cc
-)
-# add_dependencies(schema_core_litertlm_read generated_flatbuffer_headers)
-target_include_directories(schema_core_litertlm_read
-  PRIVATE
-    ${GENERATED_SRC_DIR}
-    ${LITERTLM_INCLUDE_PATHS}
-)
-target_link_libraries(schema_core_litertlm_read
-  PUBLIC
-    runtime_util_litert_status_util
-    runtime_util_memory_mapped_file
-    runtime_util_scoped_file
-    schema_core_litertlm_header
-    schema_core_litertlm_header_schema
-    schema_core_litertlm_utils
-  PRIVATE 
-    LITERTLM_DEPS
-    litert_libs
-    proto_lib
-
-)
-
-
-# add_litert_executable(schema_core_litertlm_read_test
-#   litertlm_read_test.cc
-# )
-# target_link_libraries(schema_core_litertlm_read_test PRIVATE
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   schema_core_litertlm_header_schema
-#   schema_core_litertlm_read
-#   runtime_proto_llm_metadata_cc_proto
-#   runtime_util_memory_mapped_file
-#   runtime_util_test_utils
-#   # litert
-#   # ${absl_libs}
-#   # gtest
-#   # sentencepiece
-#   # litert_tflite_framework
-#   # litert_tflite_framework_stable
-#   # litert_tflite_c_common
-#   # litert_tflite_kernels_builtin_ops
-# )
-# add_test(NAME schema_core_litertlm_read_test COMMAND litertlm_read_test)
-
-
-add_litert_library(schema_core_litertlm_section INTERFACE)
-# add_dependencies(schema_core_litertlm_section generated_flatbuffer_headers)
-target_include_directories(schema_core_litertlm_section 
+target_include_directories(schema_core_litertlm_header
   INTERFACE
     ${GENERATED_SRC_DIR}
-    ${LITERTLM_INCLUDE_PATHS})
+    ${LITERTLM_INCLUDE_PATHS}
+)
 
+target_link_libraries(schema_core_litertlm_header
+  INTERFACE
+    LiteRTLM::Schema::Core::HeaderSchema
+    LITERTLM_DEPS
+)
 
-# add_litert_executable(schema_core_litertlm_section_test
-#   litertlm_section_test.cc
-# )
-# target_link_libraries(schema_core_litertlm_section_test PRIVATE
-#   ${LITERTLM_DEPS}
-#   ${absl_libs}
-#   schema_core_litertlm_section
-#   runtime_proto_llm_metadata_cc_proto
-#   runtime_proto_token_cc_proto
-#   # gtest
-# )
-# add_test(NAME schema_core_litertlm_section_test COMMAND litertlm_section_test)
-
-
-add_litert_library(schema_core_litertlm_utils STATIC
+# ==============================================================================
+# 3. Utils
+#    Bazel: cc_library(name = "litertlm_utils", ...)
+# ==============================================================================
+add_litertlm_library(schema_core_litertlm_utils STATIC
   litertlm_utils.cc
 )
-# add_dependencies(schema_core_litertlm_utils generated_flatbuffer_headers)
+add_library(LiteRTLM::Schema::Core::Utils ALIAS schema_core_litertlm_utils)
+
 target_include_directories(schema_core_litertlm_utils 
   PRIVATE
     ${GENERATED_SRC_DIR}
@@ -168,22 +68,119 @@ target_include_directories(schema_core_litertlm_utils
 
 target_link_libraries(schema_core_litertlm_utils 
   PUBLIC
-    schema_core_litertlm_header
-    schema_core_litertlm_header_schema
-  PRIVATE
+    LiteRTLM::Schema::Core::Header
+    LiteRTLM::Schema::Core::HeaderSchema
     LITERTLM_DEPS
-    litert_libs
-  #  flatbuffers
 )
 
+# ==============================================================================
+# 4. Read
+#    Bazel: cc_library(name = "litertlm_read", ...)
+# ==============================================================================
+add_litertlm_library(schema_core_litertlm_read STATIC
+  tf_proxy.cc
+  litertlm_read.cc
+)
+add_library(LiteRTLM::Schema::Core::Read ALIAS schema_core_litertlm_read)
 
+target_include_directories(schema_core_litertlm_read
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${TENSORFLOW_SOURCE_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(schema_core_litertlm_read
+  PUBLIC
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
+    LiteRTLM::Runtime::Util::MemoryMappedFile
+    LiteRTLM::Runtime::Util::ScopedFile
+    LiteRTLM::Schema::Core::Header
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Schema::Core::Utils
+    LITERTLM_DEPS
+)
+
+# ==============================================================================
+# 5. Section
+#    Bazel: cc_library(name = "litertlm_section", ...)
+# ==============================================================================
+add_litertlm_library(schema_core_litertlm_section INTERFACE)
+add_library(LiteRTLM::Schema::Core::Section ALIAS schema_core_litertlm_section)
+
+target_include_directories(schema_core_litertlm_section 
+  INTERFACE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(schema_core_litertlm_section
+  INTERFACE
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Runtime::Util::LiteRtStatusUtil
+    zlib_lib
+    LITERTLM_DEPS
+)
+
+# ==============================================================================
+# 6. Export
+#    Bazel: cc_library(name = "litertlm_export", ...)
+# ==============================================================================
+add_litertlm_library(schema_core_litertlm_export STATIC
+  litertlm_export.cc
+)
+add_library(LiteRTLM::Schema::Core::Export ALIAS schema_core_litertlm_export)
+
+target_include_directories(schema_core_litertlm_export
+  PRIVATE 
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(schema_core_litertlm_export 
+  PUBLIC
+    LiteRTLM::Schema::Core::Header
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Schema::Core::Section
+    LiteRTLM::Schema::Core::Utils
+    LITERTLM_DEPS
+)
+
+# ==============================================================================
+# 7. Print
+#    Bazel: cc_library(name = "litertlm_print", ...)
+# ==============================================================================
+add_litertlm_library(schema_core_litertlm_print STATIC
+  litertlm_print.cc
+)
+add_library(LiteRTLM::Schema::Core::Print ALIAS schema_core_litertlm_print)
+
+target_include_directories(schema_core_litertlm_print
+  PRIVATE
+    ${GENERATED_SRC_DIR}
+    ${LITERTLM_INCLUDE_PATHS}
+)
+
+target_link_libraries(schema_core_litertlm_print
+  PUBLIC
+    LiteRTLM::Schema::Core::HeaderSchema
+    LiteRTLM::Schema::Core::Read   
+    LiteRTLM::Schema::Core::Utils  
+    LITERTLM_DEPS
+)
+
+# ==============================================================================
+# 8. Folder Facade
+# ==============================================================================
 add_library(schema_core_libs INTERFACE)
+add_library(LiteRTLM::Schema::Core ALIAS schema_core_libs)
+
 target_link_libraries(schema_core_libs INTERFACE
-  schema_core_litertlm_export
-  schema_core_litertlm_header
-  schema_core_litertlm_header_schema
-  schema_core_litertlm_print
-  schema_core_litertlm_read
-  schema_core_litertlm_section
-  schema_core_litertlm_utils
+  LiteRTLM::Schema::Core::Export
+  LiteRTLM::Schema::Core::Header
+  LiteRTLM::Schema::Core::HeaderSchema
+  LiteRTLM::Schema::Core::Print
+  LiteRTLM::Schema::Core::Read
+  LiteRTLM::Schema::Core::Section
+  LiteRTLM::Schema::Core::Utils
 )
